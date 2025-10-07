@@ -1,0 +1,24 @@
+spring:
+  profiles:
+    active: prod
+
+  datasource:
+    url: jdbc:mysql://subway-worker-db.c7iwywymw7wj.ap-southeast-2.rds.amazonaws.com:3306/subway_db?serverTimezone=UTC&characterEncoding=UTF-8
+    username: sharon
+    password: ${rds.password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+
+server:
+  port: 8080
+
+redis:
+  host: REDACTED
+  port: 6379
+  username: papimo
+  password: ${redis.password}
+
