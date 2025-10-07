@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.domain;
+package com.game.subwayworkerserver.domain.friend;
 
 import com.game.subwayworkerserver.domain.skill.Skill;
 
