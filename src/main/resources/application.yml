@@ -2,15 +2,22 @@ server:
   port: 8080
 
 spring:
+  profiles:
+    active: local
   datasource:
     url: jdbc:mysql://localhost:3306/subway_game?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     driver-class-name: com.mysql.cj.jdbc.Driver
 
     username: root
-    password: REDACTED
+    password: ${LOCAL_DB_PASSWORD}
 
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
     database-platform: org.hibernate.dialect.MySQLDialect
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
