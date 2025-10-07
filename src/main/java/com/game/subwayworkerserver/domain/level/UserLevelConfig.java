@@ -1,27 +1,27 @@
 package com.game.subwayworkerserver.domain.level;
 
-import com.game.subwayworkerserver.domain.reward.UserLevelReward;
+import com.game.subwayworkerserver.domain.reward.UserLevelUpReward;
 import lombok.Getter;
 
 @Getter
 public enum UserLevelConfig {
 
-    LEVEL_RANGE_1_5(1, 5, 200, new UserLevelReward(10000, 1, 0)),
+    LEVEL_RANGE_1_5(1, 5, 200, new UserLevelUpReward(10000, 1, 0)),
 
-    LEVEL_RANGE_6_10(6, 10, 300, new UserLevelReward(30000, 2, 50)),
+    LEVEL_RANGE_6_10(6, 10, 300, new UserLevelUpReward(30000, 2, 50)),
 
-    LEVEL_RANGE_11_20(11, 20, 500, new UserLevelReward(50000, 3, 70)),
+    LEVEL_RANGE_11_20(11, 20, 500, new UserLevelUpReward(50000, 3, 70)),
 
-    LEVEL_RANGE_21_30(21, 30, 700, new UserLevelReward(100000, 5, 100)),
+    LEVEL_RANGE_21_30(21, 30, 700, new UserLevelUpReward(100000, 5, 100)),
 
-    LEVEL_RANGE_31_40(31, 40, 1000, new UserLevelReward(200000, 5, 300));
+    LEVEL_RANGE_31_40(31, 40, 1000, new UserLevelUpReward(200000, 5, 300));
 
     private final int minLevel;
     private final int maxLevel;
     private final int expMultiplier; // 해당 구간의 레벨당 경험치 증가 배수 (레벨 * ExpMultiplier)
-    private final UserLevelReward baseReward; // 기본 보상
+    private final UserLevelUpReward baseReward; // 기본 보상
 
-    UserLevelConfig(int minLevel, int maxLevel, int expMultiplier, UserLevelReward baseReward) {
+    UserLevelConfig(int minLevel, int maxLevel, int expMultiplier, UserLevelUpReward baseReward) {
         this.minLevel = minLevel;
         this.maxLevel = maxLevel;
         this.expMultiplier = expMultiplier;

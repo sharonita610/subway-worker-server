@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.domain.reward;
 
-public record UserLevelReward(
+public record UserLevelUpReward(
         long coin,
         int ticketCount,
         int cash
