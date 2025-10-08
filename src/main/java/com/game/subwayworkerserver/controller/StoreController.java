@@ -1,5 +1,7 @@
 package com.game.subwayworkerserver.controller;
 
+import com.game.subwayworkerserver.controller.request.PurchaseRequest;
+import com.game.subwayworkerserver.controller.response.RandomCaptureItemResponse;
 import com.game.subwayworkerserver.controller.response.StoreItemResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -8,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Store API", description = "상점 관련 API")
@@ -35,7 +38,7 @@ public class StoreController {
             }
     )
     @PostMapping("/buy/trap-item")
-    public ResponseEntity<?> buyTrapItem() {
+    public ResponseEntity<Void> buyTrapItem(@RequestBody PurchaseRequest request) {
         return ResponseEntity.ok().build();
     }
 
@@ -43,11 +46,12 @@ public class StoreController {
             summary = "포획도구 구매",
             description = "구매하고자 하는 포획도구 정보를 받아 저장",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "성공")
+                    @ApiResponse(responseCode = "200", description = "성공"),
+                    @ApiResponse(responseCode = "400", description = "코인이 부족합니다.")
             }
     )
     @PostMapping("/buy/capture-item")
-    public ResponseEntity<?> buyCaptureItem() {
+    public ResponseEntity<Void> buyCaptureItem(@RequestBody PurchaseRequest request) {
         return ResponseEntity.ok().build();
     }
 
@@ -59,7 +63,7 @@ public class StoreController {
             }
     )
     @PostMapping("/buy/random-capture-item")
-    public ResponseEntity<?> buyRandomCaptureItem() {
+    public ResponseEntity<RandomCaptureItemResponse> buyRandomCaptureItem() {
         return ResponseEntity.ok().build();
     }
 
@@ -71,7 +75,7 @@ public class StoreController {
             }
     )
     @PostMapping("/buy/coin")
-    public ResponseEntity<?> buyCoin() {
+    public ResponseEntity<Void> buyCoin(@RequestBody PurchaseRequest request) {
         return ResponseEntity.ok().build();
     }
 
@@ -79,11 +83,12 @@ public class StoreController {
             summary = "티켓 구매",
             description = "가챠 티켓을 구매한다",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "성공")
+                    @ApiResponse(responseCode = "200", description = "성공"),
+                    @ApiResponse(responseCode = "400", description = "코인이 부족합니다.")
             }
     )
     @PostMapping("/buy/ticket")
-    public ResponseEntity<?> buyTicket() {
+    public ResponseEntity<Void> buyTicket(@RequestBody PurchaseRequest request) {
         return ResponseEntity.ok().build();
     }
 
