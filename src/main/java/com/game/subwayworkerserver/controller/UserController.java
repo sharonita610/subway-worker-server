@@ -1,6 +1,8 @@
 package com.game.subwayworkerserver.controller;
 
+import com.game.subwayworkerserver.controller.request.CaptureItemListResponse;
 import com.game.subwayworkerserver.controller.request.UserCreateRequest;
+import com.game.subwayworkerserver.controller.response.TrapItemListResponse;
 import com.game.subwayworkerserver.controller.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -52,6 +54,34 @@ public class UserController {
     )
     @GetMapping("/user")
     public ResponseEntity<UserResponse> getUserInfo(
+            @RequestHeader("X-User-ID") String userId
+    ) {
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "포획도구리스트 조회",
+            description = "유저 uuid 로 사용 가능한 포획도구 리스트 조회",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "포획도구 리스트")
+            }
+    )
+    @GetMapping("/user/capture-item-list")
+    public ResponseEntity<CaptureItemListResponse> getCaptureListByUser(
+            @RequestHeader("X-User-ID") String userId
+    ) {
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "트랩 도구리스트 조회",
+            description = "유저 uuid 로 사용 가능한 트랩 리스트 조회",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "트랩 리스트")
+            }
+    )
+    @GetMapping("/user/trap-item-list")
+    public ResponseEntity<TrapItemListResponse> getTrapListByUser(
             @RequestHeader("X-User-ID") String userId
     ) {
         return ResponseEntity.ok().build();
