@@ -5,7 +5,7 @@ import com.game.subwayworkerserver.domain.reward.BaseReward;
 public record CaptureResponse(
         boolean success,
         BaseReward reward,
-        int extraExp,
+        int extraExpReward,
         CapturedFriendInfo capturedFriendInfo
 ) {
 }
