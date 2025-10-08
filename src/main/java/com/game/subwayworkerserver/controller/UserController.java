@@ -2,6 +2,8 @@ package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.controller.request.CaptureItemListResponse;
 import com.game.subwayworkerserver.controller.request.UserCreateRequest;
+import com.game.subwayworkerserver.controller.response.FriendListResponse;
+import com.game.subwayworkerserver.controller.response.SkillListResponse;
 import com.game.subwayworkerserver.controller.response.TrapItemListResponse;
 import com.game.subwayworkerserver.controller.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -87,5 +89,27 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+            summary = "동료 리스트 조회",
+            description = "동료 리스트를 조회",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "동료 리스트")
+            }
+    )
+    @GetMapping("/user/friends")
+    public ResponseEntity<FriendListResponse> getFriendListByUser( ) {
+        return ResponseEntity.ok().build();
+    }
 
+    @Operation(
+            summary = "스킬 리스트 조회",
+            description = "스킬 리스트 조회",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "트랩 리스트")
+            }
+    )
+    @GetMapping("/user/skills")
+    public ResponseEntity<SkillListResponse> getSkillListByUser( ) {
+        return ResponseEntity.ok().build();
+    }
 }
