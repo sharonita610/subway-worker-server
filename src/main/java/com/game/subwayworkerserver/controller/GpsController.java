@@ -56,17 +56,23 @@ public class GpsController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+            summary = "좌표에 있는 랜덤 박스 조회",
+            description = "gps의 좌표에 있는 랜덤 박스를 조회하여 랜덤 선물을 받는다."
+    )
     @PostMapping("/gps/random-gift")
     public ResponseEntity<GpsRandomGiftResponse> getRandomGift(@RequestBody GpsRandomGiftRequest request){
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+            summary = "좌표에 덫을 깔아놓는다.",
+            description = "랜덤으로 생성되는 동료를 잡기위한 덫을 설정한다."
+    )
     @PostMapping("/gps/trap")
     public ResponseEntity<Void> addTrap(@RequestBody GpsAddTrapRequest request){
         return ResponseEntity.ok().build();
     }
-
-
 
     @Operation(
             summary = "좌표로 포획 가능한 동료의 정보를 조회",
