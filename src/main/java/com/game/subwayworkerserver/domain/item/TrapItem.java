@@ -1,5 +1,11 @@
 package com.game.subwayworkerserver.domain.item;
 
-public record TrapItem(int id, String name, int level) {
+public record TrapItem(
+        String name,
+        String description,
+        int level,
+        int price,
+        int quantity
+) {
 
 }

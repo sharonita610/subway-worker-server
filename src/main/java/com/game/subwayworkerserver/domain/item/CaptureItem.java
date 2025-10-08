@@ -1,4 +1,10 @@
 package com.game.subwayworkerserver.domain.item;
 
-public record CaptureItem(int id, String name, int level) {
+public record CaptureItem(
+        String name,
+        String description,
+        int level,
+        int price,
+        int quantity
+) {
 }
