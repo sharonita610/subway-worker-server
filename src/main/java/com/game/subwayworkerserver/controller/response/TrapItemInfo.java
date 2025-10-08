@@ -1,4 +1,7 @@
 package com.game.subwayworkerserver.controller.response;
 
-public enum TrapItemInfo {
+public record TrapItemInfo(
+        String name,
+        int quantity
+) {
 }
