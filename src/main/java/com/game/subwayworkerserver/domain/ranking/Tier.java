@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.domain;
+package com.game.subwayworkerserver.domain.ranking;
 
 import lombok.Getter;
 

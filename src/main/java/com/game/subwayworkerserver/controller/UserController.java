@@ -1,7 +1,10 @@
 package com.game.subwayworkerserver.controller;
 
-import com.game.subwayworkerserver.controller.request.GpsRequest;
+import com.game.subwayworkerserver.controller.request.CaptureItemListResponse;
 import com.game.subwayworkerserver.controller.request.UserCreateRequest;
+import com.game.subwayworkerserver.controller.response.FriendListResponse;
+import com.game.subwayworkerserver.controller.response.SkillListResponse;
+import com.game.subwayworkerserver.controller.response.TrapItemListResponse;
 import com.game.subwayworkerserver.controller.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,6 +19,18 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 public class UserController {
+
+    @Operation(
+            summary = "사용자 이름 중복 체크",
+            description = "유저이름 중복 체크",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "boolean")
+            }
+    )
+    @PostMapping("/verify")
+    public ResponseEntity<Boolean> verifyUser(@RequestParam("name") String name) {
+        return ResponseEntity.ok().build();
+    }
 
     @Operation(
             summary = "최초 사용자 등록",
@@ -47,40 +62,54 @@ public class UserController {
     }
 
     @Operation(
-            summary = "요청받은 좌표기준 기준 랜덤 생성된 아이템 리스트 조회",
-            description = "유저의 좌표 기준 5km 반경에 깔린 아이템의 리스트를 조회",
+            summary = "포획도구리스트 조회",
+            description = "유저 uuid 로 사용 가능한 포획도구 리스트 조회",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "좌표와 아이템을 리스트 조회")
+                    @ApiResponse(responseCode = "200", description = "포획도구 리스트")
             }
     )
-    @PostMapping("/gps-info")
-    public ResponseEntity<?> getGpsInfo(@RequestBody GpsRequest request){
-        /**
-         * // 1. 사용자 위치(Point) 및 검색 반경(Circle) 설정
-         *         Point userLocation = new Point(request.longitude(), request.latitude());
-         *         Distance distance = new Distance(request.rangeKm(), RedisGeoCommands.DistanceUnit.KILOMETERS);
-         *         Circle searchArea = new Circle(userLocation, distance);
-         *
-         *         // 2. GEOSEARCH 옵션 설정: 거리와 좌표를 결과에 포함하도록 설정
-         *         RedisGeoCommands.GeoSearchCommandArgs args = RedisGeoCommands.GeoSearchCommandArgs.newGeoSearchArgs()
-         *                 .includeDistance() // 검색 결과에 거리를 포함
-         *                 .sort(RedisGeoCommands.GeoSearchSort.BY_DISTANCE); // 거리 순으로 정렬
-         *
-         *         // 3. Redis GEOSEARCH 실행
-         *         // key: item:locations, area: user's 5km circle, args: options
-         *         GeoResults<RedisGeoCommands.GeoLocation<String>> results = redisTemplate.opsForGeo()
-         *                 .search(ITEM_KEY, searchArea, args);
-         *
-         *         // 4. 결과 매핑 및 반환
-         *         List<ItemLocation> itemList = results.getContent().stream()
-         *                 .map(result -> new ItemLocation(
-         *                         result.getContent().getName(),
-         *                         result.getDistance().getValue() // 거리 값 (Km 단위)
-         *                 ))
-         *                 .toList();
-         *
-         *         return ResponseEntity.ok(itemList);
-         */
+    @GetMapping("/user/capture-item-list")
+    public ResponseEntity<CaptureItemListResponse> getCaptureListByUser(
+            @RequestHeader("X-User-ID") String userId
+    ) {
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "트랩 도구리스트 조회",
+            description = "유저 uuid 로 사용 가능한 트랩 리스트 조회",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "트랩 리스트")
+            }
+    )
+    @GetMapping("/user/trap-item-list")
+    public ResponseEntity<TrapItemListResponse> getTrapListByUser(
+            @RequestHeader("X-User-ID") String userId
+    ) {
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "동료 리스트 조회",
+            description = "동료 리스트를 조회",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "동료 리스트")
+            }
+    )
+    @GetMapping("/user/friends")
+    public ResponseEntity<FriendListResponse> getFriendListByUser( ) {
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "스킬 리스트 조회",
+            description = "스킬 리스트 조회",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "트랩 리스트")
+            }
+    )
+    @GetMapping("/user/skills")
+    public ResponseEntity<SkillListResponse> getSkillListByUser( ) {
         return ResponseEntity.ok().build();
     }
 }

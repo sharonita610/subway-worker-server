@@ -2,6 +2,7 @@ package com.game.subwayworkerserver.domain;
 
 import com.game.subwayworkerserver.domain.friend.Friend;
 import com.game.subwayworkerserver.domain.level.UserLevel;
+import com.game.subwayworkerserver.domain.ranking.Ranking;
 
 import java.util.List;
 
@@ -11,7 +12,6 @@ public record User(
         int cash,
         int coin,
         UserLevel level,
-        Backpack backpack,
         Treasure treasure,
         Ranking ranking,
         List<Friend> friendList
