@@ -1,8 +1,8 @@
 package com.game.subwayworkerserver.controller;
 
-import com.game.subwayworkerserver.controller.request.GpsRandomGiftRequest;
-import com.game.subwayworkerserver.controller.request.GpsRequest;
-import com.game.subwayworkerserver.controller.request.GpsAddTrapRequest;
+import com.game.subwayworkerserver.controller.request.*;
+import com.game.subwayworkerserver.controller.response.CaptureAvailableFriendResponse;
+import com.game.subwayworkerserver.controller.response.CaptureResponse;
 import com.game.subwayworkerserver.controller.response.GpsRandomGiftResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -65,4 +65,32 @@ public class GpsController {
     public ResponseEntity<Void> addTrap(@RequestBody GpsAddTrapRequest request){
         return ResponseEntity.ok().build();
     }
+
+
+
+    @Operation(
+            summary = "좌표로 포획 가능한 동료의 정보를 조회",
+            description = "gps의 좌표를 통해 현재 포획 가능한 동료의 정보를 조회하는 기능",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "포획 가능한 동료의 기본 정보를 조회")
+            }
+    )
+    @PostMapping("/gps/capture-available-friend")
+    public ResponseEntity<CaptureAvailableFriendResponse> getCaptureAvailableFriend(@RequestBody CaptureAvailableFriendRequest request) {
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "동료 포획 요청",
+            description = "포획도구로 동료를 포획 시도한다, 포획 도구에 따른 확률로 성공 유무를 가린다." +
+                    "포획 성공 시 gps 에서 해당 동료는 없어져야 한다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "포획 결과에 따른 보상")
+            }
+    )
+    @PostMapping("/gps/capture")
+    public ResponseEntity<CaptureResponse> captureFriend(@RequestBody CaptureFriendRequest request) {
+        return ResponseEntity.ok().build();
+    }
+
 }
