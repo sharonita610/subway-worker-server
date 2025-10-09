@@ -20,6 +20,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // <- 이 부분이 필수입니다!
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/v3/api-docs/**",
