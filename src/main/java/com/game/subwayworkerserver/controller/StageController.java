@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,5 +38,10 @@ public class StageController {
             return ResponseEntity.ok(new MonsterResponse(stageMonsters));
         }
         return ResponseEntity.badRequest().build();
+    }
+
+    @PostMapping("/stage/record")
+    public ResponseEntity<?> recordStage(){
+        return ResponseEntity.ok().build();
     }
 }
