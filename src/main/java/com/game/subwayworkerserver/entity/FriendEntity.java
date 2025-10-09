@@ -21,9 +21,6 @@ import static com.game.subwayworkerserver.util.SkillRandomizer.getRandomPassiveS
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FriendEntity extends BaseTimeEntity {
 
-    private static final Random RANDOM = new Random();
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -73,13 +70,13 @@ public class FriendEntity extends BaseTimeEntity {
         this.passiveSkill2 = passiveSkill2;
     }
 
-    public static FriendEntity of(final long id, final String name) {
+    public static FriendEntity of(final long id, final FriendAttribute name) {
         CharacterGenerator.CharacterStats stats = generateDefaultFriendStats();
         List<PassiveSkillCard> randomPassiveSkills = getRandomPassiveSkills(2);
         List<ActiveSkillCard> randomActiveSkills = getRandomActiveSkills(2);
 
         return FriendEntity.builder()
-                 .name(FriendAttribute.valueOf(name))
+                 .name(name)
                  .level(1)
                  .currentExp(0)
                  .userId(id)
