@@ -1,5 +1,7 @@
 package com.game.subwayworkerserver.domain.baseinfo;
 
+import java.util.List;
+
 /**
  * 캐릭터의 고유 이름 속성 (사용자가 선택하거나 부여받는 5가지 분류)
  */
@@ -28,5 +30,17 @@ public enum FriendAttribute {
             }
         }
         throw new IllegalArgumentException("Invalid FriendAttribute name: " + koreanName + ". Must be one of: 뭉실, 모카, 루니, 푸비, 요미");
+    }
+
+    public static List<String> getAllAttributesAsList() {
+
+        // 1. .values()로 배열을 얻습니다. (FriendAttribute[])
+        FriendAttribute[] attributeArray = FriendAttribute.values();
+
+        List<FriendAttribute> attributeArray1 = List.of(attributeArray);
+        return attributeArray1.stream().map(FriendAttribute::getKoreanName).toList();
+
+
+
     }
 }

@@ -1,5 +1,7 @@
 package com.game.subwayworkerserver.controller;
 
+import com.game.subwayworkerserver.controller.response.FriendAttributesResponse;
+import com.game.subwayworkerserver.service.FriendService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class FriendController {
 
+    private final FriendService friendService;
+
     @Operation(
             summary = "유저 생성시 사용할 동료 속성 리스트",
             description = "최초로 함께할 동료의 속성 정보를 조회",
@@ -21,7 +25,7 @@ public class FriendController {
             }
     )
     @GetMapping("/friend-attributes")
-    public ResponseEntity<?> getFriendAttributes() {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<FriendAttributesResponse> getFriendAttributes() {
+        return ResponseEntity.ok(friendService.getFriendAttributes());
     }
 }
