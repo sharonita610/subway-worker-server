@@ -1,12 +1,12 @@
 version: 0.2
 phases:
-  install:
-    commands:
-      # 💡 [필수] Java 17 Development Kit 설치: 이전에 실패했던 yum 대신 dnf를 사용 (Amazon Linux 2023 환경에 더 적합)
-      # yum 대신 dnf 명령을 사용하는 것이 더 성공 확률이 높습니다.
-      - echo Installing Java 17 Development Kit...
-      - sudo dnf install java-17-amazon-corretto-devel -y
-      - java -version
+  phases:
+    install:
+      commands:
+        - echo Installing Java 17 Development Kit using Amazon Linux Extras...
+        # 💡 [필수 수정] dnf 대신 amazon-linux-extras 명령으로 Corretto 17을 설치
+        - sudo amazon-linux-extras install java-openjdk17 -y
+        - java -version
 
   pre_build:
     commands:
