@@ -19,7 +19,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-resources/**"
                         ).permitAll()
-                        .requestMatchers("/user").permitAll()
+                        .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form.disable());
