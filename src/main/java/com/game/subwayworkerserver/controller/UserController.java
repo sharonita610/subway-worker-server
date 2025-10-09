@@ -6,6 +6,7 @@ import com.game.subwayworkerserver.controller.response.FriendListResponse;
 import com.game.subwayworkerserver.controller.response.SkillListResponse;
 import com.game.subwayworkerserver.controller.response.TrapItemListResponse;
 import com.game.subwayworkerserver.controller.response.UserResponse;
+import com.game.subwayworkerserver.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
 
+    private final UserService userService;
+
     @Operation(
             summary = "사용자 이름 중복 체크",
             description = "유저이름 중복 체크",
@@ -29,7 +32,7 @@ public class UserController {
     )
     @PostMapping("/verify")
     public ResponseEntity<Boolean> verifyUser(@RequestParam("name") String name) {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(userService.verifyUserName(name));
     }
 
     @Operation(
@@ -40,9 +43,8 @@ public class UserController {
             }
     )
     @PostMapping("/user")
-    public ResponseEntity<?> createUser(@RequestBody UserCreateRequest request) {
-
-        return ResponseEntity.ok().build();
+    public ResponseEntity<String> createUser(@RequestBody UserCreateRequest request) {
+        return ResponseEntity.ok(userService.createUser(request));
     }
 
     @Operation(
