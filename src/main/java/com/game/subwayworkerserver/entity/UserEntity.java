@@ -17,10 +17,23 @@ public class UserEntity extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
+    private String name;
+    private String uuid;
     private int level;
-    private int cash;
-    private int rubi;
-    private int ticketCount;
+    private int coin;
+    private int ticket;
     private int stage;
+
+    public UserEntity(String name, String uuid, int level, int coin, int ticket, int stage) {
+        this.name = name;
+        this.uuid = uuid;
+        this.level = level;
+        this.coin = coin;
+        this.ticket = ticket;
+        this.stage = stage;
+    }
+
+    public static UserEntity of(final String username, final String uuid) {
+    return new UserEntity(username, uuid, 1, 0, 0, 0);
+    }
 }
