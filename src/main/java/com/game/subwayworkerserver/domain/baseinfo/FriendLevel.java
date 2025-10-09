@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.domain.friend;
+package com.game.subwayworkerserver.domain.baseinfo;
 
 import lombok.Getter;
 
