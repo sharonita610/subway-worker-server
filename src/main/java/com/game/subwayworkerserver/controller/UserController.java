@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.controller;
 
+import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.CaptureItemListResponse;
 import com.game.subwayworkerserver.controller.request.UserCreateRequest;
 import com.game.subwayworkerserver.controller.response.FriendListResponse;
@@ -58,9 +59,10 @@ public class UserController {
     )
     @GetMapping("/user")
     public ResponseEntity<UserResponse> getUserInfo(
-            @RequestHeader("X-User-ID") String userId
     ) {
-        return ResponseEntity.ok().build();
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        System.out.println("uuid = " + uuid);
+        return ResponseEntity.ok(userService.getUserInfos(uuid));
     }
 
     @Operation(
@@ -71,9 +73,7 @@ public class UserController {
             }
     )
     @GetMapping("/user/capture-item-list")
-    public ResponseEntity<CaptureItemListResponse> getCaptureListByUser(
-            @RequestHeader("X-User-ID") String userId
-    ) {
+    public ResponseEntity<CaptureItemListResponse> getCaptureListByUser() {
         return ResponseEntity.ok().build();
     }
 

@@ -19,7 +19,11 @@ public class UserEntity extends BaseTimeEntity {
 
     private String name;
     private String uuid;
+
     private int level;
+    private int exp;
+    private int totalExp;
+
     private int coin;
     private int ticket;
     private int stage;
