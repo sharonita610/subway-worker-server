@@ -1,0 +1,27 @@
+version: 0.2
+phases:
+  install:
+    commands:
+      - echo Installing Java 17 Development Kit...
+      # Amazon Linux 환경에서 Corretto 17 설치
+      - sudo yum install java-17-amazon-corretto-devel -y
+      - java -version # 설치 확인
+
+  pre_build:
+    commands:
+      - echo Running pre-build tasks...
+
+  build:
+    commands:
+      - echo Build started on `date`
+      - chmod +x ./gradlew # gradlew 실행 권한 부여
+      # Spring Boot JAR 파일 빌드 (테스트 건너뛰기)
+      - ./gradlew clean build -x test
+
+artifacts:
+  files:
+    # CodeDeploy에 전달할 파일 목록
+    - build/libs/*.jar
+    - appspec.yml  # CodeDeploy 지시서
+    - scripts/** # 배포 스크립트 폴더 전체
+  discard-paths: no
