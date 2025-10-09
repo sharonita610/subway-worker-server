@@ -1,28 +1,24 @@
 version: 0.2
 phases:
-  phases:
-    install:
-      commands:
-        - echo Installing Java 17 Development Kit using Amazon Linux Extras...
-        # 💡 [필수 수정] dnf 대신 amazon-linux-extras 명령으로 Corretto 17을 설치
-        - sudo amazon-linux-extras install java-openjdk17 -y
-        - java -version
+  install:
+    commands:
+      - echo Installing Java 17 Development Kit...
+      # 💡 [필수 수정] CodeBuild 환경에 더 안정적인 yum 명령으로 복구
+      - sudo yum install java-17-amazon-corretto-devel -y
+      - java -version
 
   pre_build:
     commands:
-      - echo Cleaning up any Docker remnants and preparing for Gradle build.
+      - echo Preparing for Gradle build.
 
   build:
     commands:
       - echo Build started on `date`
-      # 💡 [필수] gradlew 파일에 실행 권한 부여
       - chmod +x ./gradlew
-      # 💡 [필수] Gradle 빌드 실행 (테스트 건너뛰기)
       - ./gradlew clean build -x test
 
 artifacts:
   files:
-    # CodeDeploy에 전달할 파일 목록
     - build/libs/*.jar
     - appspec.yml
     - scripts/**
