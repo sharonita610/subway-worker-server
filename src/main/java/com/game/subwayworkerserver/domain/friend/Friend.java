@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.domain.friend;
 
+import com.game.subwayworkerserver.domain.baseinfo.FriendLevel;
 import com.game.subwayworkerserver.domain.skill.Skill;
 
 public record Friend(

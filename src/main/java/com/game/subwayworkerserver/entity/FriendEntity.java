@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.entity;
 
 import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
-import com.game.subwayworkerserver.domain.baseinfo.FriendType;
+import com.game.subwayworkerserver.domain.baseinfo.FriendAttribute;
 import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import com.game.subwayworkerserver.util.CharacterGenerator;
 import jakarta.persistence.*;
@@ -27,7 +27,10 @@ public class FriendEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+
+    @Enumerated(EnumType.STRING)
+    private FriendAttribute name;
+
     private int level;
     private int currentExp;
     private long userId;
@@ -48,7 +51,7 @@ public class FriendEntity extends BaseTimeEntity {
     private int passiveSkill2;
 
     @Builder
-    public FriendEntity(String name, int level, int currentExp, long userId, long hp, long mana, long maxMana,
+    public FriendEntity(FriendAttribute name, int level, int currentExp, long userId, long hp, long mana, long maxMana,
                         long manaRecovery, long attack, long defense, boolean inUse, boolean onSale,
                         int activeSkill1, int activeSkill2, int passiveSkill1, int passiveSkill2
     ) {
@@ -76,7 +79,7 @@ public class FriendEntity extends BaseTimeEntity {
         List<ActiveSkillCard> randomActiveSkills = getRandomActiveSkills(2);
 
         return FriendEntity.builder()
-                 .name(name)
+                 .name(FriendAttribute.valueOf(name))
                  .level(1)
                  .currentExp(0)
                  .userId(id)
