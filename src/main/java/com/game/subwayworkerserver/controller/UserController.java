@@ -61,7 +61,6 @@ public class UserController {
     public ResponseEntity<UserResponse> getUserInfo(
     ) {
         String uuid = SecurityUtils.getCurrentUserUuid();
-        System.out.println("uuid = " + uuid);
         return ResponseEntity.ok(userService.getUserInfos(uuid));
     }
 
@@ -74,7 +73,8 @@ public class UserController {
     )
     @GetMapping("/user/capture-item-list")
     public ResponseEntity<CaptureItemListResponse> getCaptureListByUser() {
-        return ResponseEntity.ok().build();
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        return ResponseEntity.ok(userService.getCaptureItemList(uuid));
     }
 
     @Operation(
@@ -85,10 +85,9 @@ public class UserController {
             }
     )
     @GetMapping("/user/trap-item-list")
-    public ResponseEntity<TrapItemListResponse> getTrapListByUser(
-            @RequestHeader("X-User-ID") String userId
-    ) {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<TrapItemListResponse> getTrapListByUser() {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        return ResponseEntity.ok(userService.getTrapItemList(uuid));
     }
 
     @Operation(
@@ -100,6 +99,7 @@ public class UserController {
     )
     @GetMapping("/user/friends")
     public ResponseEntity<FriendListResponse> getFriendListByUser( ) {
+        String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok().build();
     }
 
@@ -112,6 +112,7 @@ public class UserController {
     )
     @GetMapping("/user/skills")
     public ResponseEntity<SkillListResponse> getSkillListByUser( ) {
+        String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok().build();
     }
 }
