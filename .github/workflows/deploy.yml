@@ -1,0 +1,88 @@
+name: CI/CD Pipeline for Subway Worker Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17' # 사용하시는 Java 버전에 맞게 수정
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test
+
+      - name: Find and save the built JAR file name
+        id: jar_file_name
+        run: |
+          JAR_FILE=$(ls build/libs/*.jar | grep -v 'plain' | tail -1)
+          echo "JAR_FILE=$JAR_FILE" >> $GITHUB_ENV
+
+      - name: Upload JAR as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: subway-worker-server-jar
+          path: ${{ env.JAR_FILE }}
+
+  # -------------------------------------------------------------------
+
+  deploy:
+    name: Deploy to EC2
+    needs: build
+    runs-on: ubuntu-latest
+
+    env:
+      RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+
+    steps:
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: subway-worker-server-jar
+
+      - name: Get JAR filename again
+        id: jar_file_name
+        run: |
+          JAR_FILE=$(ls *.jar | tail -1)
+          echo "JAR_FILE_ONLY=$JAR_FILE" >> $GITHUB_ENV
+
+      - name: Deploy using SCP and SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}             # EC2 퍼블릭 IP 또는 도메인
+          username: ${{ secrets.EC2_USER }}         # ec2-user
+          key: ${{ secrets.SSH_PRIVATE_KEY }}       # EC2 접속 키
+          port: 22
+          script: |
+            # 1. 이전 JAR 파일 삭제 및 새 JAR 파일 복사
+            # EC2 서버의 /home/ec2-user/subway-worker-server/build/libs 경로에 새 파일을 복사합니다.
+            sudo rm -f /home/ec2-user/subway-worker-server/build/libs/subway-worker-server-*.jar
+            
+            # 2. JAR 파일 전송 (artifacts를 직접 EC2로 전송합니다)
+            scp -i /dev/stdin ${{ env.JAR_FILE_ONLY }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ec2-user/subway-worker-server/build/libs/
+            
+            # 3. 서비스 환경 변수 설정 (Optional: systemctl service 파일에 설정되어 있다면 생략 가능)
+            export RDS_PASSWORD=${{ env.RDS_PASSWORD }}
+            export REDIS_PASSWORD=${{ env.REDIS_PASSWORD }}
+
+            # 4. 서비스 재시작
+            sudo systemctl daemon-reload
+            sudo systemctl restart subway-worker
+            
+            # 5. 재시작 확인 (선택 사항)
+            sleep 5
+            sudo systemctl status subway-worker
