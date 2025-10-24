@@ -89,9 +89,12 @@ jobs:
     name: Restart Service
     needs: deploy-upload
     runs-on: ubuntu-latest
-    env:
-      RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
-      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+
+    # 🌟 환경 변수 Secret 전달은 필요 없음 (EC2 서비스 파일에서 로드됨)
+    # env:
+    #   RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+    #   REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+
     steps:
       - name: Restart Service via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -100,18 +103,15 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          timeout: 30s # 연결 타임아웃 명시
-          # 🌟 연결 안정성 옵션 추가: 연결이 끊기는 현상 방지
+          timeout: 30s
           options: '-o StrictHostKeyChecking=no -o ServerAliveInterval=10 -o ServerAliveCountMax=3'
           script: |
-            # 1. 환경 변수 설정
-            export RDS_PASSWORD=${{ env.RDS_PASSWORD }}
-            export REDIS_PASSWORD=${{ env.REDIS_PASSWORD }}
+            # 🌟 스크립트 단순화: 환경 변수 export 및 파일 삭제 명령 제거
             
-            # 2. 서비스 재시작 (sudoers NOPASSWD 설정 필수)
+            # 1. 서비스 재시작 (EC2 service 파일의 설정대로 실행)
             sudo systemctl daemon-reload
             sudo systemctl restart subway-worker
             
-            # 3. 재시작 확인
+            # 2. 재시작 확인
             sleep 5
             sudo systemctl status subway-worker
