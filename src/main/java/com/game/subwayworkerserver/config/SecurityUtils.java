@@ -1,5 +1,7 @@
 package com.game.subwayworkerserver.config;
 
+import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -35,6 +37,6 @@ public class SecurityUtils {
         }
 
         // 예상치 못한 Principal 타입일 경우 예외 처리
-        throw new IllegalStateException("Principal 객체가 예상한 String (UUID) 타입이 아닙니다. 실제 타입: " + principal.getClass().getName());
+        throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "Principal 객체가 예상한 String (UUID) 타입이 아닙니다. 실제 타입: " + principal.getClass().getName());
     }
 }
