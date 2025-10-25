@@ -1,14 +1,10 @@
 package com.game.subwayworkerserver.service;
 
-import com.amazonaws.services.kms.model.NotFoundException;
 import com.game.subwayworkerserver.controller.request.CaptureItemListResponse;
 import com.game.subwayworkerserver.controller.request.UserCreateRequest;
 import com.game.subwayworkerserver.controller.response.*;
 import com.game.subwayworkerserver.domain.baseinfo.FriendAttribute;
-import com.game.subwayworkerserver.entity.FriendEntity;
-import com.game.subwayworkerserver.entity.ItemCategory;
-import com.game.subwayworkerserver.entity.UserEntity;
-import com.game.subwayworkerserver.entity.UserItemMapEntity;
+import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.FriendRepository;
@@ -47,7 +43,8 @@ public class UserService {
             throw new BaseException(ErrorCode.USERNAME_ALREADY_EXISTS);
         }
 
-        UserEntity userEntity = UserEntity.of(request.username(), UUID.randomUUID().toString());
+        Gender userGender = Gender.fromString(request.gender());
+        UserEntity userEntity = UserEntity.of(request.username(), UUID.randomUUID().toString(), userGender);
         UserEntity savedUser = userRepository.save(userEntity);
 
         FriendEntity friendEntity = FriendEntity.of(savedUser.getId(), friendAttribute);
@@ -110,5 +107,11 @@ public class UserService {
     public void deleteUser(final String uuid) {
         UserEntity user = findUserBy(uuid);
         userRepository.delete(user);
+    }
+
+    public FriendListResponse getFriendListByUser(String uuid) {
+        UserEntity user = findUserBy(uuid);
+        List<FriendEntity> byUserId = friendRepository.findByUserId(user.getId());
+        return new FriendListResponse(null);
     }
 }
