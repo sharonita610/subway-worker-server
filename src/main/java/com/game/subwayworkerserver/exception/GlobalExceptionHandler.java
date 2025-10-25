@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -72,4 +73,26 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    /**
+     * DataIntegrityViolationException (데이터 무결성 위반: Not Null, Unique 제약조건 위반 등) 처리
+     * Hibernate/JPA 레벨에서 발생하는 DB 제약 조건 위반 오류입니다.
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    protected ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
+            DataIntegrityViolationException e, WebRequest request) {
+
+        ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
+
+        String detailMessage = "데이터베이스 제약 조건(Not Null, Unique 등)을 위반했습니다. 입력 값을 확인해주세요.";
+        e.printStackTrace();
+
+        ErrorResponse response = ErrorResponse.builder()
+                .status(errorCode.getStatus().value())
+                .error(errorCode.getStatus().getReasonPhrase())
+                .message(detailMessage)
+                .path(((ServletWebRequest) request).getRequest().getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(response, errorCode.getStatus());    }
 }
