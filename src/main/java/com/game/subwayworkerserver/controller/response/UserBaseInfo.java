@@ -5,6 +5,7 @@ import com.game.subwayworkerserver.entity.UserEntity;
 public record UserBaseInfo(
         long id,
         String username,
+        String gender,
         int coin,
         int stageLevel,
         int ticketCount
@@ -14,6 +15,7 @@ public record UserBaseInfo(
         return new UserBaseInfo(
                 user.getId(),
                 user.getName(),
+                user.getGender().name().toLowerCase(),
                 user.getCoin(),
                 user.getStage(),
                 user.getTicket()

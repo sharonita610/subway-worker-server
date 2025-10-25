@@ -23,6 +23,10 @@ public class UserEntity extends BaseTimeEntity {
     @Column(unique = true, nullable = false)
     private String uuid;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Gender gender;
+
     @Column(nullable = false)
     private int exp;
 
@@ -41,7 +45,7 @@ public class UserEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private int stage;
 
-    public UserEntity(String name, String uuid, int exp, int level, int totalExp, int coin, int ticket, int stage) {
+    public UserEntity(String name, String uuid, int exp, int level, int totalExp, int coin, int ticket, int stage, Gender gender) {
         this.name = name;
         this.uuid = uuid;
         this.exp = exp;
@@ -50,9 +54,10 @@ public class UserEntity extends BaseTimeEntity {
         this.coin = coin;
         this.ticket = ticket;
         this.stage = stage;
+        this.gender = gender;
     }
 
-    public static UserEntity of(final String username, final String uuid) {
-        return new UserEntity(username, uuid, 0, 1, 0, 0, 0, 0);
+    public static UserEntity of(final String username, final String uuid, Gender gender) {
+        return new UserEntity(username, uuid, 0, 1, 0, 0, 0, 0, gender);
     }
 }
