@@ -101,8 +101,7 @@ public class UserController {
     @GetMapping("/user/friends")
     public ResponseEntity<FriendListResponse> getFriendListByUser( ) {
         String uuid = SecurityUtils.getCurrentUserUuid();
-        userService.getFriendListByUser(uuid);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(userService.getFriendListByUser(uuid));
     }
 
     @Operation(

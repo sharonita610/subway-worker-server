@@ -111,7 +111,7 @@ public class UserService {
 
     public FriendListResponse getFriendListByUser(String uuid) {
         UserEntity user = findUserBy(uuid);
-        List<FriendEntity> byUserId = friendRepository.findByUserId(user.getId());
-        return new FriendListResponse(null);
+        List<FriendEntity> friendEntityList = friendRepository.findByUserId(user.getId());
+        return FriendListResponse.of(friendEntityList);
     }
 }
