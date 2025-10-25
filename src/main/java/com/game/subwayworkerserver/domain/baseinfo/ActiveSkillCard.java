@@ -43,13 +43,10 @@ public enum ActiveSkillCard {
         this.type = type;
     }
 
-    /**
-     * ID를 사용하여 ActiveSkillCard Enum을 찾아 반환
-     */
-    public static ActiveSkillCard of(int id) {
+    public static String of(int id) {
         for (ActiveSkillCard card : values()) {
             if (card.id == id) {
-                return card;
+                return card.displayName;
             }
         }
         throw new BaseException(ErrorCode.NOT_VALID_ID, "유효하지 않은 Active Skill ID입니다: " + id);

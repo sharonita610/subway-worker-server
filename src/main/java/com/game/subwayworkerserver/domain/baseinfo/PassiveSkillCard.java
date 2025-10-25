@@ -1,6 +1,8 @@
 package com.game.subwayworkerserver.domain.baseinfo;
 
 import com.game.subwayworkerserver.domain.skill.SkillCardType;
+import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import lombok.Getter;
 
 @Getter
@@ -44,15 +46,12 @@ public enum PassiveSkillCard {
         this.type = type;
     }
 
-    /**
-     * ID를 사용하여 PassiveSkillCard Enum을 찾아 반환
-     */
-    public static PassiveSkillCard of(int id) {
+    public static String of(int id) {
         for (PassiveSkillCard card : values()) {
             if (card.id == id) {
-                return card;
+                return card.displayName;
             }
         }
-        throw new IllegalArgumentException("유효하지 않은 Passive Skill ID입니다: " + id);
+        throw new BaseException(ErrorCode.NOT_VALID_ID, "유효하지 않은 Passive Skill ID입니다: " + id);
     }
 }
