@@ -7,7 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface FriendRepository  extends JpaRepository<FriendEntity, Long> {
+public interface FriendRepository extends JpaRepository<FriendEntity, Long> {
 
-    List<FriendEntity> findByUserIdAndInUseTrue(Long userId);
+    List<FriendEntity> findByUserIdAndInUseTrue(final Long userId);
+
+    List<FriendEntity> findByUserId(final Long userId);
 }
