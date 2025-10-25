@@ -1,6 +1,8 @@
 package com.game.subwayworkerserver.domain.baseinfo;
 
 import com.game.subwayworkerserver.domain.skill.SkillCardType;
+import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import lombok.Getter;
 
 @Getter
@@ -50,6 +52,6 @@ public enum ActiveSkillCard {
                 return card;
             }
         }
-        throw new IllegalArgumentException("유효하지 않은 Active Skill ID입니다: " + id);
+        throw new BaseException(ErrorCode.NOT_VALID_ID, "유효하지 않은 Active Skill ID입니다: " + id);
     }
 }
