@@ -9,6 +9,8 @@ import com.game.subwayworkerserver.entity.FriendEntity;
 import com.game.subwayworkerserver.entity.ItemCategory;
 import com.game.subwayworkerserver.entity.UserEntity;
 import com.game.subwayworkerserver.entity.UserItemMapEntity;
+import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.FriendRepository;
 import com.game.subwayworkerserver.repository.UserItemMapRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
@@ -41,6 +43,10 @@ public class UserService {
     public String createUser(final UserCreateRequest request) {
         FriendAttribute friendAttribute = fromKoreanName(request.friendAttribute());
 
+        if (userRepository.existsByName(request.username())) {
+            throw new BaseException(ErrorCode.USERNAME_ALREADY_EXISTS);
+        }
+
         UserEntity userEntity = UserEntity.of(request.username(), UUID.randomUUID().toString());
         UserEntity savedUser = userRepository.save(userEntity);
 
@@ -51,11 +57,8 @@ public class UserService {
 
     public UserResponse getUserInfos(final String uuid) {
 
-        UserEntity user = userRepository.findByUuid(uuid).orElseThrow(() ->
-                new NotFoundException("User not found with uuid: " + uuid)
-        );
-        Long userId = user.getId();
-        List<FriendEntity> friendInUse = friendRepository.findByUserIdAndInUseTrue(userId);
+        UserEntity user = findUserBy(uuid);
+        List<FriendEntity> friendInUse = friendRepository.findByUserIdAndInUseTrue(user.getId());
 
         return new UserResponse(
                 UserBaseInfo.of(user),
@@ -66,9 +69,7 @@ public class UserService {
 
     public CaptureItemListResponse getCaptureItemList(final String uuid) {
 
-        UserEntity user = userRepository.findByUuid(uuid).orElseThrow(() ->
-                new NotFoundException("User not found with uuid: " + uuid)
-        );
+        UserEntity user = findUserBy(uuid);
 
         List<UserItemMapEntity> userItems = userItemMapRepository.findByUserId(user.getId());
 
@@ -83,12 +84,15 @@ public class UserService {
         return new CaptureItemListResponse(list);
     }
 
+    private UserEntity findUserBy(String uuid) {
+        return userRepository.findByUuid(uuid).orElseThrow(() ->
+                new BaseException(ErrorCode.USER_NOT_FOUND, "User not found with uuid: " + uuid)
+        );
+    }
+
     public TrapItemListResponse getTrapItemList(final String uuid) {
 
-        UserEntity user = userRepository.findByUuid(uuid).orElseThrow(() ->
-                new NotFoundException("User not found with uuid: " + uuid)
-        );
-
+        UserEntity user = findUserBy(uuid);
         List<UserItemMapEntity> userItems = userItemMapRepository.findByUserId(user.getId());
 
         List<TrapItemInfo> list = userItems.stream()
