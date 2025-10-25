@@ -103,6 +103,12 @@ public class UserService {
                                 item.getQuantity()
                         )).toList();
 
-        return  new TrapItemListResponse(list);
+        return new TrapItemListResponse(list);
+    }
+
+    @Transactional
+    public void deleteUser(final String uuid) {
+        UserEntity user = findUserBy(uuid);
+        userRepository.delete(user);
     }
 }

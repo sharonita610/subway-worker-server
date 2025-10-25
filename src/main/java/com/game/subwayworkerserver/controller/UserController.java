@@ -115,4 +115,18 @@ public class UserController {
         String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok().build();
     }
+
+    @Operation(
+            summary = "유저 삭제",
+            description = "유저 삭제 기능",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "유저 삭제 완료")
+            }
+    )
+    @DeleteMapping("/user")
+    public ResponseEntity<SkillListResponse> deleteUser( ) {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        userService.deleteUser(uuid);
+        return ResponseEntity.ok().build();
+    }
 }
