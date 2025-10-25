@@ -9,23 +9,23 @@ public enum ItemName {
 
     // --- 포획 도구 (Capture Item) ---
     // 하급: 2500 코인, 20%
-    PAPER_BOX("하급(종이박스)", "저렴한 포획 도구. 하루 3개 광고로 구매 가능.", ItemCategory.CAPTURE, 2500, 20),
+    PAPER_BOX("종이박스", "저렴한 포획 도구. 하루 3개 광고로 구매 가능.", ItemCategory.CAPTURE, 2500, 20),
 
     // 중급: 5000 코인, 50%
-    BRIEFCASE("중급(서류가방)", "균형 잡힌 포획 도구.", ItemCategory.CAPTURE, 5000, 50),
+    BRIEFCASE("서류가방", "균형 잡힌 포획 도구.", ItemCategory.CAPTURE, 5000, 50),
 
     // 상급: 재화 구매 불가, 90%
-    BUSINESS_CARRIER("상급(출장용캐리어)", "가장 강력한 포획 도구. 보물상자에서만 등장.", ItemCategory.CAPTURE, 0, 90), // 가격 0은 재화 구매 불가 의미
+    BUSINESS_CARRIER("출장용캐리어", "가장 강력한 포획 도구. 보물상자에서만 등장.", ItemCategory.CAPTURE, 0, 90), // 가격 0은 재화 구매 불가 의미
 
     // --- 트랩 도구 (Trap Item) ---
     // 하급: 4000 코인, 50%
-    WOOD_SHOVEL("하급(나무 삽)", "가장 기본적인 트랩 도구. 50% 확률로 몬스터 포획.", ItemCategory.TRAP, 4000, 50),
+    WOOD_SHOVEL("나무삽", "가장 기본적인 트랩 도구. 50% 확률로 몬스터 포획.", ItemCategory.TRAP, 4000, 50),
 
     // 중급: 8000 코인, 70%
-    SILVER_SHOVEL("중급(은 삽)", "강력한 트랩 도구. 70% 확률로 몬스터 포획.", ItemCategory.TRAP, 8000, 70),
+    SILVER_SHOVEL("은삽", "강력한 트랩 도구. 70% 확률로 몬스터 포획.", ItemCategory.TRAP, 8000, 70),
 
     // 상급: 재화 구매 불가, 100%
-    GOLD_SHOVEL("상급(금 삽)", "확정 포획이 가능한 트랩 도구. 보물상자에서만 등장.", ItemCategory.TRAP, 0, 100); // 가격 0은 재화 구매 불가 의미
+    GOLD_SHOVEL("금 삽", "확정 포획이 가능한 트랩 도구. 보물상자에서만 등장.", ItemCategory.TRAP, 0, 100); // 가격 0은 재화 구매 불가 의미
 
     private final String name;
     private final String description;
@@ -40,6 +40,4 @@ public enum ItemName {
         this.price = price;
         this.percentage = percentage;
     }
-
-    // Enum 상수를 문자열 이름으로 찾는 메서드 (필요시 추가)
 }
