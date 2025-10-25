@@ -17,11 +17,14 @@ public class UserItemMapEntity extends BaseTimeEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private Long userId;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ItemName itemName;
 
+    @Column(nullable = false)
     private int quantity;
 
 }
