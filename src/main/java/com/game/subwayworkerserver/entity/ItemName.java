@@ -25,7 +25,7 @@ public enum ItemName {
     SILVER_SHOVEL("은삽", "강력한 트랩 도구. 70% 확률로 몬스터 포획.", ItemCategory.TRAP, 8000, 70),
 
     // 상급: 재화 구매 불가, 100%
-    GOLD_SHOVEL("금 삽", "확정 포획이 가능한 트랩 도구. 보물상자에서만 등장.", ItemCategory.TRAP, 0, 100); // 가격 0은 재화 구매 불가 의미
+    GOLD_SHOVEL("금삽", "확정 포획이 가능한 트랩 도구. 보물상자에서만 등장.", ItemCategory.TRAP, 0, 100); // 가격 0은 재화 구매 불가 의미
 
     private final String name;
     private final String description;
@@ -39,5 +39,14 @@ public enum ItemName {
         this.category = category;
         this.price = price;
         this.percentage = percentage;
+    }
+
+    public static ItemName fromKoreanName(final String name) {
+        for (ItemName itemName : ItemName.values()) {
+            if (itemName.name.equalsIgnoreCase(name)) {
+                return itemName;
+            }
+        }
+        throw new IllegalArgumentException("Unknown ItemName for korean name: " + name);
     }
 }
