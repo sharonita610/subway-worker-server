@@ -40,24 +40,29 @@ public class UserEntity extends BaseTimeEntity {
     private int coin;
 
     @Column(nullable = false)
-    private int ticket;
+    private int vacationTicket;
+
+    @Column(nullable = false)
+    private int gotchaTicket;
 
     @Column(nullable = false)
     private int stage;
 
-    public UserEntity(String name, String uuid, int exp, int level, int totalExp, int coin, int ticket, int stage, Gender gender) {
+    public UserEntity(String name, String uuid, int exp, int level, int totalExp, int coin, int vacationTicket,
+                      int gotchaTicket, int stage, Gender gender) {
         this.name = name;
         this.uuid = uuid;
         this.exp = exp;
         this.level = level;
         this.totalExp = totalExp;
         this.coin = coin;
-        this.ticket = ticket;
+        this.vacationTicket = vacationTicket;
+        this.gotchaTicket = gotchaTicket;
         this.stage = stage;
         this.gender = gender;
     }
 
     public static UserEntity of(final String username, final String uuid, Gender gender) {
-        return new UserEntity(username, uuid, 0, 1, 0, 0, 0, 0, gender);
+        return new UserEntity(username, uuid, 0, 1, 0, 0, 0, 0, 0, gender);
     }
 }

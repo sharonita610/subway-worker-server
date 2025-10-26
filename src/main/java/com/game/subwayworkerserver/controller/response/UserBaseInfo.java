@@ -8,7 +8,8 @@ public record UserBaseInfo(
         String gender,
         int coin,
         int stageLevel,
-        int ticketCount
+        int vacationTicket,
+        int gotchaTicket
 
 ) {
     public static UserBaseInfo of(UserEntity user) {
@@ -18,7 +19,8 @@ public record UserBaseInfo(
                 user.getGender().name().toLowerCase(),
                 user.getCoin(),
                 user.getStage(),
-                user.getTicket()
+                user.getVacationTicket(),
+                user.getGotchaTicket()
         );
     }
 }
