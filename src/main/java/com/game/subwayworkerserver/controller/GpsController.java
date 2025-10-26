@@ -41,7 +41,7 @@ public class GpsController {
     )
     @PostMapping("/gps/random-gift")
     public ResponseEntity<GpsRandomGiftResponse> getRandomGift(@RequestBody GpsRandomGiftRequest request){
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(gpsService.getRandomGift(request));
     }
 
     @Operation(
