@@ -22,6 +22,7 @@ dependencyManagement {
     imports {
         // AWS SDK v2 최신 버전으로 관리
         mavenBom "software.amazon.awssdk:bom:2.26.16"
+        mavenBom "org.testcontainers:testcontainers-bom:1.19.8"
     }
 }
 
