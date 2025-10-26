@@ -43,7 +43,7 @@ public class GpsController {
             summary = "좌표에 있는 랜덤 박스 열기",
             description = "gps의 좌표에 있는 랜덤 박스를 조회하여 랜덤 선물을 받는다."
     )
-    @PostMapping("/gps/random-gift")
+    @PostMapping("/gps/open-random-gift")
     public ResponseEntity<GpsRandomGiftResponse> getRandomGift(@RequestBody GpsRandomGiftRequest request){
         String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok(giftBoxService.getRandomGift(request, uuid));
