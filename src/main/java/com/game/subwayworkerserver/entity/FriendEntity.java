@@ -28,23 +28,49 @@ public class FriendEntity extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private FriendAttribute name;
 
+    @Column(nullable = false)
     private int level;
+
+    @Column(nullable = false)
     private int currentExp;
+
+    @Column(nullable = false)
     private long userId;
 
+    @Column(nullable = false)
     private long hp;
+
+    @Column(nullable = false)
     private long mana;
+
+    @Column(nullable = false)
     private long maxMana;
+
+    @Column(nullable = false)
     private long manaRecovery;
+
+    @Column(nullable = false)
     private long attack;
+
+    @Column(nullable = false)
     private long defense;
 
+    @Column(nullable = false)
     private boolean inUse;
+
+    @Column(nullable = false)
     private boolean onSale;
 
+    @Column(nullable = false)
     private int activeSkill1;
+
+    @Column(nullable = false)
     private int activeSkill2;
+
+    @Column(nullable = false)
     private int passiveSkill1;
+
+    @Column(nullable = false)
     private int passiveSkill2;
 
     @Builder
