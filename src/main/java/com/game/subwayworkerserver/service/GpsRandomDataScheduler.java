@@ -74,7 +74,7 @@ public class GpsRandomDataScheduler {
         // 1. 기존 데이터 삭제 (Item_Locations_Key는 제외)
         redisTemplate.delete(FRIEND_LOCATIONS_KEY);
         redisTemplate.delete(RANDOM_GIFT_BOX_KEY);
-        log.info("    - 동료/선물상자 기존 데이터 삭제 완료.");
+        log.info("--- 동료/선물상자 기존 데이터 삭제 완료 ---");
 
         int totalCells = 0;
         int totalFriendsAndGifts = 0;
