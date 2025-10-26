@@ -20,11 +20,25 @@ public class UserItemMapEntity extends BaseTimeEntity{
     @Column(nullable = false)
     private Long userId;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     @Enumerated(EnumType.STRING)
     private ItemName itemName;
 
     @Column(nullable = false)
     private int quantity;
 
+
+    public UserItemMapEntity(Long userId, ItemName itemName, int quantity) {
+        this.userId = userId;
+        this.itemName = itemName;
+        this.quantity = quantity;
+    }
+
+    public static UserItemMapEntity of(final long userId, final ItemName itemName) {
+       return new UserItemMapEntity(userId, itemName, 1);
+    }
+
+    public void increaseQuantity() {
+        this.quantity += 1;
+    }
 }
