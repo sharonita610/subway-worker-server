@@ -65,4 +65,15 @@ public class UserEntity extends BaseTimeEntity {
     public static UserEntity of(final String username, final String uuid, Gender gender) {
         return new UserEntity(username, uuid, 0, 1, 0, 0, 0, 0, 0, gender);
     }
+
+    public void updateRewards(int totalCoins, int totalTickets, int totalExperience) {
+        this.coin += totalCoins;
+        this.vacationTicket += totalTickets;
+        this.exp += totalExperience;
+        this.totalExp += totalExperience;
+    }
+
+    public void increaseGotchaTicket() {
+        this.gotchaTicket++;
+    }
 }
