@@ -33,7 +33,7 @@ public class GpsController {
                     @ApiResponse(responseCode = "200", description = "좌표와 아이템을 리스트 조회")
             }
     )
-    @PostMapping("/gps/mobs")
+    @PostMapping("/gps/random-items")
     public ResponseEntity<RandomGpsResponse> getGpsInfo(@RequestBody @Valid GpsRequest request){
         String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok(gpsService.findItemsInArea(request, uuid));
