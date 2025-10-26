@@ -2,6 +2,7 @@ package com.game.subwayworkerserver.service;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.geo.Point;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GpsRandomDataScheduler {
@@ -45,10 +47,10 @@ public class GpsRandomDataScheduler {
      */
     @PostConstruct
     public void initialMapGeneration() {
-        System.out.println("--- [Initializer] 서버 시작, 초기 맵 생성 시작 ---");
+        log.info("--- [Initializer] 서버 시작, 초기 맵 생성 시작 ---");
         // Item 생성 포함하여 맵 초기화
         generateFullMapData(false);
-        System.out.println("--- [Initializer] 초기 맵 생성 완료 ---");
+        log.info("--- [Initializer] 초기 맵 생성 완료 ---");
     }
 
     /**
@@ -57,10 +59,10 @@ public class GpsRandomDataScheduler {
      */
     @Scheduled(fixedRate = 1800000)
     public void scheduledMapRegeneration() {
-        System.out.println("--- [Scheduler] 30분 주기 맵 재생성 시작 ---");
+        log.info("--- [Scheduler] 30분 주기 맵 재생성 시작 ---");
         // Item 생성/삭제를 건너뛰고, 동료와 선물상자만 재생성
         generateFullMapData(true);
-        System.out.println("--- [Scheduler] 30분 주기 맵 재생성 완료 ---");
+        log.info("--- [Scheduler] 30분 주기 맵 재생성 완료 ---");
     }
 
     /**
@@ -72,7 +74,7 @@ public class GpsRandomDataScheduler {
         // 1. 기존 데이터 삭제 (Item_Locations_Key는 제외)
         redisTemplate.delete(FRIEND_LOCATIONS_KEY);
         redisTemplate.delete(RANDOM_GIFT_BOX_KEY);
-        System.out.println("    - 동료/선물상자 기존 데이터 삭제 완료.");
+        log.info("    - 동료/선물상자 기존 데이터 삭제 완료.");
 
         int totalCells = 0;
         int totalFriendsAndGifts = 0;
