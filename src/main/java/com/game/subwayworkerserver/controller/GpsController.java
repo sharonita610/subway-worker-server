@@ -40,7 +40,7 @@ public class GpsController {
     }
 
     @Operation(
-            summary = "좌표에 있는 랜덤 박스 조회",
+            summary = "좌표에 있는 랜덤 박스 열기",
             description = "gps의 좌표에 있는 랜덤 박스를 조회하여 랜덤 선물을 받는다."
     )
     @PostMapping("/gps/random-gift")
