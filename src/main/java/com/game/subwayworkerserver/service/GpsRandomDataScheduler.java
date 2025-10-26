@@ -87,7 +87,7 @@ public class GpsRandomDataScheduler {
                 double cellCenterLon = lon + (LON_STEP / 2);
 
                 // 동료 생성 (1개)
-                createItemsInCell(cellCenterLat, cellCenterLon, FRIENDS_PER_CELL, FRIEND_LOCATIONS_KEY, "FRD");
+                createItemsInCell(cellCenterLat, cellCenterLon, FRIENDS_PER_CELL, FRIEND_LOCATIONS_KEY, "FRIEND");
 
                 // 선물 상자 생성 (2개)
                 createItemsInCell(cellCenterLat, cellCenterLon, GIFTS_PER_CELL, RANDOM_GIFT_BOX_KEY, "GIFT");
@@ -96,9 +96,9 @@ public class GpsRandomDataScheduler {
             }
         }
 
-        System.out.println(String.format("    - 신규 동료/선물상자 데이터 생성 완료. [총 셀 수: %d, 총 객체 수: %d]", totalCells, totalFriendsAndGifts));
+        log.info(String.format("    - 신규 동료/선물상자 데이터 생성 완료. [총 셀 수: %d, 총 객체 수: %d]", totalCells, totalFriendsAndGifts));
         if (!isScheduledExecution) {
-            System.out.println("    - 일반 아이템 (ITEM_LOCATIONS_KEY) 생성 완료.");
+            log.info("    - 일반 아이템 (ITEM_LOCATIONS_KEY) 생성 완료.");
         }
     }
 
