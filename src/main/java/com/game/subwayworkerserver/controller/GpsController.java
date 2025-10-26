@@ -1,10 +1,12 @@
 package com.game.subwayworkerserver.controller;
 
+import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.*;
 import com.game.subwayworkerserver.controller.response.CaptureAvailableFriendResponse;
 import com.game.subwayworkerserver.controller.response.CaptureResponse;
 import com.game.subwayworkerserver.controller.response.GpsRandomGiftResponse;
 import com.game.subwayworkerserver.controller.response.RandomGpsResponse;
+import com.game.subwayworkerserver.service.GiftBoxService;
 import com.game.subwayworkerserver.service.GpsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class GpsController {
 
     private final GpsService gpsService;
+    private final GiftBoxService giftBoxService;
 
     @Operation(
             summary = "요청받은 좌표기준 기준 랜덤 생성된 아이템 리스트 조회",
@@ -32,7 +35,8 @@ public class GpsController {
     )
     @PostMapping("/gps/mobs")
     public ResponseEntity<RandomGpsResponse> getGpsInfo(@RequestBody @Valid GpsRequest request){
-        return ResponseEntity.ok(gpsService.findItemsInArea(request));
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        return ResponseEntity.ok(gpsService.findItemsInArea(request, uuid));
     }
 
     @Operation(
@@ -41,7 +45,8 @@ public class GpsController {
     )
     @PostMapping("/gps/random-gift")
     public ResponseEntity<GpsRandomGiftResponse> getRandomGift(@RequestBody GpsRandomGiftRequest request){
-        return ResponseEntity.ok(gpsService.getRandomGift(request));
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        return ResponseEntity.ok(giftBoxService.getRandomGift(request, uuid));
     }
 
     @Operation(
@@ -50,6 +55,8 @@ public class GpsController {
     )
     @PostMapping("/gps/trap")
     public ResponseEntity<Void> addTrap(@RequestBody GpsAddTrapRequest request){
+        String uuid = SecurityUtils.getCurrentUserUuid();
+
         return ResponseEntity.ok().build();
     }
 
@@ -62,6 +69,8 @@ public class GpsController {
     )
     @PostMapping("/gps/capture-available-friend")
     public ResponseEntity<CaptureAvailableFriendResponse> getCaptureAvailableFriend(@RequestBody CaptureAvailableFriendRequest request) {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+
         return ResponseEntity.ok().build();
     }
 
@@ -75,6 +84,8 @@ public class GpsController {
     )
     @PostMapping("/gps/capture")
     public ResponseEntity<CaptureResponse> captureFriend(@RequestBody CaptureFriendRequest request) {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+
         return ResponseEntity.ok().build();
     }
 
