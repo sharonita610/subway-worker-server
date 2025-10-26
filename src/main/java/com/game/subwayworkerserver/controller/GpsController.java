@@ -41,7 +41,11 @@ public class GpsController {
 
     @Operation(
             summary = "좌표에 있는 랜덤 박스 열기",
-            description = "gps의 좌표에 있는 랜덤 박스를 조회하여 랜덤 선물을 받는다."
+            description = "gps의 좌표에 있는 랜덤 박스를 조회하여 랜덤 선물을 받는다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "기본 아이템과 추가 보상 아이템 리스트"),
+                    @ApiResponse(responseCode = "400", description = "이미 획득한 선물 상자입니다.")
+            }
     )
     @PostMapping("/gps/open-random-gift")
     public ResponseEntity<GpsRandomGiftResponse> getRandomGift(@RequestBody GpsRandomGiftRequest request){
