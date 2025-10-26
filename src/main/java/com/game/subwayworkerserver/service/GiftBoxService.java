@@ -69,10 +69,9 @@ public class GiftBoxService {
         List<DefaultGift> defaultGifts = calculateDefaultRewards();
         List<ExtraGift> bonusGifts = calculateBonusRewards();
 
-
         // 5. DB 업데이트 로직 (유저 재화 증가) 필요
         updateUserRewardsAndItems(userUuid, defaultGifts, bonusGifts);
-        return new GpsRandomGiftResponse(null, null);
+        return GpsRandomGiftResponse.of(defaultGifts, bonusGifts);
     }
 
     private void updateUserRewardsAndItems(String userUuid, List<DefaultGift> defaultGifts, List<ExtraGift> bonusGifts) {
