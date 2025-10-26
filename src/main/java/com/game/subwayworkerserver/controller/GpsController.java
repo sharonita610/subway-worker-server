@@ -28,7 +28,7 @@ public class GpsController {
 
     @Operation(
             summary = "요청받은 좌표기준 기준 랜덤 생성된 아이템 리스트 조회",
-            description = "유저의 좌표 기준 5km 반경에 깔린 아이템의 리스트를 조회",
+            description = "유저의 좌표 기준 요청한 반경에 깔린 아이템의 리스트를 조회",
             responses = {
                     @ApiResponse(responseCode = "200", description = "좌표와 아이템을 리스트 조회")
             }
