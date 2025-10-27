@@ -27,7 +27,7 @@ public class GpsController {
     private final GiftBoxService giftBoxService;
 
     @Operation(
-            summary = "요청받은 좌표기준 기준 랜덤 생성된 아이템 리스트 조회",
+            summary = "요청받은 좌표기준 기준 랜덤 생성된 아이템 리스트 조회 [완]",
             description = "유저의 좌표 기준 요청한 반경에 깔린 아이템의 리스트를 조회",
             responses = {
                     @ApiResponse(responseCode = "200", description = "좌표와 아이템을 리스트 조회")
@@ -40,7 +40,7 @@ public class GpsController {
     }
 
     @Operation(
-            summary = "좌표에 있는 랜덤 박스 열기",
+            summary = "좌표에 있는 랜덤 박스 열기 [완]",
             description = "gps의 좌표에 있는 랜덤 박스를 조회하여 랜덤 선물을 받는다.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "기본 아이템과 추가 보상 아이템 리스트"),
