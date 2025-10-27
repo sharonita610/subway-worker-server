@@ -2,15 +2,16 @@ package com.game.subwayworkerserver.entity;
 
 import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.FriendAttribute;
+import com.game.subwayworkerserver.domain.baseinfo.FriendType;
 import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import com.game.subwayworkerserver.util.CharacterGenerator;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
-import java.util.Random;
 
 import static com.game.subwayworkerserver.util.CharacterGenerator.generateDefaultFriendStats;
+import static com.game.subwayworkerserver.util.CharacterGenerator.getRandomFriendStat;
 import static com.game.subwayworkerserver.util.SkillRandomizer.getRandomActiveSkills;
 import static com.game.subwayworkerserver.util.SkillRandomizer.getRandomPassiveSkills;
 
@@ -36,6 +37,10 @@ public class FriendEntity extends BaseTimeEntity {
 
     @Column(nullable = false)
     private long userId;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private FriendType friendType;
 
     @Column(nullable = false)
     private long hp;
@@ -74,7 +79,7 @@ public class FriendEntity extends BaseTimeEntity {
     private int passiveSkill2;
 
     @Builder
-    public FriendEntity(FriendAttribute name, int level, int currentExp, long userId, long hp, long mana, long maxMana,
+    public FriendEntity(FriendAttribute name, int level, int currentExp, long userId, FriendType friendType, long hp, long mana, long maxMana,
                         long manaRecovery, long attack, long defense, boolean inUse, boolean onSale,
                         int activeSkill1, int activeSkill2, int passiveSkill1, int passiveSkill2
     ) {
@@ -82,6 +87,7 @@ public class FriendEntity extends BaseTimeEntity {
         this.level = level;
         this.currentExp = currentExp;
         this.userId = userId;
+        this.friendType = friendType;
         this.hp = hp;
         this.mana = mana;
         this.maxMana = maxMana;
@@ -96,7 +102,7 @@ public class FriendEntity extends BaseTimeEntity {
         this.passiveSkill2 = passiveSkill2;
     }
 
-    public static FriendEntity of(final long id, final FriendAttribute name) {
+    public static FriendEntity of(final long userId, final FriendAttribute name) {
         CharacterGenerator.CharacterStats stats = generateDefaultFriendStats();
         List<PassiveSkillCard> randomPassiveSkills = getRandomPassiveSkills(2);
         List<ActiveSkillCard> randomActiveSkills = getRandomActiveSkills(2);
@@ -105,7 +111,8 @@ public class FriendEntity extends BaseTimeEntity {
                  .name(name)
                  .level(1)
                  .currentExp(0)
-                 .userId(id)
+                 .userId(userId)
+                 .friendType(FriendType.fromName(stats.type()))
                  .hp(stats.hp())
                  .mana(stats.mpNow())
                  .maxMana(stats.mpMax())
@@ -122,4 +129,30 @@ public class FriendEntity extends BaseTimeEntity {
     }
 
 
+    public static FriendEntity of(final long userId, String friendName, int friendLevel) {
+        CharacterGenerator.CharacterStats stats = getRandomFriendStat();
+        List<PassiveSkillCard> randomPassiveSkills = getRandomPassiveSkills(2);
+        List<ActiveSkillCard> randomActiveSkills = getRandomActiveSkills(2);
+
+
+        return FriendEntity.builder()
+                .name(FriendAttribute.fromKoreanName(friendName))
+                .level(friendLevel)
+                .currentExp(0)
+                .userId(userId)
+                .friendType(FriendType.fromName(stats.type()))
+                .hp(stats.hp())
+                .mana(stats.mpNow())
+                .maxMana(stats.mpMax())
+                .manaRecovery(stats.manaRecovery())
+                .attack(stats.attack())
+                .defense(stats.defense())
+                .onSale(false)
+                .inUse(false)
+                .activeSkill1(randomActiveSkills.get(0).getId())
+                .activeSkill2(randomActiveSkills.get(1).getId())
+                .passiveSkill1(randomPassiveSkills.get(0).getId())
+                .passiveSkill2(randomPassiveSkills.get(1).getId())
+                .build();
+    }
 }
