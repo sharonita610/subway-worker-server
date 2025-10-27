@@ -92,7 +92,7 @@ public class UserController {
     }
 
     @Operation(
-            summary = "동료 리스트 조회 [완]",
+            summary = "동료 리스트 조회 [완 - 보완 필요, sorting]",
             description = "동료 리스트를 조회",
             responses = {
                     @ApiResponse(responseCode = "200", description = "동료 리스트")
