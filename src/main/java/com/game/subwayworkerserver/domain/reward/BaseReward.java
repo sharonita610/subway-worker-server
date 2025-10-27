@@ -9,6 +9,10 @@ public record BaseReward(
         return new BaseReward(30, 3000);
     }
 
+    public static BaseReward getFailedCaptureReward() {
+        return new BaseReward(0, 0);
+    }
+
     public static BaseReward getTrapReward() {
         return new BaseReward(50, 5000);
     }
