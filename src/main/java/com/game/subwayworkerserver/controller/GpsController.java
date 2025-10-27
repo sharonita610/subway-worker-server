@@ -6,6 +6,7 @@ import com.game.subwayworkerserver.controller.response.CaptureAvailableFriendRes
 import com.game.subwayworkerserver.controller.response.CaptureResponse;
 import com.game.subwayworkerserver.controller.response.GpsRandomGiftResponse;
 import com.game.subwayworkerserver.controller.response.RandomGpsResponse;
+import com.game.subwayworkerserver.service.CaptureFriendService;
 import com.game.subwayworkerserver.service.GiftBoxService;
 import com.game.subwayworkerserver.service.GpsService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +26,7 @@ public class GpsController {
 
     private final GpsService gpsService;
     private final GiftBoxService giftBoxService;
+    private final CaptureFriendService captureFriendService;
 
     @Operation(
             summary = "요청받은 좌표기준 기준 랜덤 생성된 아이템 리스트 조회 [완]",
@@ -66,7 +68,8 @@ public class GpsController {
 
     @Operation(
             summary = "좌표로 포획 가능한 동료의 정보를 조회",
-            description = "gps의 좌표를 통해 현재 포획 가능한 동료의 정보를 조회하는 기능",
+            description = "좌표에 있는 현재 포획 가능한 동료의 정보를 조회하는 기능, 좌표에서 한 번 조회 한 랜덤 동료는 " +
+                    "다른유저에게도 동일하게 보여진다.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "포획 가능한 동료의 기본 정보를 조회")
             }
@@ -74,8 +77,7 @@ public class GpsController {
     @PostMapping("/gps/capture-available-friend")
     public ResponseEntity<CaptureAvailableFriendResponse> getCaptureAvailableFriend(@RequestBody CaptureAvailableFriendRequest request) {
         String uuid = SecurityUtils.getCurrentUserUuid();
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(captureFriendService.randomAvailableFriend(request, uuid));
     }
 
     @Operation(
@@ -89,8 +91,7 @@ public class GpsController {
     @PostMapping("/gps/capture")
     public ResponseEntity<CaptureResponse> captureFriend(@RequestBody CaptureFriendRequest request) {
         String uuid = SecurityUtils.getCurrentUserUuid();
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(captureFriendService.tryToCapture(uuid,request));
     }
 
 }
