@@ -1,5 +1,7 @@
 package com.game.subwayworkerserver.domain.baseinfo;
 
+import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.util.CharacterGenerator;
 import lombok.Getter;
 
@@ -34,4 +36,13 @@ public enum FriendType {
         this.defenseRange = defenseRange;
     }
 
+    public static FriendType fromName(final String type) {
+        for (FriendType friendType : FriendType.values()) {
+            if (friendType.type.equalsIgnoreCase(type)) {
+                return friendType;
+            }
+        }
+        // 일치하는 상수가 없을 경우 예외 발생
+        throw new BaseException(ErrorCode.BAD_REQUEST, "유효하지 않은 FriendType 직업 이름입니다: " + type);
+    }
 }
