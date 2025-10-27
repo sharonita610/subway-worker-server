@@ -5,6 +5,7 @@ import com.game.subwayworkerserver.exception.ErrorCode;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
 public enum FriendAttribute {
@@ -35,5 +36,11 @@ public enum FriendAttribute {
 
         List<FriendAttribute> attributeArray1 = List.of(attributeArray);
         return attributeArray1.stream().map(FriendAttribute::getKoreanName).toList();
+    }
+
+    public static FriendAttribute getRandomAttribute() {
+        FriendAttribute[] attributes = FriendAttribute.values();
+        int randomIndex = ThreadLocalRandom.current().nextInt(attributes.length);
+        return attributes[randomIndex];
     }
 }

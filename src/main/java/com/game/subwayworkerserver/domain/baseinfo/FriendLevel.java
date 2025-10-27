@@ -2,6 +2,8 @@ package com.game.subwayworkerserver.domain.baseinfo;
 
 import lombok.Getter;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 @Getter
 public enum FriendLevel{
 
@@ -46,5 +48,25 @@ public enum FriendLevel{
             }
         }
         throw new IllegalArgumentException("유효하지 않은 SkillLevel 번호입니다: " + level);
+    }
+
+    public static FriendLevel getRandomLevel() {
+        FriendLevel[] levels = FriendLevel.values();
+
+        double totalWeight = 0;
+        for (int i = 0; i < levels.length; i++) {
+            totalWeight += 1.0 / levels[i].level;
+        }
+        double randomValue = ThreadLocalRandom.current().nextDouble(0, totalWeight);
+
+        double cumulativeWeight = 0;
+        for (FriendLevel level : levels) {
+            cumulativeWeight += 1.0 / level.level;
+
+            if (randomValue <= cumulativeWeight) {
+                return level;
+            }
+        }
+        return levels[0];
     }
 }
