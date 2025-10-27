@@ -1,6 +1,10 @@
 package com.game.subwayworkerserver.entity;
 
+import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import lombok.Getter;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
 public enum ItemName {
@@ -48,5 +52,21 @@ public enum ItemName {
             }
         }
         throw new IllegalArgumentException("Unknown ItemName for korean name: " + name);
+    }
+
+    public static boolean canCaptureSucceed(final String koreanName) {
+        ItemName tool = fromKoreanName(koreanName);
+
+        // 1. 포획 도구 카테고리 확인 (CAPTURE인지 TRAP인지 확인)
+        if (tool.category != ItemCategory.CAPTURE) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "'" + tool.name + "'은 포획(Capture) 도구가 아닙니다.");
+        }
+
+        // 2. 포획 확률 (%) 추출
+        int chance = tool.percentage;
+
+        // 3. 포획 시뮬레이션: 0부터 99 사이의 난수 생성
+        int randomRoll = ThreadLocalRandom.current().nextInt(100);
+        return randomRoll < chance;
     }
 }
