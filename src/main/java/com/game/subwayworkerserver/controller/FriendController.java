@@ -18,7 +18,7 @@ public class FriendController {
     private final FriendService friendService;
 
     @Operation(
-            summary = "유저 생성시 사용할 동료 속성 리스트",
+            summary = "유저 생성시 사용할 동료 속성 리스트 [완]",
             description = "최초로 함께할 동료의 속성 정보를 조회",
             responses = {
                     @ApiResponse(responseCode = "200", description = "동료의 속성 리스트를 조회")

@@ -5,6 +5,8 @@ import com.game.subwayworkerserver.controller.response.MonsterResponse;
 import com.game.subwayworkerserver.controller.response.StageFriendListResponse;
 import com.game.subwayworkerserver.controller.sampleData.MonsterSampleData;
 import com.game.subwayworkerserver.service.StageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,10 @@ public class StageController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+            summary = "스테이지 몬스터 정보 읽어오기 [완]",
+            description = "파라미터 num 1 or 2"
+    )
     @GetMapping("/stage/monsters")
     public ResponseEntity<MonsterResponse> getStageMonsters(@RequestParam("num") int num){
         if(num<=0){
