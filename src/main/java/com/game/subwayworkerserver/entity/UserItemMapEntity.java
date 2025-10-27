@@ -1,5 +1,7 @@
 package com.game.subwayworkerserver.entity;
 
+import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -40,5 +42,12 @@ public class UserItemMapEntity extends BaseTimeEntity{
 
     public void increaseQuantity() {
         this.quantity += 1;
+    }
+
+    public void decreaseQuantity() {
+        if (this.quantity <= 0) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "Cannot decrease quantity: Item quantity is already zero or below.");
+        }
+        this.quantity -= 1;
     }
 }
