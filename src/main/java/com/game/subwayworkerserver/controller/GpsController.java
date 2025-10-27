@@ -67,7 +67,7 @@ public class GpsController {
     }
 
     @Operation(
-            summary = "좌표로 포획 가능한 동료의 정보를 조회",
+            summary = "좌표로 포획 가능한 동료의 정보를 조회 [완]",
             description = "좌표에 있는 현재 포획 가능한 동료의 정보를 조회하는 기능, 좌표에서 한 번 조회 한 랜덤 동료는 " +
                     "다른유저에게도 동일하게 보여진다.",
             responses = {
@@ -81,7 +81,7 @@ public class GpsController {
     }
 
     @Operation(
-            summary = "동료 포획 요청",
+            summary = "동료 포획 요청 [완]",
             description = "포획도구로 동료를 포획 시도한다, 포획 도구에 따른 확률로 성공 유무를 가린다." +
                     "포획 성공 시 gps 에서 해당 동료는 없어져야 한다.",
             responses = {
