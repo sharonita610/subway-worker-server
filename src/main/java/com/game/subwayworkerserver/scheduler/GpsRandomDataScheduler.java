@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.service;
+package com.game.subwayworkerserver.scheduler;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
