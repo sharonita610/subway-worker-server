@@ -1,10 +1,10 @@
 package com.game.subwayworkerserver.scheduler;
 
+import com.game.subwayworkerserver.service.FriendDataCreator;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import org.springframework.data.geo.Point;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -15,17 +15,19 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-@Async
 @Slf4j
-@Service
+@Component
 @RequiredArgsConstructor
 public class GpsRandomDataScheduler {
+
+    private final FriendDataCreator friendDataCreator;
 
     private final RedisTemplate<String, String> redisTemplate;
 
     // Redis Key 상수
     private static final String FRIEND_LOCATIONS_KEY = "friend:locations";
     private static final String RANDOM_GIFT_BOX_KEY = "giftbox:locations";
+    private static final String FRIEND_DATA_PREFIX = "friend:data:";
 
     // 대한민국 지도 범위 (대략적)
     private static final double MIN_LAT = 33.0;
@@ -59,7 +61,7 @@ public class GpsRandomDataScheduler {
      * 2. 30분마다 맵의 동료와 선물 상자 데이터를 재생성합니다.
      * fixedRate = 1800000ms (30분)
      */
-    @Scheduled(fixedRate = 1800000)
+    @Scheduled(fixedRate = 1800000, initialDelay = 60000)
     public void scheduledMapRegeneration() {
         log.info("--- [Scheduler] 30분 주기 맵 재생성 시작 ---");
         // Item 생성/삭제를 건너뛰고, 동료와 선물상자만 재생성
@@ -76,6 +78,7 @@ public class GpsRandomDataScheduler {
         // 1. 기존 데이터 삭제 (Item_Locations_Key는 제외)
         redisTemplate.delete(FRIEND_LOCATIONS_KEY);
         redisTemplate.delete(RANDOM_GIFT_BOX_KEY);
+        redisTemplate.delete(FRIEND_DATA_PREFIX);
         log.info("--- 동료/선물상자 기존 데이터 삭제 완료 ---");
 
         int totalCells = 0;
@@ -109,19 +112,32 @@ public class GpsRandomDataScheduler {
      * Helper: 특정 셀 중심에 N개의 아이템을 랜덤하게 생성하여 Redis에 저장합니다.
      */
     private void createItemsInCell(double centerLat, double centerLon, int count, String key, String prefix) {
+
         Map<String, Point> locations = new HashMap<>();
 
         for (int i = 0; i < count; i++) {
+            String memberName = prefix + "_" + UUID.randomUUID().toString().substring(0, 8);
+
             // 셀 중심 좌표에서 MAX_JITTER 내에서 랜덤하게 위치를 흩뿌립니다.
             double randomLat = generateRandomCoordinate(centerLat, MAX_JITTER);
             double randomLon = generateRandomCoordinate(centerLon, MAX_JITTER);
 
-            String memberName = prefix + "_" + UUID.randomUUID().toString().substring(0, 8);
-            locations.put(memberName, new Point(randomLon, randomLat));        }
+            locations.put(memberName, new Point(randomLon, randomLat));
+
+            if (key.equals(FRIEND_LOCATIONS_KEY)) {
+                createAndSaveFriendHashData(memberName);
+            }
+        }
 
         if (!locations.isEmpty()) {
             redisTemplate.opsForGeo().add(key, locations);
         }
+    }
+
+    private void createAndSaveFriendHashData(final String friendId) {
+        Map<String, String> dataToSave = friendDataCreator.createRandomFriendAttribute();
+        String instanceKey = FRIEND_DATA_PREFIX + friendId;
+        redisTemplate.opsForHash().putAll(instanceKey, dataToSave);
     }
 
     private double generateRandomCoordinate(double center, double maxOffset) {
