@@ -69,4 +69,13 @@ public enum ItemName {
         int randomRoll = ThreadLocalRandom.current().nextInt(100);
         return randomRoll < chance;
     }
+
+    public static ItemName fromConstantName(final String constantName) {
+        try {
+            return ItemName.valueOf(constantName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "Invalid Item Constant Name: " + constantName);
+        }
+    }
+
 }
