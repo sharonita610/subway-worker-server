@@ -2,6 +2,7 @@ package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.*;
+import com.game.subwayworkerserver.controller.response.UserTrapListResponse;
 import com.game.subwayworkerserver.controller.response.CaptureAvailableFriendResponse;
 import com.game.subwayworkerserver.controller.response.CaptureResponse;
 import com.game.subwayworkerserver.controller.response.GpsRandomGiftResponse;
@@ -9,12 +10,14 @@ import com.game.subwayworkerserver.controller.response.RandomGpsResponse;
 import com.game.subwayworkerserver.service.CaptureFriendService;
 import com.game.subwayworkerserver.service.GiftBoxService;
 import com.game.subwayworkerserver.service.GpsService;
+import com.game.subwayworkerserver.service.TrapService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +30,7 @@ public class GpsController {
     private final GpsService gpsService;
     private final GiftBoxService giftBoxService;
     private final CaptureFriendService captureFriendService;
+    private final TrapService trapService;
 
     @Operation(
             summary = "요청받은 좌표기준 기준 랜덤 생성된 아이템 리스트 조회 [완]",
@@ -56,14 +60,24 @@ public class GpsController {
     }
 
     @Operation(
-            summary = "좌표에 덫을 깔아놓는다.",
+            summary = "좌표에 덫을 깔아놓는다. [완]",
             description = "랜덤으로 생성되는 동료를 잡기위한 덫을 설정한다."
     )
     @PostMapping("/gps/trap")
     public ResponseEntity<Void> addTrap(@RequestBody GpsAddTrapRequest request){
         String uuid = SecurityUtils.getCurrentUserUuid();
-
+        trapService.setTrap(uuid, request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "유저가 깔아둔 덫을 조회한다.",
+            description = "덫을 깔아 5분마다 덫에 걸린 동료가 있는지 확인하는 스케줄러를 작동한다."
+    )
+    @GetMapping("/gps/trap")
+    public ResponseEntity<UserTrapListResponse> findTrapByUser(){
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        return ResponseEntity.ok(trapService.findTrapByUser(uuid));
     }
 
     @Operation(
