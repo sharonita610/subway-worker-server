@@ -33,7 +33,7 @@ public class GpsController {
     private final TrapService trapService;
 
     @Operation(
-            summary = "요청받은 좌표기준 기준 랜덤 생성된 아이템 리스트 조회 [완]",
+            summary = "요청받은 좌표기준 기준 랜덤 생성된 아이템(기프트박스, 동료) 리스트 조회 [완]",
             description = "유저의 좌표 기준 요청한 반경에 깔린 아이템의 리스트를 조회",
             responses = {
                     @ApiResponse(responseCode = "200", description = "좌표와 아이템을 리스트 조회")
@@ -71,7 +71,7 @@ public class GpsController {
     }
 
     @Operation(
-            summary = "유저가 깔아둔 덫을 조회한다.",
+            summary = "유저가 깔아둔 덫을 조회한다. [완]",
             description = "덫을 깔아 5분마다 덫에 걸린 동료가 있는지 확인하는 스케줄러를 작동한다."
     )
     @GetMapping("/gps/trap")
@@ -81,7 +81,7 @@ public class GpsController {
     }
 
     @Operation(
-            summary = "좌표로 포획 가능한 동료의 정보를 조회 [완]",
+            summary = "[미사용 api] 좌표로 포획 가능한 동료의 정보를 조회",
             description = "좌표에 있는 현재 포획 가능한 동료의 정보를 조회하는 기능, 좌표에서 한 번 조회 한 랜덤 동료는 " +
                     "다른유저에게도 동일하게 보여진다.",
             responses = {
