@@ -48,6 +48,12 @@ public class UserEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private int stage;
 
+    @Column(nullable = false)
+    private boolean trapSuccess = false;
+
+    @Column(nullable = false)
+    private boolean  hasPendingReward = false;
+
     public UserEntity(String name, String uuid, int exp, int level, int totalExp, int coin, int vacationTicket,
                       int gotchaTicket, int stage, Gender gender) {
         this.name = name;
@@ -75,5 +81,13 @@ public class UserEntity extends BaseTimeEntity {
 
     public void increaseGotchaTicket() {
         this.gotchaTicket++;
+    }
+
+    public void updateTrapSuccess() {
+        this.trapSuccess = true;
+    }
+
+    public boolean isTrapSuccess() {
+        return this.trapSuccess;
     }
 }
