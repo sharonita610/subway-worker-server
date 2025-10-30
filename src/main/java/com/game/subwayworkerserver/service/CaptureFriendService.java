@@ -43,40 +43,40 @@ public class CaptureFriendService {
     private static final String FRIEND_DATA_PREFIX = "friend:data:"; // 👈 동료 인스턴스 속성 저장 키
     private static final double SEARCH_RADIUS_METER = 10.0;
 
-    public CaptureAvailableFriendResponse randomAvailableFriend(
-            final CaptureAvailableFriendRequest request, final String uuid
-    ) {
-        String friendId = findUnacquiredNearestFriendId(request.longitude(), request.latitude());
-        if (friendId == null) {
-            throw new BaseException(ErrorCode.NOT_FOUND, "50m 반경 내에 포획 가능한 동료가 없습니다.");
-        }
+//    public CaptureAvailableFriendResponse randomAvailableFriend(
+//            final CaptureAvailableFriendRequest request, final String uuid
+//    ) {
+//        String friendId = findUnacquiredNearestFriendId(request.longitude(), request.latitude());
+//        if (friendId == null) {
+//            throw new BaseException(ErrorCode.NOT_FOUND, "50m 반경 내에 포획 가능한 동료가 없습니다.");
+//        }
+//
+//        return getOrCreateFriendCaptureData(friendId);
+//    }
 
-        return getOrCreateFriendCaptureData(friendId);
-    }
-
-    private CaptureAvailableFriendResponse getOrCreateFriendCaptureData(final String friendId) {
-
-        String instanceKey = FRIEND_DATA_PREFIX + friendId;
-        Map<Object, Object> hashData = redisTemplate.opsForHash().entries(instanceKey);
-
-        if (!hashData.isEmpty()) {
-            // 2. 데이터가 이미 존재: 로드된 Hash 데이터를 응답 DTO로 변환하여 반환
-            // (이름과 레벨은 이미 저장된 것을 사용)
-            String friendName = (String) hashData.get("friendName");
-            int friendLevel = Integer.parseInt((String) hashData.get("friendLevel"));
-            String position = (String) hashData.get("position");
-
-            return CaptureAvailableFriendResponse.of(friendId, friendName, position, friendLevel);
-        }
-
-        FriendAttribute randomFriend = FriendAttribute.getRandomAttribute();
-        FriendLevel randomLevel = FriendLevel.getRandomLevel();
-        Map<String, String> dataToSave = friendDataCreator.createData(
-                randomFriend.getKoreanName(), randomLevel.getTitle(), randomLevel.getLevel()
-        );
-        redisTemplate.opsForHash().putAll(instanceKey, dataToSave);
-        return CaptureAvailableFriendResponse.of(friendId,randomFriend, randomLevel);
-    }
+//    private CaptureAvailableFriendResponse getOrCreateFriendCaptureData(final String friendId) {
+//
+//        String instanceKey = FRIEND_DATA_PREFIX + friendId;
+//        Map<Object, Object> hashData = redisTemplate.opsForHash().entries(instanceKey);
+//
+//        if (!hashData.isEmpty()) {
+//            // 2. 데이터가 이미 존재: 로드된 Hash 데이터를 응답 DTO로 변환하여 반환
+//            // (이름과 레벨은 이미 저장된 것을 사용)
+//            String friendName = (String) hashData.get("friendName");
+//            int friendLevel = Integer.parseInt((String) hashData.get("friendLevel"));
+//            String position = (String) hashData.get("position");
+//
+//            return CaptureAvailableFriendResponse.of(friendId, friendName, position, friendLevel);
+//        }
+//
+//        FriendAttribute randomFriend = FriendAttribute.getRandomAttribute();
+//        FriendLevel randomLevel = FriendLevel.getRandomLevel();
+//        Map<String, String> dataToSave = friendDataCreator.createData(
+//                randomFriend.getKoreanName(), randomLevel.getTitle(), randomLevel.getLevel()
+//        );
+//        redisTemplate.opsForHash().putAll(instanceKey, dataToSave);
+//        return CaptureAvailableFriendResponse.of(friendId,randomFriend, randomLevel);
+//    }
 
     /**
      * Helper: 사용자 좌표에서 가장 가까운 friend 상자 ID를 검색합니다.

@@ -91,7 +91,7 @@ public class GpsController {
     @PostMapping("/gps/capture-available-friend")
     public ResponseEntity<CaptureAvailableFriendResponse> getCaptureAvailableFriend(@RequestBody CaptureAvailableFriendRequest request) {
         String uuid = SecurityUtils.getCurrentUserUuid();
-        return ResponseEntity.ok(captureFriendService.randomAvailableFriend(request, uuid));
+        return ResponseEntity.ok().build();
     }
 
     @Operation(
