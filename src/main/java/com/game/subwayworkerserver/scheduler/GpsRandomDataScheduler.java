@@ -138,6 +138,9 @@ public class GpsRandomDataScheduler {
 
     private void createAndSaveFriendHashData(final String friendId) {
         Map<String, String> dataToSave = friendDataCreator.createRandomFriendAttribute();
+        if(dataToSave.isEmpty()) {
+            return;
+        }
         String instanceKey = FRIEND_DATA_PREFIX + friendId;
         redisTemplate.opsForHash().putAll(instanceKey, dataToSave);
     }
