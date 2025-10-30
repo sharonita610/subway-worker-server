@@ -51,11 +51,11 @@ public enum ItemName {
                 return itemName;
             }
         }
-        throw new IllegalArgumentException("Unknown ItemName for korean name: " + name);
+        throw new BaseException(ErrorCode.BAD_REQUEST, "Unknown ItemName for korean name: " + name);
     }
 
     public static boolean canCaptureSucceed(final String koreanName) {
-        ItemName tool = fromKoreanName(koreanName);
+        ItemName tool = fromConstantName(koreanName);
 
         // 1. 포획 도구 카테고리 확인 (CAPTURE인지 TRAP인지 확인)
         if (tool.category != ItemCategory.CAPTURE) {
@@ -69,4 +69,13 @@ public enum ItemName {
         int randomRoll = ThreadLocalRandom.current().nextInt(100);
         return randomRoll < chance;
     }
+
+    public static ItemName fromConstantName(final String constantName) {
+        try {
+            return ItemName.valueOf(constantName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "Invalid Item Constant Name: " + constantName);
+        }
+    }
+
 }

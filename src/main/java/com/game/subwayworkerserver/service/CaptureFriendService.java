@@ -127,7 +127,7 @@ public class CaptureFriendService {
         ).getId();
 
         // user item map 에서 도구 조회
-        ItemName itemName = ItemName.fromKoreanName(request.captureItemName());
+        ItemName itemName = ItemName.fromConstantName(request.captureItemName());
         UserItemMapEntity userItemMapEntity = userItemMapRepository.findByUserIdAndItemName(userId, itemName)
                 .orElseThrow(
                         () -> new BaseException(ErrorCode.NOT_FOUND, "사용 가능한 포획도구가 더이상 없습니다.")
