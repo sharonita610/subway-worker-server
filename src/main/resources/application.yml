@@ -4,20 +4,20 @@ server:
 spring:
   profiles:
     active: prod
-  datasource:
-    url: jdbc:mysql://localhost:3306/subway_game?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-    username: root
-    password: ${LOCAL_DB_PASSWORD}
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    database-platform: org.hibernate.dialect.MySQLDialect
-
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: 6379
+#  datasource:
+#    url: jdbc:mysql://localhost:3306/subway_game?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#
+#    username: root
+#    password: ${LOCAL_DB_PASSWORD}
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+#    database-platform: org.hibernate.dialect.MySQLDialect
+#
+#  data:
+#    redis:
+#      host: ${REDIS_HOST}
+#      port: 6379
