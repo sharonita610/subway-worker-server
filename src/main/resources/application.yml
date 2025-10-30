@@ -9,7 +9,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
     username: root
-    password: REDACTED
+    password: ${LOCAL_DB_PASSWORD}
 
   jpa:
     hibernate:
@@ -19,5 +19,5 @@ spring:
 
   data:
     redis:
-      host: localhost
+      host: ${REDIS_HOST}
       port: 6379
