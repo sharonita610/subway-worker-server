@@ -4,7 +4,10 @@ import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import lombok.Getter;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
 public enum ItemName {
@@ -21,6 +24,8 @@ public enum ItemName {
     // 상급: 재화 구매 불가, 90%
     BUSINESS_CARRIER("출장용캐리어", "가장 강력한 포획 도구. 보물상자에서만 등장.", ItemCategory.CAPTURE, 0, 90), // 가격 0은 재화 구매 불가 의미
 
+    RANDOM_CAPTURE("랜덤 포획", "포획 도구 중 하나를 랜덤으로 획득합니다. (하루 3회 무료)", ItemCategory.CAPTURE, 0, 0),
+
     // --- 트랩 도구 (Trap Item) ---
     // 하급: 4000 코인, 50%
     WOOD_SHOVEL("나무삽", "가장 기본적인 트랩 도구. 50% 확률로 몬스터 포획.", ItemCategory.TRAP, 4000, 50),
@@ -29,7 +34,10 @@ public enum ItemName {
     SILVER_SHOVEL("은삽", "강력한 트랩 도구. 70% 확률로 몬스터 포획.", ItemCategory.TRAP, 8000, 70),
 
     // 상급: 재화 구매 불가, 100%
-    GOLD_SHOVEL("금삽", "확정 포획이 가능한 트랩 도구. 보물상자에서만 등장.", ItemCategory.TRAP, 0, 100); // 가격 0은 재화 구매 불가 의미
+    GOLD_SHOVEL("금삽", "확정 포획이 가능한 트랩 도구. 보물상자에서만 등장.", ItemCategory.TRAP, 0, 100),
+
+    // 가격 0은 재화 구매 불가 의미
+    RANDOM_TRAP("랜덤 트랩", "트랩 도구 중 하나를 랜덤으로 획득합니다. (하루 3회 무료)", ItemCategory.TRAP, 0, 0);
 
     private final String name;
     private final String description;
@@ -76,6 +84,20 @@ public enum ItemName {
         } catch (IllegalArgumentException e) {
             throw new BaseException(ErrorCode.BAD_REQUEST, "Invalid Item Constant Name: " + constantName);
         }
+    }
+
+    public static List<ItemName> getTrapList() {
+        return Stream.of(ItemName.values())
+                .filter(item -> item.category == ItemCategory.TRAP)
+                .filter(item -> item != ItemName.GOLD_SHOVEL)
+                .collect(Collectors.toList());
+    }
+
+    public static List<ItemName> getCaptureList() {
+        return Stream.of(ItemName.values())
+                .filter(item -> item.category == ItemCategory.CAPTURE)
+                .filter(item -> item != ItemName.BUSINESS_CARRIER)
+                .collect(Collectors.toList());
     }
 
     public boolean canTrapSucceed() {
