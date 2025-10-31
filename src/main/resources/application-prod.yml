@@ -17,7 +17,7 @@ spring:
     redis:
       host: REDACTED
       port: 6379
-      username: papimo
+      username: default
       password: ${redis.password}
       ssl:
         enabled: true
