@@ -13,12 +13,10 @@ spring:
       ddl-auto: create
     show-sql: true
 
-server:
-  port: 8080
-
-redis:
-  host: REDACTED
-  port: 6379
-  username: papimo
-  password: ${redis.password}
+  data:
+    redis:
+      host: REDACTED
+      port: 6379
+      username: papimo
+      password: ${redis.password}
 
