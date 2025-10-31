@@ -37,6 +37,9 @@ public class UserTrapMapEntity {
     @Column(nullable = false)
     private boolean isSuccessful = false;
 
+    @Column(nullable = false)
+    private boolean isTrapped = false;
+
     private String capturedFriendId;
 
     @Builder
@@ -59,7 +62,20 @@ public class UserTrapMapEntity {
     }
 
     public void markSuccess(String capturedFriendId) {
-        this.isSuccessful = true;
+        this.isTrapped = true;
         this.capturedFriendId = capturedFriendId;
+    }
+
+    public void setIsSuccessful() {
+        this.isSuccessful = true;
+        this.isTrapped = false;
+    }
+
+    public void setExpiresAt() {
+        this.expiresAt = LocalDateTime.now();
+    }
+
+    public void setIsNotSuccessful() {
+        this.isSuccessful = false;
     }
 }

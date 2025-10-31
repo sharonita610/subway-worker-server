@@ -38,7 +38,8 @@ public class TrapCheckerScheduler {
      * // 5분 = 300,000ms
      */
     @Async
-    @Scheduled(cron = "17 0 */2 * * *")    @Transactional
+    @Scheduled(cron = "17 0 */2 * * *")
+    @Transactional
     public void checkTrapsForCapture() {
         log.info("--- [Scheduler] 트랩-동료 겹침 확인 시작 ---");
 
@@ -48,7 +49,7 @@ public class TrapCheckerScheduler {
 
         // 1. 현재 유효하고 포획에 성공하지 않은 모든 트랩 조회
         List<UserTrapMapEntity> activeTraps = userSetTrapRepository
-                .findByExpiresAtAfterAndIsSuccessfulFalse(LocalDateTime.now());
+                .findByExpiresAtAfterAndIsTrappedFalse(LocalDateTime.now());
 
         if (activeTraps.isEmpty()) {
             log.info("유효한 트랩이 없습니다. 스킵합니다.");
@@ -75,11 +76,11 @@ public class TrapCheckerScheduler {
             if (results != null && !results.getContent().isEmpty()) {
                 // 2-2. 겹치는 동료 발견 (트랩 성공!)
                 RedisGeoCommands.GeoLocation<String> friendLocation = results.getContent().get(0).getContent();
-                String capturedFriendId = friendLocation.getName();
+                String friendId = friendLocation.getName();
 
                 // 2-3. 트랩 및 유저 정보 업데이트
                 // a) UserSetTrapEntity에 성공 기록
-                trap.markSuccess(capturedFriendId);
+                trap.markSuccess(friendId);
 
                 // b) UserEntity에 성공 플래그 설정 (로그인 시 알림용)
                 userRepository.findById(trap.getUserId()).ifPresent(user -> {
@@ -89,7 +90,7 @@ public class TrapCheckerScheduler {
 
                 userRepository.findById(trap.getUserId()).ifPresent(user -> {
                     final String acquiredKey = USER_ACQUIRED_PREFIX + user.getUuid() + ":" + FRIEND_LOCATIONS_KEY;
-                    redisTemplate.opsForSet().add(acquiredKey, capturedFriendId);
+                    redisTemplate.opsForSet().add(acquiredKey, friendId);
                 });
 
                 successCount++;
@@ -101,9 +102,9 @@ public class TrapCheckerScheduler {
 
     @Transactional
     public long cleanUpExpiredTraps() {
-        // 현재 시간보다 만료 시간이 이전인 (isSuccessful=false인) 트랩 목록을 조회합니다.
+        // 현재 시간보다 만료 시간이 이전인 (isTrapped=false인) 트랩 목록을 조회합니다.
         List<UserTrapMapEntity> expiredTraps = userSetTrapRepository
-                .findByExpiresAtBeforeAndIsSuccessfulFalse(LocalDateTime.now()); // ⚠️ findByExpiresAtBefore... 메서드가 필요합니다.
+                .findByExpiresAtBeforeAndIsTrappedFalse(LocalDateTime.now()); // ⚠️ findByExpiresAtBefore... 메서드가 필요합니다.
 
         if (expiredTraps.isEmpty()) {
             return 0;
