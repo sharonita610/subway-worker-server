@@ -46,10 +46,10 @@ public enum PassiveSkillCard {
         this.type = type;
     }
 
-    public static String of(int id) {
+    public static PassiveSkillCard from(int id) {
         for (PassiveSkillCard card : values()) {
             if (card.id == id) {
-                return card.displayName;
+                return card;
             }
         }
         throw new BaseException(ErrorCode.NOT_VALID_ID, "유효하지 않은 Passive Skill ID입니다: " + id);
