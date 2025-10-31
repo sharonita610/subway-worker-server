@@ -90,6 +90,10 @@ public class GpsController {
         return ResponseEntity.ok(captureFriendService.tryToCapture(uuid,request));
     }
 
+    @Operation(
+            summary = "포획 성공 확을 하는 기능 [완]",
+            description = "포획 성공 시, 포획한 동료의 정보 리스트를, 아니라면 빈 배열을 반환한다."
+    )
     @GetMapping("/gps/trap-success-reward")
     public ResponseEntity<FriendListResponse> getTrapSuccessReward(){
         String uuid = SecurityUtils.getCurrentUserUuid();
