@@ -125,7 +125,7 @@ public class UserController {
             }
     )
     @DeleteMapping("/user")
-    public ResponseEntity<SkillListResponse> deleteUser( ) {
+    public ResponseEntity<Void> deleteUser( ) {
         String uuid = SecurityUtils.getCurrentUserUuid();
         userService.deleteUser(uuid);
         return ResponseEntity.ok().build();
