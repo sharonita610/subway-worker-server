@@ -9,7 +9,9 @@ public record UserBaseInfo(
         int coin,
         int stageLevel,
         int vacationTicket,
-        int gotchaTicket
+        int gotchaTicket,
+        boolean hasPendingReward,
+        boolean hasTrappedSomething
 
 ) {
     public static UserBaseInfo of(UserEntity user) {
@@ -20,7 +22,9 @@ public record UserBaseInfo(
                 user.getCoin(),
                 user.getStage(),
                 user.getVacationTicket(),
-                user.getGotchaTicket()
+                user.getGotchaTicket(),
+                user.isHasPendingReward(),
+                user.isTrapSuccess()
         );
     }
 }
