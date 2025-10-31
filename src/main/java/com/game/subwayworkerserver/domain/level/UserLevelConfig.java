@@ -38,9 +38,9 @@ public enum UserLevelConfig {
     /**
      * 특정 레벨에서 다음 레벨로 가기 위해 필요한 기본 경험치를 계산
      */
-    public long getRequiredExpForLevel(int level) {
-        // (레벨 * ExpMultiplier) 공식 적용
-        return (long) level * this.expMultiplier;
+    public static long getRequiredExpForLevel(int level) {
+        UserLevelConfig userLevel = getConfigByLevel(level);
+        return (long) level * userLevel.expMultiplier;
     }
 
     /**
