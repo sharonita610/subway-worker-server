@@ -1,13 +1,15 @@
 package com.game.subwayworkerserver.service;
 
+import com.game.subwayworkerserver.controller.request.PurchaseRequest;
 import com.game.subwayworkerserver.controller.response.StoreItemResponse;
 import com.game.subwayworkerserver.domain.baseinfo.Coin;
 import com.game.subwayworkerserver.domain.baseinfo.VacationTicket;
-import com.game.subwayworkerserver.entity.ItemName;
-import com.game.subwayworkerserver.entity.UserEntity;
+import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.repository.UserItemMapRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
 import com.game.subwayworkerserver.repository.UserStoreMapRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.game.subwayworkerserver.exception.ErrorCode.BAD_REQUEST;
 import static com.game.subwayworkerserver.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
@@ -23,6 +26,7 @@ public class StoreService {
 
     private final UserRepository userRepository;
     private final UserStoreMapRepository userStoreMapRepository;
+    private final UserItemMapRepository userItemMapRepository;
 
     private static final String VACATION = "VACATION_TICKET";
     private static final String COIN = "COIN";
@@ -33,10 +37,7 @@ public class StoreService {
 
     public StoreItemResponse getStoreItems(final String uuid) {
 
-        UserEntity user = userRepository.findByUuid(uuid).orElseThrow(
-                () -> new BaseException(USER_NOT_FOUND)
-        );
-        Long userId = user.getId();
+        Long userId = getUserByUuid(uuid).getId();
 
         boolean isFirst = userStoreMapRepository.existsByUserIdAndItemName(userId, VACATION);
         int todayRandomTrapPurchase = getTodayPurchaseCount(userId, RANDOM_TRAP);
@@ -49,10 +50,16 @@ public class StoreService {
 
         return StoreItemResponse.of(
                 trapList, todayRandomTrapPurchase,
-                captureList,todayRandomCapture,
+                captureList, todayRandomCapture,
                 coinList,
                 vacationTicketList,
                 !isFirst
+        );
+    }
+
+    private UserEntity getUserByUuid(String uuid) {
+        return userRepository.findByUuid(uuid).orElseThrow(
+                () -> new BaseException(USER_NOT_FOUND)
         );
     }
 
@@ -72,4 +79,73 @@ public class StoreService {
         );
         return (int) count;
     }
+
+    @Transactional
+    public void purchaseItemWithCoin(String uuid, PurchaseRequest request) {
+        UserEntity user = getUserByUuid(uuid);
+        String name = request.name();
+        ItemName itemName = ItemName.fromConstantName(name);
+        int coinNeeded = itemName.getPrice();
+
+        boolean ableToBuy = user.hasCoinMoreThanItemPrice(coinNeeded);
+        if (!ableToBuy) {
+            throw new BaseException(BAD_REQUEST, "Not enough coin");
+        }
+
+        user.purchaseWithCoin(coinNeeded);
+        saveUserItemIntoMap(user.getId(), itemName);
+        saveUserStoreRecord(user.getId(), String.valueOf(itemName),1, coinNeeded, CurrencyType.COIN);
+    }
+
+    private void saveUserStoreRecord(long userId, String itemName, int quantity, int price , CurrencyType currencyType) {
+        UserStoreMapEntity userStoreMapEntity = UserStoreMapEntity.of(
+                userId, itemName, quantity, price, currencyType
+        );
+        userStoreMapRepository.save(userStoreMapEntity);
+    }
+
+    private void saveUserItemIntoMap(long userId, ItemName itemName) {
+        userItemMapRepository.findByUserIdAndItemName(userId, itemName)
+                .ifPresentOrElse(
+                        UserItemMapEntity::increaseQuantity,
+                        () -> {
+                            UserItemMapEntity userItemMapEntity = UserItemMapEntity.of(userId, itemName);
+                            userItemMapRepository.save(userItemMapEntity);
+                        }
+                );
+    }
+
+    @Transactional
+    public void purchaseCoinWithVacationTicket(String uuid, PurchaseRequest request) {
+        UserEntity user = getUserByUuid(uuid);
+        String name = request.name();
+        Coin coin = Coin.valueOf(request.name());
+        int vacationTicketNeeded = coin.getTicketPrice();
+
+        boolean ableToBuy = user.hasEnoughVacationTickets(vacationTicketNeeded);
+        if (!ableToBuy) {
+            throw new BaseException(BAD_REQUEST, "Not enough coin");
+        }
+
+        user.purchaseWithVacationTickets(coin.getAcquiredCoin(), vacationTicketNeeded);
+        saveUserStoreRecord(user.getId(), name, coin.getAcquiredCoin(), vacationTicketNeeded, CurrencyType.VACATION_TICKET);
+
+    }
+
+    public void buyVacationTicket(String uuid, PurchaseRequest request) {
+
+    }
+
+    @Transactional
+    public void purchaseRandomItem(String uuid, PurchaseRequest request) {
+        UserEntity user = getUserByUuid(uuid);
+        String name = request.name();
+        ItemName itemName = ItemName.getRandomItem(name);
+
+        // 광고보고 오기
+
+        saveUserItemIntoMap(user.getId(), itemName);
+        saveUserStoreRecord(user.getId(), name, 1, 0, CurrencyType.FREE);
+    }
 }
+
