@@ -19,4 +19,6 @@ spring:
       port: 6379
       username: papimo
       password: ${redis.password}
+      ssl:
+        enabled: on
 
