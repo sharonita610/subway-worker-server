@@ -2,11 +2,7 @@ package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.*;
-import com.game.subwayworkerserver.controller.response.UserTrapListResponse;
-import com.game.subwayworkerserver.controller.response.CaptureAvailableFriendResponse;
-import com.game.subwayworkerserver.controller.response.CaptureResponse;
-import com.game.subwayworkerserver.controller.response.GpsRandomGiftResponse;
-import com.game.subwayworkerserver.controller.response.RandomGpsResponse;
+import com.game.subwayworkerserver.controller.response.*;
 import com.game.subwayworkerserver.service.CaptureFriendService;
 import com.game.subwayworkerserver.service.GiftBoxService;
 import com.game.subwayworkerserver.service.GpsService;
@@ -92,6 +88,12 @@ public class GpsController {
     public ResponseEntity<CaptureResponse> captureFriend(@RequestBody CaptureFriendRequest request) {
         String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok(captureFriendService.tryToCapture(uuid,request));
+    }
+
+    @GetMapping("/gps/trap-success-reward")
+    public ResponseEntity<FriendListResponse> getTrapSuccessReward(){
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        return ResponseEntity.ok(trapService.getTrapSuccessReward(uuid));
     }
 
 }
