@@ -87,7 +87,7 @@ public class UserEntity extends BaseTimeEntity {
         this.trapSuccess = true;
     }
 
-    public boolean isTrapSuccess() {
-        return this.trapSuccess;
+    public void updateTrapDone() {
+        this.trapSuccess = false;
     }
 }

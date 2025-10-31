@@ -104,6 +104,7 @@ public class TrapService {
         UserEntity user = getUserByUuid(uuid);
         List<UserTrapMapEntity> userTrapMapList = userTrapMapRepository.findByUserIdAndIsTrappedTrue(user.getId());
         List<FriendEntity> friendEntityList = saveUserTrapIfSuccess(userTrapMapList);
+        user.updateTrapDone();
         return friendEntityList.isEmpty() ? FriendListResponse.empty() : FriendListResponse.of(friendEntityList);
     }
 
@@ -143,14 +144,10 @@ public class TrapService {
                     trapMap.setIsSuccessful();
                     trapMap.setExpiresAt();
 
-                    // 5. Redis에서 임시 데이터 삭제 (선택 사항)
-                    redisTemplate.delete(instanceKey);
-
-                    // 6. 성공한 친구 엔티티를 수집하기 위해 반환
+                    // 5. 성공한 친구 엔티티를 수집하기 위해 반환
                     return savedFriend;
                 } catch (NumberFormatException e) {
                     log.error("Invalid friendLevel format: {}", levelString);
-                    // 데이터 문제로 저장 실패했으므로 null 반환
                     return null;
                 }
             }
