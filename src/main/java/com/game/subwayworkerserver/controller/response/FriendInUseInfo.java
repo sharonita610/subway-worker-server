@@ -6,7 +6,8 @@ import com.game.subwayworkerserver.entity.FriendEntity;
 import java.util.List;
 
 public record FriendInUseInfo(
-    String name,
+    String engName,
+    String korName,
     String position,
     int level
 ) {
@@ -14,6 +15,7 @@ public record FriendInUseInfo(
         return  friendInUse.stream()
                 .map(friend ->
                         new FriendInUseInfo(
+                                String.valueOf(friend.getName()),
                                 friend.getName().getKoreanName(),
                                 FriendLevel.of(friend.getLevel()).getTitle(),
                                 friend.getLevel()
