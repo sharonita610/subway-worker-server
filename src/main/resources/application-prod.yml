@@ -20,5 +20,5 @@ spring:
       username: papimo
       password: ${redis.password}
       ssl:
-        enabled: on
+        enabled: true
 
