@@ -15,7 +15,7 @@ spring:
 
   data:
     redis:
-      host: REDACTED
+      host: REDACTED:6379
       port: 6379
       username: papimo
       password: ${redis.password}
