@@ -2,6 +2,8 @@ package com.game.subwayworkerserver.controller.response;
 
 import lombok.Builder;
 
+import java.util.List;
+
 public record FriendBaseInfo(
         long id,
         boolean inUse,
@@ -11,8 +13,9 @@ public record FriendBaseInfo(
         long maxMana,
         long attack,
         long defense,
-        String passiveSkills,
-        String activeSkills
+        long manaRecovery,
+        List<SkillBaseInfo> passiveSkills,
+        List<SkillBaseInfo> activeSkills
 ) {
     @Builder
     public FriendBaseInfo {

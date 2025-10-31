@@ -1,7 +1,5 @@
 package com.game.subwayworkerserver.controller.response;
 
-import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
-import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import com.game.subwayworkerserver.entity.FriendEntity;
 
 import java.util.List;
@@ -21,10 +19,15 @@ public record FriendListResponse(
                                 .maxMana(friend.getMaxMana())
                                 .attack(friend.getAttack())
                                 .defense(friend.getDefense())
-                                .activeSkills(ActiveSkillCard.of(friend.getActiveSkill1()) + "," + ActiveSkillCard.of(friend.getActiveSkill2()))
-                                .passiveSkills(PassiveSkillCard.of(friend.getPassiveSkill1()) + "," + PassiveSkillCard.of(friend.getPassiveSkill2()))
+                                .manaRecovery(friend.getManaRecovery())
+                                .activeSkills(SkillBaseInfo.activeSkill(friend.getActiveSkill1(), friend.getActiveSkill2()))
+                                .passiveSkills(SkillBaseInfo.passiveSkill(friend.getPassiveSkill1(), friend.getPassiveSkill2()))
                                 .build()
                 ).toList();
         return new FriendListResponse(friendBaseInfos);
+    }
+
+    public static FriendListResponse empty() {
+        return new FriendListResponse(List.of());
     }
 }

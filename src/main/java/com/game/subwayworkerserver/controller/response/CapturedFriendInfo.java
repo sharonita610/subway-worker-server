@@ -4,6 +4,8 @@ import com.game.subwayworkerserver.domain.baseinfo.*;
 import com.game.subwayworkerserver.entity.FriendEntity;
 import lombok.Builder;
 
+import java.util.List;
+
 public record CapturedFriendInfo(
         String friendName,
         String position,
@@ -19,8 +21,8 @@ public record CapturedFriendInfo(
         long attack,
         long defense,
         long manaRecovery,
-        String activeSkills,
-        String passiveSkills
+        List<SkillBaseInfo> activeSkills,
+        List<SkillBaseInfo> passiveSkills
 ) {
 
     @Builder
@@ -44,8 +46,8 @@ public record CapturedFriendInfo(
                 .attack(friend.getAttack())
                 .defense(friend.getDefense())
                 .manaRecovery(friend.getManaRecovery())
-                .activeSkills(ActiveSkillCard.of(friend.getActiveSkill1()) + "," + ActiveSkillCard.of(friend.getActiveSkill2()))
-                .passiveSkills(PassiveSkillCard.of(friend.getPassiveSkill1()) + "," + PassiveSkillCard.of(friend.getPassiveSkill2()))
+                .activeSkills(SkillBaseInfo.activeSkill(friend.getActiveSkill1(), friend.getActiveSkill2()))
+                .passiveSkills(SkillBaseInfo.passiveSkill(friend.getActiveSkill1(), friend.getPassiveSkill2()))
                 .build();
     }
 }
