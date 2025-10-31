@@ -39,6 +39,21 @@ public enum ItemName {
     // 가격 0은 재화 구매 불가 의미
     RANDOM_TRAP("랜덤 트랩", "트랩 도구 중 하나를 랜덤으로 획득합니다. (하루 3회 무료)", ItemCategory.TRAP, 0, 0);
 
+    // --- 새로 추가할 상수 (가중치 정의) ---
+    private static final List<ItemName> CAPTURE_POOL = List.of(
+            ItemName.BUSINESS_CARRIER,
+            ItemName.BRIEFCASE,
+            ItemName.PAPER_BOX
+    );
+    private static final List<Integer> CAPTURE_WEIGHTS = List.of(10, 40, 50); // 총합 100
+
+    private static final List<ItemName> TRAP_POOL = List.of(
+            ItemName.GOLD_SHOVEL,
+            ItemName.SILVER_SHOVEL,
+            ItemName.WOOD_SHOVEL
+    );
+    private static final List<Integer> TRAP_WEIGHTS = List.of(10, 40, 50); // 총합 100
+
     private final String name;
     private final String description;
     private final ItemCategory category;
@@ -98,6 +113,40 @@ public enum ItemName {
                 .filter(item -> item.category == ItemCategory.CAPTURE)
                 .filter(item -> item != ItemName.BUSINESS_CARRIER)
                 .collect(Collectors.toList());
+    }
+
+    public static ItemName getRandomItem(final String name) {
+        ItemName randomTool = fromConstantName(name);
+
+        if (randomTool == ItemName.RANDOM_CAPTURE) {
+            return selectRandomItemByWeight(CAPTURE_POOL, CAPTURE_WEIGHTS);
+        } else if (randomTool == ItemName.RANDOM_TRAP) {
+            return selectRandomItemByWeight(TRAP_POOL, TRAP_WEIGHTS);
+        }
+
+        throw new BaseException(ErrorCode.BAD_REQUEST, "유효하지 않은 랜덤 상품 이름입니다: " + name);
+    }
+
+    private static ItemName selectRandomItemByWeight(List<ItemName> pool, List<Integer> weights) {
+        if (pool.size() != weights.size() || weights.stream().mapToInt(Integer::intValue).sum() != 100) {
+            throw new IllegalArgumentException("가중치 풀 또는 가중치 합산 오류가 발생했습니다.");
+        }
+
+        // 0부터 99 사이의 랜덤 값 생성 (가중치 총합 100)
+        int randomRoll = ThreadLocalRandom.current().nextInt(100);
+        int cumulativeWeight = 0;
+
+        for (int i = 0; i < pool.size(); i++) {
+            cumulativeWeight += weights.get(i); // 가중치 누적
+
+            if (randomRoll < cumulativeWeight) {
+                // 랜덤 값이 현재 누적된 가중치 범위 안에 들어오면 해당 아이템 선택
+                return pool.get(i);
+            }
+        }
+
+        // 안전 장치 (100% 확률 보장 시 여기에 도달하지 않아야 함)
+        throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR, "랜덤 아이템 선택 실패.");
     }
 
     public boolean canTrapSucceed() {
