@@ -36,8 +36,10 @@ public class GpsRandomDataScheduler {
     private static final double MAX_LON = 131.0;
 
     // 1km Grid 셀 간격 (약 1km에 해당하는 도(degree) 값)
-    private static final double LAT_STEP = 0.009;
-    private static final double LON_STEP = 0.011;
+//    private static final double LAT_STEP = 0.009;
+//    private static final double LON_STEP = 0.011;
+    private static final double LAT_STEP = 0.018;
+    private static final double LON_STEP = 0.022;
 
     // Grid 셀당 생성할 아이템 수
     private static final int FRIENDS_PER_CELL = 5;
@@ -61,7 +63,7 @@ public class GpsRandomDataScheduler {
      * 2. 30분마다 맵의 동료와 선물 상자 데이터를 재생성합니다.
      * fixedRate = 1800000ms (30분)
      */
-    @Scheduled(fixedRate = 1800000, initialDelay = 60000)
+    @Scheduled(fixedRate = 10800000)
     public void scheduledMapRegeneration() {
         log.info("--- [Scheduler] 30분 주기 맵 재생성 시작 ---");
         // Item 생성/삭제를 건너뛰고, 동료와 선물상자만 재생성
