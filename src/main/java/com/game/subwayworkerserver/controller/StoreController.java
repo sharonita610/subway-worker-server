@@ -1,8 +1,10 @@
 package com.game.subwayworkerserver.controller;
 
+import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.PurchaseRequest;
 import com.game.subwayworkerserver.controller.response.RandomCaptureItemResponse;
 import com.game.subwayworkerserver.controller.response.StoreItemResponse;
+import com.game.subwayworkerserver.service.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,8 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class StoreController {
 
+    private final StoreService storeService;
+
     @Operation(
-            summary = "store 조회",
+            summary = "store 조회 [완]",
             description = "store에서 구매 가능한 모든 아이템의 리스트를 조회",
             responses = {
                     @ApiResponse(responseCode = "200", description = "성공적인 정보 조회")
@@ -27,7 +31,8 @@ public class StoreController {
     )
     @GetMapping("/store")
     public ResponseEntity<StoreItemResponse> getStoreItems() {
-        return ResponseEntity.ok().build();
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        return ResponseEntity.ok(storeService.getStoreItems(uuid));
     }
 
     @Operation(
