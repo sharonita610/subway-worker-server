@@ -31,11 +31,9 @@ public enum FriendAttribute {
         throw new BaseException(ErrorCode.INVALID_FRIEND_ATTRIBUTE);
     }
 
-    public static List<String> getAllAttributesAsList() {
+    public static List<FriendAttribute> getAllAttributesAsList() {
         FriendAttribute[] attributeArray = FriendAttribute.values();
-
-        List<FriendAttribute> attributeArray1 = List.of(attributeArray);
-        return attributeArray1.stream().map(FriendAttribute::getKoreanName).toList();
+        return List.of(attributeArray);
     }
 
     public static FriendAttribute getRandomAttribute() {

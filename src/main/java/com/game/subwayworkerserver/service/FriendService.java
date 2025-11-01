@@ -14,6 +14,6 @@ public class FriendService {
     private final FriendRepository friendRepository;
 
     public FriendAttributesResponse getFriendAttributes() {
-        return new FriendAttributesResponse(FriendAttribute.getAllAttributesAsList());
+        return FriendAttributesResponse.from(FriendAttribute.getAllAttributesAsList());
     }
 }
