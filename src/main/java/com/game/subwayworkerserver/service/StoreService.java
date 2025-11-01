@@ -84,6 +84,11 @@ public class StoreService {
     public void purchaseItemWithCoin(String uuid, PurchaseRequest request) {
         UserEntity user = getUserByUuid(uuid);
         String name = request.name();
+
+        if(name.contains(RANDOM_TRAP) || name.contains(RANDOM_CAPTURE)) {
+            throw new BaseException(BAD_REQUEST, "Cannot purchase random item with this api.");
+        }
+
         ItemName itemName = ItemName.fromConstantName(name);
         int coinNeeded = itemName.getPrice();
 
@@ -128,13 +133,28 @@ public class StoreService {
         }
 
         user.purchaseWithVacationTickets(coin.getAcquiredCoin(), vacationTicketNeeded);
-        saveUserStoreRecord(user.getId(), name, coin.getAcquiredCoin(), vacationTicketNeeded, CurrencyType.VACATION_TICKET);
+        saveUserStoreRecord(user.getId(), COIN, coin.getAcquiredCoin(), vacationTicketNeeded, CurrencyType.VACATION_TICKET);
 
     }
 
+    @Transactional
     public void buyVacationTicket(String uuid, PurchaseRequest request) {
+        UserEntity user = getUserByUuid(uuid);
+        VacationTicket vacationTicket = VacationTicket.valueOf(request.name());
+
+        // 외부 결제 api
+
+        user.purchaseVacationTicket(vacationTicket.getAcquiredTickets());
+        saveUserStoreRecord(
+                user.getId(),
+                VACATION,
+                vacationTicket.getAcquiredTickets(),
+                vacationTicket.getPriceKrw(),
+                CurrencyType.CASH
+        );
 
     }
+
 
     @Transactional
     public void purchaseRandomItem(String uuid, PurchaseRequest request) {
