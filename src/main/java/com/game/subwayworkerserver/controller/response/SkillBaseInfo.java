@@ -12,8 +12,7 @@ public record SkillBaseInfo(
         String engName,
         String korName,
         String description,
-        int level,
-        boolean inUse
+        int level
 ) {
 
     @Builder
@@ -23,11 +22,9 @@ public record SkillBaseInfo(
     private static SkillBaseInfo toBaseInfo(long id, String engName, String korName, String description) {
         return SkillBaseInfo.builder()
                 .id(id)
-                .korName(engName)
-                .engName(korName)
+                .engName(engName)
+                .korName(korName)
                 .description(description)
-                .level(1)
-                .inUse(false)
                 .build();
     }
 
@@ -39,7 +36,7 @@ public record SkillBaseInfo(
                 .map(skillCard -> toBaseInfo(
                         skillCard.getId(),
                         skillCard.name(),
-                        skillCard.getDisplayName(),
+                        skillCard.getKoreanName(),
                         skillCard.getDescription()
                 )).toList();
     }
@@ -51,7 +48,7 @@ public record SkillBaseInfo(
                 .map(skillCard -> toBaseInfo(
                         skillCard.getId(),
                         skillCard.name(),
-                        skillCard.getDisplayName(),
+                        skillCard.getKoreanName(),
                         skillCard.getDescription()
                 )).toList();
     }
