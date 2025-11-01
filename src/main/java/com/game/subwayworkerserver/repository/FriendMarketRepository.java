@@ -7,5 +7,7 @@ import java.util.List;
 
 public interface FriendMarketRepository extends JpaRepository<FriendMarketEntity, Long> {
 
-    List<FriendMarketEntity> findAllByAvailableTrueAndSoldFalse();
+    List<FriendMarketEntity> findAllByAvailableTrueAndSoldFalseAndSellerIdNot(long userId);
+
+    List<FriendMarketEntity>  findAllBySellerIdAndAvailableTrue(long userId);
 }
