@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.controller.response;
 
-import com.game.subwayworkerserver.domain.baseinfo.FriendAttribute;
+import com.game.subwayworkerserver.domain.baseinfo.FriendType;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public record RandomGpsResponse(
         ) {
             return new RandomFriendLocationResponse(
                     friendId,
-                    String.valueOf(FriendAttribute.fromKoreanName(friendName)),
+                    String.valueOf(FriendType.fromName(friendName)),
                     friendName,
                     friendLevel,
                     position,
