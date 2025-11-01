@@ -6,6 +6,10 @@ import java.util.List;
 
 public record FriendBaseInfo(
         long id,
+        String engName,
+        String korName,
+        String position,
+        int level,
         boolean inUse,
         boolean onSale,
         long hp,
