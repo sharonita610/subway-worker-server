@@ -9,7 +9,7 @@ public record TrapItemInfo(
 ) {
     public static TrapItemInfo of(String korName, int quantity) {
         return new TrapItemInfo(
-                String.valueOf(ItemName.fromConstantName(korName)),
+                String.valueOf(ItemName.fromKoreanName(korName)),
                 korName,
                 quantity
         );

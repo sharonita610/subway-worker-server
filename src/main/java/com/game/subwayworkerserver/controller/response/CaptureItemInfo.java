@@ -10,7 +10,7 @@ public record CaptureItemInfo(
 ) {
     public static CaptureItemInfo of(String korName, int quantity) {
         return new CaptureItemInfo(
-                String.valueOf(ItemName.fromConstantName(korName)),
+                String.valueOf(ItemName.fromKoreanName(korName)),
                 korName,
                 quantity
         );
