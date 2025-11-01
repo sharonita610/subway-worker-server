@@ -2,6 +2,7 @@ package com.game.subwayworkerserver.controller;
 
 
 import com.game.subwayworkerserver.config.SecurityUtils;
+import com.game.subwayworkerserver.controller.request.FriendFilterRequest;
 import com.game.subwayworkerserver.controller.request.SellingRequest;
 import com.game.subwayworkerserver.controller.response.*;
 import com.game.subwayworkerserver.service.MarketService;
@@ -23,7 +24,7 @@ public class MarketController {
             description = "장터에 올라온 모든 동료의 리스트를 필터링 기능을 포함하여 조회"
     )
     @PostMapping("/market/global/friends")
-    public ResponseEntity<GlobalFriendsResponse> getFriendsOnSale(){
+    public ResponseEntity<GlobalFriendsResponse> getFriendsOnSale(@RequestBody FriendFilterRequest request) {
         String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok(marketService.getFriendsOnSale(uuid));
     }
