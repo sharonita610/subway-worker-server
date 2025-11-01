@@ -1,6 +1,7 @@
 package com.game.subwayworkerserver.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.game.subwayworkerserver.domain.market.FriendOnSale;
 import lombok.Builder;
 
 import java.util.List;
@@ -27,5 +28,24 @@ public record FriendBaseInfo(
 ) {
     @Builder
     public FriendBaseInfo {
+    }
+
+    public static FriendBaseInfo from(FriendOnSale friendOnSale) {
+        return FriendBaseInfo.builder()
+                .id(friendOnSale.friendId())
+                .engName(friendOnSale.engName())
+                .korName(friendOnSale.korName())
+                .position(friendOnSale.position())
+                .level(friendOnSale.level())
+                .hp(friendOnSale.hp())
+                .mana(friendOnSale.mana())
+                .maxMana(friendOnSale.maxMana())
+                .attack(friendOnSale.attack())
+                .defense(friendOnSale.defense())
+                .manaRecovery(friendOnSale.manaRecovery())
+                .passiveSkills(SkillBaseInfo.passiveSkill(friendOnSale.passiveSkillId1(), friendOnSale.passiveSkillId2()))
+                .activeSkills(SkillBaseInfo.activeSkill(friendOnSale.activeSkillId1(), friendOnSale.activeSkillId2()))
+                .korAttributeName(friendOnSale.attribute())
+                .build();
     }
 }
