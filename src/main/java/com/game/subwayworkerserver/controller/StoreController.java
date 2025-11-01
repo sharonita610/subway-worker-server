@@ -2,6 +2,7 @@ package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.PurchaseRequest;
+import com.game.subwayworkerserver.controller.response.ItemResponse;
 import com.game.subwayworkerserver.controller.response.StoreItemResponse;
 import com.game.subwayworkerserver.service.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,10 +57,9 @@ public class StoreController {
             }
     )
     @PostMapping("/store/random-item")
-    public ResponseEntity<Void> buyRandomItem(@RequestBody PurchaseRequest request) {
+    public ResponseEntity<ItemResponse> buyRandomItem(@RequestBody PurchaseRequest request) {
         String uuid = SecurityUtils.getCurrentUserUuid();
-        storeService.purchaseRandomItem(uuid, request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(storeService.purchaseRandomItem(uuid, request));
     }
 
     @Operation(
