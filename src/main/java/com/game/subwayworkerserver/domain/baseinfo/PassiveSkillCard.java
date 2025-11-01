@@ -35,13 +35,13 @@ public enum PassiveSkillCard {
     DOUBLE_EDGED_SWORD(108, "양날의 검 (퇴사 시뮬레이션)", "설명 없음 (만들지 고민 중)", SkillCardType.PASSIVE);
 
     private final int id;
-    private final String displayName;
+    private final String koreanName;
     private final String description; // 새로운 필드
     private final SkillCardType type;
 
-    PassiveSkillCard(int id, String displayName, String description, SkillCardType type) {
+    PassiveSkillCard(int id, String koreanName, String description, SkillCardType type) {
         this.id = id;
-        this.displayName = displayName;
+        this.koreanName = koreanName;
         this.description = description;
         this.type = type;
     }

@@ -32,13 +32,13 @@ public enum ActiveSkillCard {
 
 
     private final int id;
-    private final String displayName;
+    private final String koreanName;
     private final String description; // 설명 필드
     private final SkillCardType type;
 
-    ActiveSkillCard(int id, String displayName, String description, SkillCardType type) {
+    ActiveSkillCard(int id, String koreanName, String description, SkillCardType type) {
         this.id = id;
-        this.displayName = displayName;
+        this.koreanName = koreanName;
         this.description = description;
         this.type = type;
     }
