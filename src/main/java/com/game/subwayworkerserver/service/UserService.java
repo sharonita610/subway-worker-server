@@ -3,7 +3,7 @@ package com.game.subwayworkerserver.service;
 import com.game.subwayworkerserver.controller.request.CaptureItemListResponse;
 import com.game.subwayworkerserver.controller.request.UserCreateRequest;
 import com.game.subwayworkerserver.controller.response.*;
-import com.game.subwayworkerserver.domain.baseinfo.FriendAttribute;
+import com.game.subwayworkerserver.domain.baseinfo.FriendType;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-
-import static com.game.subwayworkerserver.domain.baseinfo.FriendAttribute.fromKoreanName;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +35,7 @@ public class UserService {
 
     @Transactional
     public String createUser(final UserCreateRequest request) {
-        FriendAttribute friendAttribute = fromKoreanName(request.friendAttribute());
+        FriendType friendType = FriendType.valueOf(request.friendName());
 
         if (userRepository.existsByName(request.username())) {
             throw new BaseException(ErrorCode.USERNAME_ALREADY_EXISTS);
@@ -47,7 +45,7 @@ public class UserService {
         UserEntity userEntity = UserEntity.of(request.username(), UUID.randomUUID().toString(), userGender);
         UserEntity savedUser = userRepository.save(userEntity);
 
-        FriendEntity friendEntity = FriendEntity.of(savedUser.getId(), friendAttribute);
+        FriendEntity friendEntity = FriendEntity.of(savedUser.getId(), friendType);
         friendRepository.save(friendEntity);
         return savedUser.getUuid();
     }
