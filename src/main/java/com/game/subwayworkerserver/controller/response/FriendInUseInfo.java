@@ -1,6 +1,5 @@
 package com.game.subwayworkerserver.controller.response;
 
-import com.game.subwayworkerserver.domain.baseinfo.FriendLevel;
 import com.game.subwayworkerserver.entity.FriendEntity;
 
 import java.util.List;
@@ -15,10 +14,10 @@ public record FriendInUseInfo(
         return  friendInUse.stream()
                 .map(friend ->
                         new FriendInUseInfo(
-                                String.valueOf(friend.getName()),
-                                friend.getName().getKoreanName(),
-                                FriendLevel.of(friend.getLevel()).getTitle(),
-                                friend.getLevel()
+                                friend.getFriendType().name(),
+                                friend.getName(),
+                                friend.getLevel().getTitle(),
+                                friend.getLevel().getLevel()
                         )
                 ).toList();
     }

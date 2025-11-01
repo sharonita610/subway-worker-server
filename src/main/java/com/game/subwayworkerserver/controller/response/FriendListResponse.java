@@ -12,9 +12,10 @@ public record FriendListResponse(
                 .map(friend ->
                         FriendBaseInfo.builder()
                                 .id(friend.getId())
-                                .engName(String.valueOf(friend.getName()))
-                                .korName(friend.getName().getKoreanName())
-                                .level(friend.getLevel())
+                                .engName(String.valueOf(friend.getFriendType()))
+                                .korName(friend.getName())
+                                .position(friend.getLevel().getTitle())
+                                .level(friend.getLevel().getLevel())
                                 .inUse(friend.isInUse())
                                 .onSale(friend.isOnSale())
                                 .hp(friend.getHp())
@@ -25,6 +26,8 @@ public record FriendListResponse(
                                 .manaRecovery(friend.getManaRecovery())
                                 .activeSkills(SkillBaseInfo.activeSkill(friend.getActiveSkill1(), friend.getActiveSkill2()))
                                 .passiveSkills(SkillBaseInfo.passiveSkill(friend.getPassiveSkill1(), friend.getPassiveSkill2()))
+                                .engAttributeName(friend.getFriendAttribute().name())
+                                .korAttributeName(friend.getFriendAttribute().getKoreanName())
                                 .build()
                 ).toList();
         return new FriendListResponse(friendBaseInfos);
