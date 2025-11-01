@@ -4,6 +4,7 @@ package com.game.subwayworkerserver.controller;
 import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.SellingRequest;
 import com.game.subwayworkerserver.controller.response.*;
+import com.game.subwayworkerserver.service.MarketService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class MarketController {
 
+    private final MarketService marketService;
+
     @Operation(
             summary = "영입 가능한 동료 리스트 조회",
             description = "장터에 올라온 모든 동료의 리스트를 필터링 기능을 포함하여 조회"
@@ -22,8 +25,7 @@ public class MarketController {
     @PostMapping("/market/global/friends")
     public ResponseEntity<GlobalFriendsResponse> getFriendsOnSale(){
         String uuid = SecurityUtils.getCurrentUserUuid();
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(marketService.getFriendsOnSale(uuid));
     }
 
     @Operation(
