@@ -38,8 +38,8 @@ public class GpsRandomDataScheduler {
     // 1km Grid 셀 간격 (약 1km에 해당하는 도(degree) 값)
 //    private static final double LAT_STEP = 0.009;
 //    private static final double LON_STEP = 0.011;
-    private static final double LAT_STEP = 0.018;
-    private static final double LON_STEP = 0.022;
+    private static final double LAT_STEP = 0.045;
+    private static final double LON_STEP = 0.055;
 
     // Grid 셀당 생성할 아이템 수
     private static final int FRIENDS_PER_CELL = 5;
