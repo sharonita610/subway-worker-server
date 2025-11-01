@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.controller;
 
-import com.game.subwayworkerserver.controller.response.FriendAttributesResponse;
+import com.game.subwayworkerserver.controller.response.FriendTypesResponse;
 import com.game.subwayworkerserver.service.FriendService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,8 +24,8 @@ public class FriendController {
                     @ApiResponse(responseCode = "200", description = "동료의 속성 리스트를 조회")
             }
     )
-    @GetMapping("/friend-attributes")
-    public ResponseEntity<FriendAttributesResponse> getFriendAttributes() {
+    @GetMapping("/friend-types")
+    public ResponseEntity<FriendTypesResponse> getFriendAttributes() {
         return ResponseEntity.ok(friendService.getFriendAttributes());
     }
 }
