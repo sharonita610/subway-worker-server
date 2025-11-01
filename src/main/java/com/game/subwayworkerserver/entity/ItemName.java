@@ -42,18 +42,16 @@ public enum ItemName {
 
     // --- 새로 추가할 상수 (가중치 정의) ---
     private static final List<ItemName> CAPTURE_POOL = List.of(
-            ItemName.BUSINESS_CARRIER,
             ItemName.BRIEFCASE,
             ItemName.PAPER_BOX
     );
-    private static final List<Integer> CAPTURE_WEIGHTS = List.of(10, 40, 50); // 총합 100
+    private static final List<Integer> CAPTURE_WEIGHTS = List.of(50, 50); // 총합 100
 
     private static final List<ItemName> TRAP_POOL = List.of(
-            ItemName.GOLD_SHOVEL,
             ItemName.SILVER_SHOVEL,
             ItemName.WOOD_SHOVEL
     );
-    private static final List<Integer> TRAP_WEIGHTS = List.of(10, 40, 50); // 총합 100
+    private static final List<Integer> TRAP_WEIGHTS = List.of(50, 50); // 총합 100
 
     private final String name;
     private final String description;
