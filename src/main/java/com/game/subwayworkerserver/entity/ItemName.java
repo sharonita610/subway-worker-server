@@ -16,25 +16,25 @@ public enum ItemName {
 
     // --- 포획 도구 (Capture Item) ---
     // 하급: 2500 코인, 20%
-    PAPER_BOX("종이박스", "저렴한 포획 도구. 하루 3개 광고로 구매 가능.", ItemCategory.CAPTURE, 2500, 20),
+    PAPER_BOX("종이박스", "동료를 포획할 때 사용할 수 있다. 내구성이 떨어져 동료가 잡혀도 달아날 수 있는 편이다.", ItemCategory.CAPTURE, 2500, 20),
 
     // 중급: 5000 코인, 50%
-    BRIEFCASE("서류가방", "균형 잡힌 포획 도구.", ItemCategory.CAPTURE, 5000, 50),
+    BRIEFCASE("서류가방", "동료를 포획할 때 사용할 수 있다. 지퍼를 여닫을 수 있어 종이박스 보다 포획률이 높다.", ItemCategory.CAPTURE, 5000, 50),
 
     // 상급: 재화 구매 불가, 90%
-    BUSINESS_CARRIER("출장용캐리어", "가장 강력한 포획 도구. 보물상자에서만 등장.", ItemCategory.CAPTURE, 0, 90), // 가격 0은 재화 구매 불가 의미
+    BUSINESS_CARRIER("출장용캐리어", "동료를 포획할 때 사용할 수 있다. 튼튼한 재질로 만들어져 있고 부피가 커서 포획률이 엄청나다.", ItemCategory.CAPTURE, 0, 90), // 가격 0은 재화 구매 불가 의미
 
     RANDOM_CAPTURE("랜덤 포획", "포획 도구 중 하나를 랜덤으로 획득합니다. (하루 3회 무료)", ItemCategory.CAPTURE, 0, 0),
 
     // --- 트랩 도구 (Trap Item) ---
     // 하급: 4000 코인, 50%
-    WOOD_SHOVEL("나무삽", "가장 기본적인 트랩 도구. 50% 확률로 몬스터 포획.", ItemCategory.TRAP, 4000, 50),
+    WOOD_SHOVEL("나무삽", "삽질을하여 적을 구덩이에 빠뜨릴 수 있게한다. 얕게 삽질이 가능하다. (설치 후 12시간 지속)", ItemCategory.TRAP, 4000, 50),
 
     // 중급: 8000 코인, 70%
-    SILVER_SHOVEL("은삽", "강력한 트랩 도구. 70% 확률로 몬스터 포획.", ItemCategory.TRAP, 8000, 70),
+    SILVER_SHOVEL("은삽", "삽질을하여 적을 구덩이에 빠뜨릴 수 있게한다. 나무삽 보다는 깊게 삽질이 가능하다. (설치 후 12시간 지속)", ItemCategory.TRAP, 8000, 70),
 
     // 상급: 재화 구매 불가, 100%
-    GOLD_SHOVEL("금삽", "확정 포획이 가능한 트랩 도구. 보물상자에서만 등장.", ItemCategory.TRAP, 0, 100),
+    GOLD_SHOVEL("금삽", "삽질을하여 적을 구덩이에 빠뜨릴 수 있게한다. 삽질 마스터가 가능하다. (설치 후 12시간 지속)", ItemCategory.TRAP, 0, 100),
 
     // 가격 0은 재화 구매 불가 의미
     RANDOM_TRAP("랜덤 트랩", "트랩 도구 중 하나를 랜덤으로 획득합니다. (하루 3회 무료)", ItemCategory.TRAP, 0, 0);
