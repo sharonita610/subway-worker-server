@@ -22,7 +22,9 @@ public record CapturedFriendInfo(
         long defense,
         long manaRecovery,
         List<SkillBaseInfo> activeSkills,
-        List<SkillBaseInfo> passiveSkills
+        List<SkillBaseInfo> passiveSkills,
+        String engAttributeName,
+        String korAttributeName
 ) {
 
     @Builder
@@ -32,7 +34,7 @@ public record CapturedFriendInfo(
     public static CapturedFriendInfo of(final FriendEntity friend, String position) {
         FriendType type = friend.getFriendType();
         return CapturedFriendInfo.builder()
-                .friendName(friend.getName().getKoreanName())
+                .friendName(friend.getName())
                 .position(position)
                 .baseHpRange(type.getHpRange().min() + "~"  + type.getHpRange().max())
                 .baseManaRange(type.getMpNowRange().min() + "~"  + type.getMpNowRange().max())
@@ -48,6 +50,8 @@ public record CapturedFriendInfo(
                 .manaRecovery(friend.getManaRecovery())
                 .activeSkills(SkillBaseInfo.activeSkill(friend.getActiveSkill1(), friend.getActiveSkill2()))
                 .passiveSkills(SkillBaseInfo.passiveSkill(friend.getActiveSkill1(), friend.getPassiveSkill2()))
+                .engAttributeName(friend.getFriendAttribute().name())
+                .korAttributeName(friend.getFriendAttribute().getKoreanName())
                 .build();
     }
 }

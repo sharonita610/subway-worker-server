@@ -19,7 +19,9 @@ public record FriendBaseInfo(
         long defense,
         long manaRecovery,
         List<SkillBaseInfo> passiveSkills,
-        List<SkillBaseInfo> activeSkills
+        List<SkillBaseInfo> activeSkills,
+        String engAttributeName,
+        String korAttributeName
 ) {
     @Builder
     public FriendBaseInfo {
