@@ -1,6 +1,7 @@
 package com.game.subwayworkerserver.controller;
 
 
+import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.SellingRequest;
 import com.game.subwayworkerserver.controller.response.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +21,8 @@ public class MarketController {
     )
     @PostMapping("/market/global/friends")
     public ResponseEntity<GlobalFriendsResponse> getFriendsOnSale(){
+        String uuid = SecurityUtils.getCurrentUserUuid();
+
         return ResponseEntity.ok().build();
     }
 
@@ -28,8 +31,8 @@ public class MarketController {
             description = "내가 판매 중인 동료의 리스트를 포함하여 조회"
     )
     @PostMapping("/market/friend/selling-list")
-    public ResponseEntity<FriendsOnSaleResponse> getMyFriendSellingList(
-    ){
+    public ResponseEntity<FriendsOnSaleResponse> getMyFriendSellingList(){
+        String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok().build();
     }
 
@@ -39,6 +42,8 @@ public class MarketController {
     )
     @PostMapping("/market/global/buy-friend")
     public ResponseEntity<Void> buyFriend(@RequestParam("id") long friendId){
+        String uuid = SecurityUtils.getCurrentUserUuid();
+
         return ResponseEntity.ok().build();
     }
 
@@ -48,6 +53,8 @@ public class MarketController {
     )
     @PostMapping("/market/friend/sell")
     public ResponseEntity<Void> sellFriend(@RequestBody SellingRequest request){
+        String uuid = SecurityUtils.getCurrentUserUuid();
+
         return ResponseEntity.ok().build();
     }
 
@@ -66,6 +73,8 @@ public class MarketController {
     )
     @GetMapping("/market/friend/get-paid")
     public ResponseEntity<PaymentSuccessResponse> getFriendPaid(@RequestParam("id") long friendId){
+        String uuid = SecurityUtils.getCurrentUserUuid();
+
         return ResponseEntity.ok().build();
     }
 
@@ -75,6 +84,8 @@ public class MarketController {
     )
     @PostMapping("/market/global/skill")
     public ResponseEntity<GlobalSkillCardResponse> getGlobalSkillCardOnSale(){
+        String uuid = SecurityUtils.getCurrentUserUuid();
+
         return ResponseEntity.ok().build();
     }
 
@@ -83,8 +94,9 @@ public class MarketController {
             description = "내가 판매 중인 스킬카드 리스트를 조회"
     )
     @PostMapping("/market/skill/selling-list")
-    public ResponseEntity<SkillOnSaleResponse> getMySkillSellingList(
-    ){
+    public ResponseEntity<SkillOnSaleResponse> getMySkillSellingList(){
+        String uuid = SecurityUtils.getCurrentUserUuid();
+
         return ResponseEntity.ok().build();
     }
 
@@ -94,6 +106,8 @@ public class MarketController {
     )
     @PostMapping("/market/global/buy-skill")
     public ResponseEntity<Void> buySkillCard(@RequestParam("id") long skillId){
+        String uuid = SecurityUtils.getCurrentUserUuid();
+
         return ResponseEntity.ok().build();
     }
 
@@ -103,6 +117,8 @@ public class MarketController {
     )
     @PostMapping("/market/skill/sell")
     public ResponseEntity<Void> sellSkill(@RequestBody SellingRequest request){
+        String uuid = SecurityUtils.getCurrentUserUuid();
+
         return ResponseEntity.ok().build();
     }
 
@@ -112,6 +128,8 @@ public class MarketController {
     )
     @PostMapping("/market/skill/cancel")
     public ResponseEntity<Void> cancelSellingSkill(@RequestParam("id") long skillId){
+        String uuid = SecurityUtils.getCurrentUserUuid();
+
         return ResponseEntity.ok().build();
     }
 
@@ -121,6 +139,8 @@ public class MarketController {
     )
     @GetMapping("/market/skill/get-paid")
     public ResponseEntity<PaymentSuccessResponse> getSillPaid(@RequestParam("id") long skillId){
+        String uuid = SecurityUtils.getCurrentUserUuid();
+
         return ResponseEntity.ok().build();
     }
 }
