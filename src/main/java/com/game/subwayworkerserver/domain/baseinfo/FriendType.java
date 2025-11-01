@@ -18,7 +18,7 @@ public enum FriendType {
     MOONGSHIL("뭉실", new CharacterGenerator.Range(58, 91), new CharacterGenerator.Range(0, 5), new CharacterGenerator.Range(23, 36), 10, new CharacterGenerator.Range(14, 21), new CharacterGenerator.Range(3, 7)),
     MOKA("모카", new CharacterGenerator.Range(44, 83), new CharacterGenerator.Range(0, 5), new CharacterGenerator.Range(23, 36), 10, new CharacterGenerator.Range(16, 23), new CharacterGenerator.Range(8, 15)),
     LOONY("루니", new CharacterGenerator.Range(31, 54), new CharacterGenerator.Range(8, 25), new CharacterGenerator.Range(40, 78), 13, new CharacterGenerator.Range(6, 19), new CharacterGenerator.Range(1, 3)),
-    POOBIE("푸비", new CharacterGenerator.Range(35, 58), new CharacterGenerator.Range(0, 10), new CharacterGenerator.Range(27, 44), 10, new CharacterGenerator.Range(19, 31), new CharacterGenerator.Range(3, 7)),
+    POOBY("푸비", new CharacterGenerator.Range(35, 58), new CharacterGenerator.Range(0, 10), new CharacterGenerator.Range(27, 44), 10, new CharacterGenerator.Range(19, 31), new CharacterGenerator.Range(3, 7)),
     YOMY("요미", new CharacterGenerator.Range(43, 78), new CharacterGenerator.Range(3, 15), new CharacterGenerator.Range(33, 57), 11, new CharacterGenerator.Range(16, 26), new CharacterGenerator.Range(4, 11));
 
     private final String koreanName;
