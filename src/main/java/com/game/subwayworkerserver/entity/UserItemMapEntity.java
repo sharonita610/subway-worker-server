@@ -22,7 +22,7 @@ public class UserItemMapEntity extends BaseTimeEntity{
     @Column(nullable = false)
     private Long userId;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
     private ItemName itemName;
 
