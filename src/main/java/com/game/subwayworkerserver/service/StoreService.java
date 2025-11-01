@@ -53,7 +53,7 @@ public class StoreService {
                 captureList, todayRandomCapture,
                 coinList,
                 vacationTicketList,
-                !isFirst
+                isFirst
         );
     }
 
