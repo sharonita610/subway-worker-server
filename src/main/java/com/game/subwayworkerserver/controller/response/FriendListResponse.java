@@ -12,6 +12,9 @@ public record FriendListResponse(
                 .map(friend ->
                         FriendBaseInfo.builder()
                                 .id(friend.getId())
+                                .engName(String.valueOf(friend.getName()))
+                                .korName(friend.getName().getKoreanName())
+                                .level(friend.getLevel())
                                 .inUse(friend.isInUse())
                                 .onSale(friend.isOnSale())
                                 .hp(friend.getHp())
