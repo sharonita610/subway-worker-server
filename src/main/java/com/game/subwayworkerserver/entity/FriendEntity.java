@@ -162,4 +162,18 @@ public class FriendEntity extends BaseTimeEntity {
                 .friendAttribute(stats.attribute())
                 .build();
     }
+
+    public List<ActiveSkillCard> getActiveSkills() {
+        return List.of(
+                ActiveSkillCard.from(this.getActiveSkill1()),
+                ActiveSkillCard.from(this.getActiveSkill2())
+        );
+    }
+
+    public List<PassiveSkillCard> getPassiveSkills() {
+        return List.of(
+                PassiveSkillCard.from(this.getPassiveSkill1()),
+                PassiveSkillCard.from(this.getPassiveSkill2())
+        );
+    }
 }
