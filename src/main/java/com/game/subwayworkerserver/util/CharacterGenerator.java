@@ -100,7 +100,7 @@ public class CharacterGenerator {
         // --- 예시 사용 ---
     public static void main(String[] args) {
         CharacterStats tanker = generateStats(FriendType.MOONGSHIL);
-        CharacterStats defenseTanker = generateStats(FriendType.POOBIE);
+        CharacterStats defenseTanker = generateStats(FriendType.POOBY);
 
         System.out.println("--- 랜덤 스탯 생성 결과 ---");
         System.out.println(tanker);
