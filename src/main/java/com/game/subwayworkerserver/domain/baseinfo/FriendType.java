@@ -5,6 +5,7 @@ import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.util.CharacterGenerator;
 import lombok.Getter;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -51,5 +52,9 @@ public enum FriendType {
         FriendType[] attributes = FriendType.values();
         int randomIndex = ThreadLocalRandom.current().nextInt(attributes.length);
         return attributes[randomIndex];
+    }
+
+    public static List<FriendType> getAll() {
+        return List.of(FriendType.values());
     }
 }
