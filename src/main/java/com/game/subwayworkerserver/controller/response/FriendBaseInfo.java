@@ -1,9 +1,11 @@
 package com.game.subwayworkerserver.controller.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record FriendBaseInfo(
         long id,
         String engName,
