@@ -90,4 +90,25 @@ public class UserEntity extends BaseTimeEntity {
     public void updateTrapDone() {
         this.trapSuccess = false;
     }
+
+    public boolean hasCoinMoreThanItemPrice(final int itemPrice) {
+        return this.coin >= itemPrice;
+    }
+
+    public void purchaseWithCoin(final int itemPrice) {
+        this.coin -= itemPrice;
+    }
+
+    public boolean hasEnoughVacationTickets(final int itemPrice) {
+        return this.vacationTicket >= itemPrice;
+    }
+
+    public void purchaseWithVacationTickets(final int acquiredCoin, final int itemPrice) {
+        this.coin += acquiredCoin;
+        this.vacationTicket -= itemPrice;
+    }
+
+    public void purchaseVacationTicket(final int acquiredTickets) {
+        this.vacationTicket += acquiredTickets;
+    }
 }
