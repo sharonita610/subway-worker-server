@@ -2,7 +2,6 @@ package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.PurchaseRequest;
-import com.game.subwayworkerserver.controller.response.RandomCaptureItemResponse;
 import com.game.subwayworkerserver.controller.response.StoreItemResponse;
 import com.game.subwayworkerserver.service.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,64 +35,58 @@ public class StoreController {
     }
 
     @Operation(
-            summary = "트랩 구매",
-            description = "구매하고자 하는 트랩 정보를 받아 저장",
+            summary = "아이템 구매 [완]",
+            description = "구매하고자 포획 또는 덫의 정보를 받아 코인으로 구매",
             responses = {
                     @ApiResponse(responseCode = "200", description = "성공")
             }
     )
-    @PostMapping("/buy/trap-item")
+    @PostMapping("/store/item")
     public ResponseEntity<Void> buyTrapItem(@RequestBody PurchaseRequest request) {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        storeService.purchaseItemWithCoin(uuid, request);
         return ResponseEntity.ok().build();
     }
 
     @Operation(
-            summary = "포획도구 구매",
-            description = "구매하고자 하는 포획도구 정보를 받아 저장",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "성공"),
-                    @ApiResponse(responseCode = "400", description = "코인이 부족합니다.")
-            }
-    )
-    @PostMapping("/buy/capture-item")
-    public ResponseEntity<Void> buyCaptureItem(@RequestBody PurchaseRequest request) {
-        return ResponseEntity.ok().build();
-    }
-
-    @Operation(
-            summary = "포획도구 랜덤 구매",
-            description = "유저는 광고를 1회 보고 포획 도구 한 개를 랜덤으로 지급, 및 정보 저장",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "랜덤 포획도구 정보")
-            }
-    )
-    @PostMapping("/buy/random-capture-item")
-    public ResponseEntity<RandomCaptureItemResponse> buyRandomCaptureItem() {
-        return ResponseEntity.ok().build();
-    }
-
-    @Operation(
-            summary = "코인 구매",
-            description = "코인을 구매한다",
+            summary = "광고를 보고 아이템 구매 하기 [외부 광고 api 제외 완]",
+            description = "광고를 보고 랜덤 아이템을 얻는 기능",
             responses = {
                     @ApiResponse(responseCode = "200", description = "성공")
             }
     )
-    @PostMapping("/buy/coin")
-    public ResponseEntity<Void> buyCoin(@RequestBody PurchaseRequest request) {
+    @PostMapping("/store/random-item")
+    public ResponseEntity<Void> buyRandomItem(@RequestBody PurchaseRequest request) {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        storeService.purchaseRandomItem(uuid, request);
         return ResponseEntity.ok().build();
     }
 
     @Operation(
-            summary = "티켓 구매",
-            description = "가챠 티켓을 구매한다",
+            summary = "코인 구매 [완]",
+            description = "휴가 티켓으로 코인을 구매한다",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "성공"),
-                    @ApiResponse(responseCode = "400", description = "코인이 부족합니다.")
+                    @ApiResponse(responseCode = "200", description = "성공")
             }
     )
-    @PostMapping("/buy/ticket")
+    @PostMapping("/store/coin")
+    public ResponseEntity<Void> buyCoin(@RequestBody PurchaseRequest request) {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        storeService.purchaseCoinWithVacationTicket(uuid, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "휴가 티켓 구매 [실제 결제 제외 완]",
+            description = "현금으로 휴가 티켓을 구매한다",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "성공"),
+            }
+    )
+    @PostMapping("/store/vacation-ticket")
     public ResponseEntity<Void> buyTicket(@RequestBody PurchaseRequest request) {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        storeService.buyVacationTicket(uuid, request);
         return ResponseEntity.ok().build();
     }
 
