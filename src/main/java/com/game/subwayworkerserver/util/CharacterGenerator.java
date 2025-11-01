@@ -1,10 +1,9 @@
 package com.game.subwayworkerserver.util;
 
+import com.game.subwayworkerserver.domain.baseinfo.FriendAttribute;
 import com.game.subwayworkerserver.domain.baseinfo.FriendType;
 
 import java.util.Random;
-
-import static com.game.subwayworkerserver.domain.baseinfo.FriendType.BALANCED;
 
 public class CharacterGenerator {
 
@@ -29,7 +28,7 @@ public class CharacterGenerator {
      * 생성된 캐릭터의 최종 스탯을 저장하는 Record.
      */
     public record CharacterStats(
-            String type, // 직업명/타입 (예: "탱커")
+            FriendAttribute attribute, //
             int hp,
             int mpNow, // 현재 마나
             int mpMax, // 최대 마나
@@ -42,7 +41,7 @@ public class CharacterGenerator {
             // String.format() 출력 필드명도 type으로 변경
             return String.format(
                     "[직업: %s] HP: %d, MP: %d/%d (회복:%d), 공격: %d, 방어: %d",
-                    type, hp, mpNow, mpMax, manaRecovery, attack, defense
+                    attribute, hp, mpNow, mpMax, manaRecovery, attack, defense
             );
         }
     }
@@ -73,7 +72,7 @@ public class CharacterGenerator {
 
         // FriendType의 getJob() 대신 getJob()의 역할을 하던 필드를 type으로 사용
         return new CharacterStats(
-                type.getType(), // FriendType의 getJob()을 그대로 사용하여 직업명을 가져옵니다.
+                FriendAttribute.getRandomAttribute(),
                 hpValue,
                 initialMp, // 현재 MP
                 maxMp,     // 최대 MP
@@ -83,29 +82,25 @@ public class CharacterGenerator {
         );
     }
 
-    public static CharacterStats generateDefaultFriendStats() {
+    public static CharacterStats generateDefaultFriendStats(final FriendType type) {
         return new CharacterStats(
-                BALANCED.getType(),
-                53,
-                11,
-                47,
-                BALANCED.getManaRecovery(),
-                19,
-                8
+                FriendAttribute.getRandomAttribute(),
+                type.getHpRange().min(),
+                type.getMpNowRange().min(),
+                type.getMpMaxRange().min(),
+                type.getManaRecovery(),
+                type.getAttackRange().min(),
+                type.getDefenseRange().min()
         );
-
     }
 
-    public static CharacterGenerator.CharacterStats getRandomFriendStat() {
-        FriendType[] types = FriendType.values();
-        int randomIndex = RANDOM.nextInt(types.length);
-        FriendType type = types[randomIndex];
-        return generateStats(type);
+    public static CharacterGenerator.CharacterStats getRandomFriendStat(FriendType friendType) {
+        return generateStats(friendType);
     }
         // --- 예시 사용 ---
     public static void main(String[] args) {
-        CharacterStats tanker = generateStats(FriendType.TANKER);
-        CharacterStats defenseTanker = generateStats(FriendType.DEFENSE_TANKER);
+        CharacterStats tanker = generateStats(FriendType.MOONGSHIL);
+        CharacterStats defenseTanker = generateStats(FriendType.POOBIE);
 
         System.out.println("--- 랜덤 스탯 생성 결과 ---");
         System.out.println(tanker);
