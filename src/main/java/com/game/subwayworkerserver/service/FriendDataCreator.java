@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.service;
 
-import com.game.subwayworkerserver.domain.baseinfo.FriendAttribute;
 import com.game.subwayworkerserver.domain.baseinfo.FriendLevel;
+import com.game.subwayworkerserver.domain.baseinfo.FriendType;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import java.util.Map;
 public class FriendDataCreator {
 
     public Map<String, String> createRandomFriendAttribute() {
-        FriendAttribute randomFriend = FriendAttribute.getRandomAttribute();
+        FriendType randomFriend = FriendType.getRandomAttribute();
         FriendLevel randomLevel = FriendLevel.getRandomLevel();
         return createData(randomFriend.getKoreanName(), randomLevel.getTitle(), randomLevel.getLevel());
     }
