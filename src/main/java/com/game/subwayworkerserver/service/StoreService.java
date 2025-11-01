@@ -1,6 +1,7 @@
 package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.PurchaseRequest;
+import com.game.subwayworkerserver.controller.response.ItemResponse;
 import com.game.subwayworkerserver.controller.response.StoreItemResponse;
 import com.game.subwayworkerserver.domain.baseinfo.Coin;
 import com.game.subwayworkerserver.domain.baseinfo.VacationTicket;
@@ -157,7 +158,7 @@ public class StoreService {
 
 
     @Transactional
-    public void purchaseRandomItem(String uuid, PurchaseRequest request) {
+    public ItemResponse purchaseRandomItem(String uuid, PurchaseRequest request) {
         UserEntity user = getUserByUuid(uuid);
         String name = request.name();
         ItemName itemName = ItemName.getRandomItem(name);
@@ -166,6 +167,7 @@ public class StoreService {
 
         saveUserItemIntoMap(user.getId(), itemName);
         saveUserStoreRecord(user.getId(), name, 1, 0, CurrencyType.FREE);
+        return ItemResponse.of(itemName.name(), itemName.getName(), itemName.getDescription(), 1);
     }
 }
 
