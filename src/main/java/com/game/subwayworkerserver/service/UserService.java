@@ -24,6 +24,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
     private final UserItemMapRepository userItemMapRepository;
+    private final FriendListFilter friendListFilter;
+
 
     public Boolean verifyUserName(final String name) {
         if (name == null) {
@@ -107,9 +109,10 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    public FriendListResponse getFriendListByUser(String uuid) {
+    public FriendListResponse getFriendListByUser(final String uuid) {
         UserEntity user = findUserBy(uuid);
-        List<FriendEntity> friendEntityList = friendRepository.findByUserId(user.getId());
-        return FriendListResponse.of(friendEntityList);
+        List<FriendEntity> friendEntityList = friendRepository.findByUserIdAndOnSaleFalse(user.getId());
+        List<FriendEntity> sortedFriendList = friendListFilter.sort(friendEntityList);
+        return FriendListResponse.of(sortedFriendList);
     }
 }

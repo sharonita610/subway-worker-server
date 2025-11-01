@@ -4,11 +4,13 @@ import com.game.subwayworkerserver.controller.request.FriendFilterRequest;
 import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import com.game.subwayworkerserver.domain.market.FriendOnSale;
+import com.game.subwayworkerserver.entity.FriendEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class FriendListFilter {
@@ -100,5 +102,32 @@ public class FriendListFilter {
             case "방어력높은순" -> Comparator.comparing(FriendOnSale::defense).reversed();
             default -> Comparator.comparing(FriendOnSale::level).reversed();
         };
+    }
+
+    public List<FriendEntity> sort(List<FriendEntity> friendEntityList) {
+
+        // 1. Comparator 정의 (우선순위 순서대로 thenComparing 연결)
+        Comparator<FriendEntity> friendComparator = Comparator
+
+                // 1순위: 파트너 먼저 (true가 false보다 먼저 오도록)
+                // (isPartner()가 boolean이면, Boolean.compare(b2, b1) 또는 b1.compareTo(b2)를 반대로 사용)
+                .comparing(FriendEntity::isInUse, Comparator.reverseOrder())
+
+                // 2순위: 레벨 높은 순
+                .thenComparing(friendEntity -> friendEntity.getLevel().getLevel(), Comparator.reverseOrder())
+
+                // 3순위: 같은 레벨이면 경험치 높은 순
+                .thenComparing(FriendEntity::getCurrentExp, Comparator.reverseOrder())
+
+                // 4순위: 공격력 높은 순
+                .thenComparing(FriendEntity::getAttack, Comparator.reverseOrder())
+
+                // 5순위: 체력 높은 순
+                .thenComparing(FriendEntity::getHp, Comparator.reverseOrder());
+
+        // 2. Stream을 사용하여 정렬 및 새로운 리스트 반환
+        return friendEntityList.stream()
+                .sorted(friendComparator)
+                .collect(Collectors.toList());
     }
 }
