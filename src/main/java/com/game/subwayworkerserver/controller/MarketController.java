@@ -6,6 +6,7 @@ import com.game.subwayworkerserver.controller.request.FriendFilterRequest;
 import com.game.subwayworkerserver.controller.request.SellingRequest;
 import com.game.subwayworkerserver.controller.response.*;
 import com.game.subwayworkerserver.service.MarketService;
+import io.micrometer.common.lang.Nullable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,23 +21,23 @@ public class MarketController {
     private final MarketService marketService;
 
     @Operation(
-            summary = "영입 가능한 동료 리스트 조회",
+            summary = "영입 가능한 동료 리스트 조회 [완]",
             description = "장터에 올라온 모든 동료의 리스트를 필터링 기능을 포함하여 조회"
     )
     @PostMapping("/market/global/friends")
-    public ResponseEntity<GlobalFriendsResponse> getFriendsOnSale(@RequestBody FriendFilterRequest request) {
+    public ResponseEntity<GlobalFriendsResponse> getFriendsOnSale(@Nullable @RequestBody FriendFilterRequest request) {
         String uuid = SecurityUtils.getCurrentUserUuid();
-        return ResponseEntity.ok(marketService.getFriendsOnSale(uuid));
+        return ResponseEntity.ok(marketService.getFriendMarket(uuid, request));
     }
 
     @Operation(
-            summary = "내가 판매 중인 동료 리스트 조회",
+            summary = "내가 판매 중인 동료 리스트 조회 [완]",
             description = "내가 판매 중인 동료의 리스트를 포함하여 조회"
     )
     @PostMapping("/market/friend/selling-list")
-    public ResponseEntity<FriendsOnSaleResponse> getMyFriendSellingList(){
+    public ResponseEntity<MyFriendsMarketResponse> getMyFriendSellingList(){
         String uuid = SecurityUtils.getCurrentUserUuid();
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(marketService.getMyFriendsOnSale(uuid));
     }
 
     @Operation(
@@ -66,7 +67,7 @@ public class MarketController {
             description = "장터에 내놓았던 동료를 철회하는 기능"
     )
     @PostMapping("/market/friend/cancel")
-    public ResponseEntity<Void> cancelSellingFriend(@RequestParam("id") long friendId){
+    public ResponseEntity<Void> cancelSellingFriend(@RequestParam("id") long marketId){
         return ResponseEntity.ok().build();
     }
 
@@ -75,7 +76,7 @@ public class MarketController {
             description = "장터에 내놓았던 동료가 판매되어 정산 요청"
     )
     @GetMapping("/market/friend/get-paid")
-    public ResponseEntity<PaymentSuccessResponse> getFriendPaid(@RequestParam("id") long friendId){
+    public ResponseEntity<PaymentSuccessResponse> getFriendPaid(@RequestParam("id") long marketId){
         String uuid = SecurityUtils.getCurrentUserUuid();
 
         return ResponseEntity.ok().build();
