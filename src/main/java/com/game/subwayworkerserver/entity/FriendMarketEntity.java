@@ -43,6 +43,9 @@ public class FriendMarketEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private boolean available = false;
 
+    @Column(nullable = false)
+    private boolean isPaid = false;
+
     private LocalDateTime soldTime;
 
 
