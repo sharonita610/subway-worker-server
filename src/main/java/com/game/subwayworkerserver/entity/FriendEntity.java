@@ -1,9 +1,6 @@
 package com.game.subwayworkerserver.entity;
 
-import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
-import com.game.subwayworkerserver.domain.baseinfo.FriendAttribute;
-import com.game.subwayworkerserver.domain.baseinfo.FriendType;
-import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
+import com.game.subwayworkerserver.domain.baseinfo.*;
 import com.game.subwayworkerserver.util.CharacterGenerator;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,11 +23,12 @@ public class FriendEntity extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private FriendAttribute name;
-
     @Column(nullable = false)
-    private int level;
+    private String name;
+
+    @Column(nullable = false, length = 50)
+    @Enumerated(EnumType.STRING)
+    private FriendLevel level;
 
     @Column(nullable = false)
     private int currentExp;
@@ -38,7 +36,7 @@ public class FriendEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private long userId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
     private FriendType friendType;
 
@@ -78,10 +76,15 @@ public class FriendEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private int passiveSkill2;
 
+
+    @Column(nullable = false, length = 50)
+    @Enumerated(EnumType.STRING)
+    private FriendAttribute friendAttribute;
+
     @Builder
-    public FriendEntity(FriendAttribute name, int level, int currentExp, long userId, FriendType friendType, long hp, long mana, long maxMana,
+    public FriendEntity(String name, FriendLevel level, int currentExp, long userId, FriendType friendType, long hp, long mana, long maxMana,
                         long manaRecovery, long attack, long defense, boolean inUse, boolean onSale,
-                        int activeSkill1, int activeSkill2, int passiveSkill1, int passiveSkill2
+                        int activeSkill1, int activeSkill2, int passiveSkill1, int passiveSkill2, FriendAttribute friendAttribute
     ) {
         this.name = name;
         this.level = level;
@@ -100,47 +103,50 @@ public class FriendEntity extends BaseTimeEntity {
         this.activeSkill2 = activeSkill2;
         this.passiveSkill1 = passiveSkill1;
         this.passiveSkill2 = passiveSkill2;
+        this.friendAttribute = friendAttribute;
     }
 
-    public static FriendEntity of(final long userId, final FriendAttribute name) {
-        CharacterGenerator.CharacterStats stats = generateDefaultFriendStats();
+    public static FriendEntity of(final long userId, final FriendType friendType) {
+        CharacterGenerator.CharacterStats stats = generateDefaultFriendStats(friendType);
         List<PassiveSkillCard> randomPassiveSkills = getRandomPassiveSkills(2);
         List<ActiveSkillCard> randomActiveSkills = getRandomActiveSkills(2);
 
         return FriendEntity.builder()
-                 .name(name)
-                 .level(1)
-                 .currentExp(0)
-                 .userId(userId)
-                 .friendType(FriendType.fromName(stats.type()))
-                 .hp(stats.hp())
-                 .mana(stats.mpNow())
-                 .maxMana(stats.mpMax())
-                 .manaRecovery(stats.manaRecovery())
-                 .attack(stats.attack())
-                 .defense(stats.defense())
-                 .onSale(false)
-                 .inUse(true)
-                 .activeSkill1(randomActiveSkills.get(0).getId())
-                 .activeSkill2(randomActiveSkills.get(1).getId())
-                 .passiveSkill1(randomPassiveSkills.get(0).getId())
-                 .passiveSkill2(randomPassiveSkills.get(1).getId())
-                 .build();
+                .name(friendType.getKoreanName())
+                .level(FriendLevel.of(1))
+                .currentExp(0)
+                .userId(userId)
+                .friendType(friendType)
+                .hp(stats.hp())
+                .mana(stats.mpNow())
+                .maxMana(stats.mpMax())
+                .manaRecovery(stats.manaRecovery())
+                .attack(stats.attack())
+                .defense(stats.defense())
+                .onSale(false)
+                .inUse(true)
+                .activeSkill1(randomActiveSkills.get(0).getId())
+                .activeSkill2(randomActiveSkills.get(1).getId())
+                .passiveSkill1(randomPassiveSkills.get(0).getId())
+                .passiveSkill2(randomPassiveSkills.get(1).getId())
+                .friendAttribute(stats.attribute())
+                .build();
     }
 
 
     public static FriendEntity of(final long userId, String friendName, int friendLevel) {
-        CharacterGenerator.CharacterStats stats = getRandomFriendStat();
+        FriendType friendType = FriendType.fromName(friendName);
+        CharacterGenerator.CharacterStats stats = getRandomFriendStat(friendType);
         List<PassiveSkillCard> randomPassiveSkills = getRandomPassiveSkills(2);
         List<ActiveSkillCard> randomActiveSkills = getRandomActiveSkills(2);
 
 
         return FriendEntity.builder()
-                .name(FriendAttribute.fromKoreanName(friendName))
-                .level(friendLevel)
+                .name(friendName)
+                .level(FriendLevel.of(friendLevel))
                 .currentExp(0)
                 .userId(userId)
-                .friendType(FriendType.fromName(stats.type()))
+                .friendType(friendType)
                 .hp(stats.hp())
                 .mana(stats.mpNow())
                 .maxMana(stats.mpMax())
@@ -153,6 +159,7 @@ public class FriendEntity extends BaseTimeEntity {
                 .activeSkill2(randomActiveSkills.get(1).getId())
                 .passiveSkill1(randomPassiveSkills.get(0).getId())
                 .passiveSkill2(randomPassiveSkills.get(1).getId())
+                .friendAttribute(stats.attribute())
                 .build();
     }
 }
