@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -32,6 +34,10 @@ public class TrapCheckerScheduler {
     private static final String FRIEND_LOCATIONS_KEY = "friend:locations";
     private static final String USER_ACQUIRED_PREFIX = "user:acquired:";
     private static final double TRAP_CAPTURE_RADIUS_METER = 25.0;
+
+    private static final String FRIEND_DATA_PREFIX = "friend:data:";
+    private static final String TRAPPED_FRIEND_DATA_PREFIX = "trapped:friend:data:";
+    private static final long TRAPPED_DATA_TTL_DAYS = 14;
 
     /**
      * 💡 3. 트랩-동료 겹침 확인 스케줄러 (30분마다 실행)
@@ -78,6 +84,18 @@ public class TrapCheckerScheduler {
                 RedisGeoCommands.GeoLocation<String> friendLocation = results.getContent().get(0).getContent();
                 String friendId = friendLocation.getName();
 
+                String friendDataKey = FRIEND_DATA_PREFIX + friendId;
+                String trappedFriendDataKey = TRAPPED_FRIEND_DATA_PREFIX + friendId;
+
+                Map<Object, Object> friendAttributes = redisTemplate.opsForHash().entries(friendDataKey);
+                if (!friendAttributes.isEmpty()) {
+                    redisTemplate.opsForHash().putAll(trappedFriendDataKey, friendAttributes);
+                    // 2. 백업 데이터의 유효 기간(TTL)을 설정합니다.
+                    redisTemplate.expire(trappedFriendDataKey, TRAPPED_DATA_TTL_DAYS, TimeUnit.DAYS);
+                    log.info("ID {} 동료 속성 백업 완료. 키: {}", friendId, trappedFriendDataKey);
+                } else {
+                    log.warn("ID {} 동료 상세 데이터({})가 Redis에 존재하지 않아 백업에 실패했습니다.", friendId, friendDataKey);
+                }
                 // 2-3. 트랩 및 유저 정보 업데이트
                 // a) UserSetTrapEntity에 성공 기록
                 trap.markSuccess(friendId);

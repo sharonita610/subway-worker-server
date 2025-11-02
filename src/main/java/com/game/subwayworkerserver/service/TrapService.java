@@ -33,12 +33,13 @@ public class TrapService {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    private static final String FRIEND_DATA_PREFIX = "friend:data:";
+    private static final String TRAPPED_FRIEND_DATA_PREFIX = "trapped:friend:data:";
     private static final long TRAP_VALID_HOURS = 12;
 
     /**
      * 덫 설치 API 요청을 처리하고, 아이템을 소모하여 트랩 정보를 DB에 저장합니다.
-     * @param uuid 현재 유저의 UUID
+     *
+     * @param uuid    현재 유저의 UUID
      * @param request 설치할 트랩 정보 (아이템 이름, 위도, 경도)
      */
     @Transactional
@@ -110,50 +111,51 @@ public class TrapService {
 
     private List<FriendEntity> saveUserTrapIfSuccess(final List<UserTrapMapEntity> userTrapMapList) {
         return userTrapMapList.stream().map(trapMap -> {
-            ItemName trapItemName = trapMap.getTrapItemName();
+                    ItemName trapItemName = trapMap.getTrapItemName();
 
-            if (!trapItemName.canTrapSucceed()) {
-                trapMap.setIsNotSuccessful();
-                trapMap.setExpiresAt();
-                return null;
-            }
+                    if (!trapItemName.canTrapSucceed()) {
+                        trapMap.setIsNotSuccessful();
+                        trapMap.setExpiresAt();
+                        return null;
+                    }
 
-            String capturedFriendId = trapMap.getCapturedFriendId();
-            String instanceKey = FRIEND_DATA_PREFIX + capturedFriendId;
-            Map<Object, Object> hashData = redisTemplate.opsForHash().entries(instanceKey);
+                    String capturedFriendId = trapMap.getCapturedFriendId();
+                    String trappedKey = TRAPPED_FRIEND_DATA_PREFIX + capturedFriendId;
+                    Map<Object, Object> hashData = redisTemplate.opsForHash().entries(trappedKey);
 
-            if (hashData.isEmpty()) {
-                log.info("Null info for instance {}.", instanceKey);
-                trapMap.setIsNotSuccessful();
-                trapMap.setExpiresAt();
-                return null;
-            }
+                    if (hashData.isEmpty()) {
+                        log.info("Null info for instance {}.", trappedKey);
+                        trapMap.setIsNotSuccessful();
+                        trapMap.setExpiresAt();
+                        return null;
+                    }
 
-            String friendName = (String) hashData.get("friendName");
-            String levelString = (String) hashData.get("friendLevel");
+                    String friendName = (String) hashData.get("friendName");
+                    String levelString = (String) hashData.get("friendLevel");
 
-            if (friendName != null && levelString != null) {
-                try {
-                    int friendLevel = Integer.parseInt(levelString);
+                    if (friendName != null && levelString != null) {
+                        try {
+                            int friendLevel = Integer.parseInt(levelString);
 
-                    // 3. DB에 FriendEntity 저장
-                    FriendEntity friendEntity = FriendEntity.of(trapMap.getUserId(), friendName, friendLevel);
-                    FriendEntity savedFriend = friendRepository.save(friendEntity);
+                            // 3. DB에 FriendEntity 저장
+                            FriendEntity friendEntity = FriendEntity.of(trapMap.getUserId(), friendName, friendLevel);
+                            FriendEntity savedFriend = friendRepository.save(friendEntity);
 
-                    // 4. ⭐ 트랩 상태 업데이트: 성공 처리 및 즉시 만료 ⭐
-                    trapMap.setIsSuccessful();
-                    trapMap.setExpiresAt();
+                            // 4. ⭐ 트랩 상태 업데이트: 성공 처리 및 즉시 만료 ⭐
+                            trapMap.setIsSuccessful();
+                            trapMap.setExpiresAt();
+                            redisTemplate.delete(trappedKey);
 
-                    // 5. 성공한 친구 엔티티를 수집하기 위해 반환
-                    return savedFriend;
-                } catch (NumberFormatException e) {
-                    log.error("Invalid friendLevel format: {}", levelString);
+                            // 5. 성공한 친구 엔티티를 수집하기 위해 반환
+                            return savedFriend;
+                        } catch (NumberFormatException e) {
+                            log.error("Invalid friendLevel format: {}", levelString);
+                            return null;
+                        }
+                    }
                     return null;
-                }
-            }
-            return null;
-        })
-        .filter(Objects::nonNull)
-        .toList();
+                })
+                .filter(Objects::nonNull)
+                .toList();
     }
 }
