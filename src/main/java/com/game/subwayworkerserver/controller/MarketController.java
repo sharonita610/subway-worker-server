@@ -10,6 +10,7 @@ import io.micrometer.common.lang.Nullable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,10 +57,10 @@ public class MarketController {
             description = "나의 동료를 장터에 내놓기 위한 기능"
     )
     @PostMapping("/market/friend/sell")
-    public ResponseEntity<Void> sellFriend(@RequestBody SellingRequest request){
+    public ResponseEntity<HttpStatus> sellFriend(@RequestBody SellingRequest request){
         String uuid = SecurityUtils.getCurrentUserUuid();
-
-        return ResponseEntity.ok().build();
+        marketService.registerFriendOnMarket(uuid, request);
+        return ResponseEntity.ok(HttpStatus.NO_CONTENT);
     }
 
     @Operation(
