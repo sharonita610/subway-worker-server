@@ -31,9 +31,7 @@ public class StoreService {
 
     private static final String VACATION = "VACATION_TICKET";
     private static final String COIN = "COIN";
-    private static final String TRAP = "TRAP";
     private static final String RANDOM_TRAP = "RANDOM_TRAP";
-    private static final String CAPTURE = "CAPTURE";
     private static final String RANDOM_CAPTURE = "RANDOM_CAPTURE";
 
     public StoreItemResponse getStoreItems(final String uuid) {
