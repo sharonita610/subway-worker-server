@@ -111,7 +111,7 @@ public class UserService {
 
     public FriendListResponse getFriendListByUser(final String uuid) {
         UserEntity user = findUserBy(uuid);
-        List<FriendEntity> friendEntityList = friendRepository.findByUserIdAndOnSaleFalse(user.getId());
+        List<FriendEntity> friendEntityList = friendRepository.findByUserIdAndOnSaleFalseAndAvailableTrue(user.getId());
         List<FriendEntity> sortedFriendList = friendListFilter.sort(friendEntityList);
         return FriendListResponse.of(sortedFriendList);
     }

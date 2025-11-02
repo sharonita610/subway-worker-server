@@ -16,7 +16,9 @@ public interface FriendRepository extends JpaRepository<FriendEntity, Long> {
 
     List<FriendEntity> findAllByIdInAndOnSale(List<Long> ids, boolean onSale);
 
-    List<FriendEntity> findByUserIdAndOnSaleFalse(long userId);
+    List<FriendEntity> findByUserIdAndOnSaleFalseAndAvailableTrue(long userId);
 
     Optional<FriendEntity> findByUserIdAndId(final long userId, final long friendId);
+
+    Optional<FriendEntity> findByIdAndOnSaleTrue(long friendId);
 }
