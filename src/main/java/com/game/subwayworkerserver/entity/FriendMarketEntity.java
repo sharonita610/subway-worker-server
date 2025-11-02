@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.entity;
 
+import com.game.subwayworkerserver.controller.request.SellingRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -49,4 +50,26 @@ public class FriendMarketEntity extends BaseTimeEntity {
     private LocalDateTime soldTime;
 
 
+    public FriendMarketEntity(
+           long sellerId,  int price, int commission, CurrencyType currency, long friendId, boolean available
+    ) {
+        this.sellerId = sellerId;
+        this.price = price;
+        this.commission = commission;
+        this.currency = currency;
+        this.friendId = friendId;
+        this.available = available;
+    }
+
+
+    public static FriendMarketEntity of(final long userId, final SellingRequest request) {
+        return new FriendMarketEntity(
+                userId,
+                request.sellingPrice(),
+                request.sellingCommission(),
+                CurrencyType.VACATION_TICKET,
+                request.friendId(),
+                true
+        );
+    }
 }
