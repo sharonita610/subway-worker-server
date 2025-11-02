@@ -42,10 +42,10 @@ public class MarketController {
     }
 
     @Operation(
-            summary = "장터에서 동료 영입하기",
+            summary = "장터에서 동료 영입하기 [완]",
             description = "장터에 올라온 동료를 영입하기"
     )
-    @PostMapping("/market/global/buy-friend [완]")
+    @PostMapping("/market/global/buy-friend")
     public ResponseEntity<Void> buyFriend(@RequestParam("id") long marketId){
         String uuid = SecurityUtils.getCurrentUserUuid();
         marketService.purchaseFriend(uuid, marketId);
