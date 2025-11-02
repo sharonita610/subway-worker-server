@@ -45,7 +45,7 @@ public class MarketController {
             summary = "장터에서 동료 영입하기",
             description = "장터에 올라온 동료를 영입하기"
     )
-    @PostMapping("/market/global/buy-friend")
+    @PostMapping("/market/global/buy-friend [완]")
     public ResponseEntity<Void> buyFriend(@RequestParam("id") long marketId){
         String uuid = SecurityUtils.getCurrentUserUuid();
         marketService.purchaseFriend(uuid, marketId);
