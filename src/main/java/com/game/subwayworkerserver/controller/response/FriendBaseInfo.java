@@ -37,6 +37,8 @@ public record FriendBaseInfo(
                 .korName(friendOnSale.korName())
                 .position(friendOnSale.position())
                 .level(friendOnSale.level())
+                .inUse(friendOnSale.inUse())
+                .onSale(friendOnSale.onSale())
                 .hp(friendOnSale.hp())
                 .mana(friendOnSale.mana())
                 .maxMana(friendOnSale.maxMana())
