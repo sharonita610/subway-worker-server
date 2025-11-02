@@ -8,6 +8,7 @@ import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.FriendRepository;
+import com.game.subwayworkerserver.repository.UserGachaRepository;
 import com.game.subwayworkerserver.repository.UserItemMapRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -25,6 +26,7 @@ public class UserService {
     private final FriendRepository friendRepository;
     private final UserItemMapRepository userItemMapRepository;
     private final FriendListFilter friendListFilter;
+    private final UserGachaRepository gachaRepository;
 
 
     public Boolean verifyUserName(final String name) {
@@ -49,6 +51,9 @@ public class UserService {
 
         FriendEntity friendEntity = FriendEntity.of(savedUser.getId(), friendType);
         friendRepository.save(friendEntity);
+
+        List<UserGachaEntity> gachaEntities = UserGachaEntity.from(userEntity.getId());
+        gachaRepository.saveAll(gachaEntities);
         return savedUser.getUuid();
     }
 
