@@ -52,7 +52,7 @@ public class UserEntity extends BaseTimeEntity {
     private boolean trapSuccess = false;
 
     @Column(nullable = false)
-    private boolean  hasPendingReward = false;
+    private boolean hasPendingReward = false;
 
     public UserEntity(String name, String uuid, int exp, int level, int totalExp, int coin, int vacationTicket,
                       int gotchaTicket, int stage, Gender gender) {
@@ -108,12 +108,8 @@ public class UserEntity extends BaseTimeEntity {
         this.vacationTicket -= itemPrice;
     }
 
-    public void purchaseVacationTicket(final int acquiredTickets) {
+    public void increaseVacationTicket(final int acquiredTickets) {
         this.vacationTicket += acquiredTickets;
-    }
-
-    public void getPaid(final int price) {
-        this.vacationTicket += price;
     }
 
     public void purchaseWithVacationTickets(final int friendRealPrice) {
@@ -127,4 +123,17 @@ public class UserEntity extends BaseTimeEntity {
             return this.gotchaTicket >= itemPrice;
         }
     }
+
+    public void purchaseWithTickets(final String currencyType, final int itemPrice) {
+        if (currencyType.equals("vacationTicket")) {
+            this.vacationTicket -= itemPrice;
+        } else {
+            this.gotchaTicket -= itemPrice;
+        }
+    }
+
+    public void increaseCoin(final int quantity) {
+        this.coin += quantity;
+    }
+
 }

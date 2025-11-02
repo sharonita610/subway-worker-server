@@ -143,7 +143,7 @@ public class StoreService {
 
         // 외부 결제 api
 
-        user.purchaseVacationTicket(vacationTicket.getAcquiredTickets());
+        user.increaseVacationTicket(vacationTicket.getAcquiredTickets());
         saveUserStoreRecord(
                 user.getId(),
                 VACATION,

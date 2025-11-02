@@ -119,7 +119,7 @@ public class MarketService {
                                 () -> new BaseException(NOT_FOUND, "Friend not found on market.")
                         );
         int friendRealPrice = friendMarketEntity.getPrice() - friendMarketEntity.getCommission();
-        user.getPaid(friendRealPrice);
+        user.increaseVacationTicket(friendRealPrice);
         friendMarketEntity.paidDone();
         friendRepository.findByIdAndOnSaleTrue(friendMarketEntity.getFriendId()).ifPresent(FriendEntity::paidDone);
         return PaymentSuccessResponse.of(
