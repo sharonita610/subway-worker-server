@@ -72,4 +72,19 @@ public class FriendMarketEntity extends BaseTimeEntity {
                 true
         );
     }
+
+    public void paidDone() {
+        this.isPaid = true;
+    }
+
+    public void purchase(final long buyerId) {
+        this.buyerId = buyerId;
+        this.soldTime = LocalDateTime.now();
+        this.sold = true;
+        this.available = false;
+    }
+
+    public void changeFriendId(final long newFriendId) {
+        this.friendId = newFriendId;
+    }
 }
