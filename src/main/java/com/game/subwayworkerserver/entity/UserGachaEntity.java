@@ -48,4 +48,16 @@ public class UserGachaEntity extends BaseTimeEntity {
                         .build())
                 .toList();
     }
+
+    public static UserGachaEntity of(final long userId, GachaTreasure gacha) {
+        return UserGachaEntity.builder()
+                .userId(userId)
+                .gacha(gacha)
+                .gachaCount(1)
+                .build();
+    }
+
+    public void increaseGachaCount() {
+        this.gachaCount += 1;
+    }
 }
