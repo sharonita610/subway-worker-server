@@ -1,6 +1,7 @@
 package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.FriendFilterRequest;
+import com.game.subwayworkerserver.controller.request.SellingRequest;
 import com.game.subwayworkerserver.controller.response.GlobalFriendsResponse;
 import com.game.subwayworkerserver.controller.response.MyFriendsMarketResponse;
 import com.game.subwayworkerserver.domain.market.FriendOnSale;
@@ -11,12 +12,13 @@ import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.repository.FriendMarketRepository;
 import com.game.subwayworkerserver.repository.FriendRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.game.subwayworkerserver.exception.ErrorCode.USER_NOT_FOUND;
+import static com.game.subwayworkerserver.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -61,5 +63,32 @@ public class MarketService {
         List<FriendEntity> friendsOnSaleByFriendIds = findFriendsOnSaleByFriendIds(friendIds);
         List<FriendOnSale> friendOnSalesDomainList = FriendOnSale.toDomain(friendsOnSale, friendsOnSaleByFriendIds);
         return MyFriendsMarketResponse.of(friendOnSalesDomainList);
+    }
+
+    @Transactional
+    public void registerFriendOnMarket(final String uuid, final SellingRequest request) {
+        UserEntity user = findUserByUuid(uuid);
+        Long userId = user.getId();
+        checkUserCoin(request.registrationFee(), user);
+
+        FriendEntity friendEntity = friendRepository.findByUserIdAndId(userId, request.friendId()).orElseThrow(
+                () -> new BaseException(NOT_FOUND, "Friend not found.")
+        );
+
+        if(friendEntity.isInUse()) {
+            throw new BaseException(BAD_REQUEST, "Friend is already in use.");
+        }
+
+        friendEntity.friendOnSale();
+        FriendMarketEntity friendMarketEntity = FriendMarketEntity.of(userId, request);
+        friendMarketRepository.save(friendMarketEntity);
+        user.purchaseWithCoin(request.registrationFee());
+    }
+
+    private static void checkUserCoin(final int registrationFee, final UserEntity user) {
+        boolean ableToBuy = user.hasCoinMoreThanItemPrice(registrationFee);
+        if (!ableToBuy) {
+            throw new BaseException(BAD_REQUEST, "Not enough coin");
+        }
     }
 }
