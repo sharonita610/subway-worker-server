@@ -111,4 +111,12 @@ public class UserEntity extends BaseTimeEntity {
     public void purchaseVacationTicket(final int acquiredTickets) {
         this.vacationTicket += acquiredTickets;
     }
+
+    public void getPaid(final int price) {
+        this.vacationTicket += price;
+    }
+
+    public void purchaseWithVacationTickets(final int friendRealPrice) {
+        this.vacationTicket -= friendRealPrice;
+    }
 }
