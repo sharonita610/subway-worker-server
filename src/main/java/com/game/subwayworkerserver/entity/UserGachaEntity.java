@@ -25,7 +25,7 @@ public class UserGachaEntity extends BaseTimeEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private GachaTreasure obtainedTreasure;
+    private GachaTreasure gacha;
 
     @Min(0)
     @Max(20)
@@ -33,9 +33,9 @@ public class UserGachaEntity extends BaseTimeEntity {
     private int gachaCount;
 
     @Builder
-    public UserGachaEntity(long userId, GachaTreasure obtainedTreasure, int gachaCount) {
+    public UserGachaEntity(long userId, GachaTreasure gacha, int gachaCount) {
         this.userId = userId;
-        this.obtainedTreasure = obtainedTreasure;
+        this.gacha = gacha;
         this.gachaCount = gachaCount;
     }
 
@@ -43,7 +43,7 @@ public class UserGachaEntity extends BaseTimeEntity {
         return Arrays.stream(GachaTreasure.values())
                 .map(treasure -> UserGachaEntity.builder()
                         .userId(userId)
-                        .obtainedTreasure(treasure)
+                        .gacha(treasure)
                         .gachaCount(0) // 초기 사용 횟수 0
                         .build())
                 .toList();
