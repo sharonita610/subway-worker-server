@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -28,6 +29,7 @@ public class GpsRandomDataScheduler {
     private static final String FRIEND_LOCATIONS_KEY = "friend:locations";
     private static final String RANDOM_GIFT_BOX_KEY = "giftbox:locations";
     private static final String FRIEND_DATA_PREFIX = "friend:data:";
+    private static final long MAP_DATA_TTL_HOURS = 3;
 
     // 대한민국 지도 범위 (대략적)
     private static final double MIN_LAT = 33.0;
@@ -81,7 +83,6 @@ public class GpsRandomDataScheduler {
             // 1. 기존 데이터 삭제 (Item_Locations_Key는 제외)
             redisTemplate.delete(FRIEND_LOCATIONS_KEY);
             redisTemplate.delete(RANDOM_GIFT_BOX_KEY);
-            redisTemplate.delete(FRIEND_DATA_PREFIX);
             log.info("--- 동료/선물상자 기존 데이터 삭제 완료 ---");
         }
 
@@ -135,6 +136,7 @@ public class GpsRandomDataScheduler {
 
         if (!locations.isEmpty()) {
             redisTemplate.opsForGeo().add(key, locations);
+            redisTemplate.expire(key, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
         }
     }
 
@@ -145,6 +147,7 @@ public class GpsRandomDataScheduler {
         }
         String instanceKey = FRIEND_DATA_PREFIX + friendId;
         redisTemplate.opsForHash().putAll(instanceKey, dataToSave);
+        redisTemplate.expire(instanceKey, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
     }
 
     private double generateRandomCoordinate(double center, double maxOffset) {
