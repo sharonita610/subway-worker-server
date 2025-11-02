@@ -16,6 +16,8 @@ public record FriendOnSale(
         long friendId,
         String engName,
         String korName,
+        boolean inUse,
+        boolean onSale,
         int level,
         String position,
         String attribute,
@@ -71,6 +73,8 @@ public record FriendOnSale(
                             .korName(friend.getName())
                             .level(friend.getLevel().getLevel())
                             .position(friend.getLevel().getTitle())
+                            .inUse(friend.isInUse())
+                            .onSale(friend.isOnSale())
                             .attribute(friend.getFriendAttribute().getKoreanName())
                             .hp(friend.getHp())
                             .attack(friend.getAttack())
