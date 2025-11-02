@@ -119,4 +119,12 @@ public class UserEntity extends BaseTimeEntity {
     public void purchaseWithVacationTickets(final int friendRealPrice) {
         this.vacationTicket -= friendRealPrice;
     }
+
+    public boolean hasEnoughTickets(final String currencyType, final int itemPrice) {
+        if (currencyType.equals("vacationTicket")) {
+            return this.vacationTicket >= itemPrice;
+        } else {
+            return this.gotchaTicket >= itemPrice;
+        }
+    }
 }
