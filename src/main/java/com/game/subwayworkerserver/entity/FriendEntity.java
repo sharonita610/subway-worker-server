@@ -65,6 +65,9 @@ public class FriendEntity extends BaseTimeEntity {
     private boolean onSale;
 
     @Column(nullable = false)
+    private boolean available = true;
+
+    @Column(nullable = false)
     private int activeSkill1;
 
     @Column(nullable = false)
@@ -82,9 +85,10 @@ public class FriendEntity extends BaseTimeEntity {
     private FriendAttribute friendAttribute;
 
     @Builder
-    public FriendEntity(String name, FriendLevel level, int currentExp, long userId, FriendType friendType, long hp, long mana, long maxMana,
-                        long manaRecovery, long attack, long defense, boolean inUse, boolean onSale,
-                        int activeSkill1, int activeSkill2, int passiveSkill1, int passiveSkill2, FriendAttribute friendAttribute
+    public FriendEntity(String name, FriendLevel level, int currentExp, long userId, FriendType friendType, long hp,
+                        long mana, long maxMana, long manaRecovery, long attack, long defense, boolean inUse,
+                        boolean onSale, int activeSkill1, int activeSkill2, int passiveSkill1, int passiveSkill2,
+                        FriendAttribute friendAttribute, boolean available
     ) {
         this.name = name;
         this.level = level;
@@ -104,6 +108,7 @@ public class FriendEntity extends BaseTimeEntity {
         this.passiveSkill1 = passiveSkill1;
         this.passiveSkill2 = passiveSkill2;
         this.friendAttribute = friendAttribute;
+        this.available = available;
     }
 
     public static FriendEntity of(final long userId, final FriendType friendType) {
@@ -125,6 +130,7 @@ public class FriendEntity extends BaseTimeEntity {
                 .defense(stats.defense())
                 .onSale(false)
                 .inUse(true)
+                .available(true)
                 .activeSkill1(randomActiveSkills.get(0).getId())
                 .activeSkill2(randomActiveSkills.get(1).getId())
                 .passiveSkill1(randomPassiveSkills.get(0).getId())
@@ -140,7 +146,6 @@ public class FriendEntity extends BaseTimeEntity {
         List<PassiveSkillCard> randomPassiveSkills = getRandomPassiveSkills(2);
         List<ActiveSkillCard> randomActiveSkills = getRandomActiveSkills(2);
 
-
         return FriendEntity.builder()
                 .name(friendName)
                 .level(FriendLevel.of(friendLevel))
@@ -155,11 +160,36 @@ public class FriendEntity extends BaseTimeEntity {
                 .defense(stats.defense())
                 .onSale(false)
                 .inUse(false)
+                .available(true)
                 .activeSkill1(randomActiveSkills.get(0).getId())
                 .activeSkill2(randomActiveSkills.get(1).getId())
                 .passiveSkill1(randomPassiveSkills.get(0).getId())
                 .passiveSkill2(randomPassiveSkills.get(1).getId())
                 .friendAttribute(stats.attribute())
+                .build();
+    }
+
+    public static FriendEntity copyEntityForRegistration(final FriendEntity friendEntity) {
+        return FriendEntity.builder()
+                .name(friendEntity.getName())
+                .level(friendEntity.getLevel())
+                .currentExp(friendEntity.getCurrentExp())
+                .userId(friendEntity.getUserId())
+                .friendType(friendEntity.getFriendType())
+                .hp(friendEntity.getHp())
+                .mana(friendEntity.getMana())
+                .maxMana(friendEntity.getMaxMana())
+                .manaRecovery(friendEntity.getManaRecovery())
+                .attack(friendEntity.getAttack())
+                .defense(friendEntity.getDefense())
+                .onSale(true)
+                .inUse(false)
+                .available(false)
+                .activeSkill1(friendEntity.getActiveSkill1())
+                .activeSkill2(friendEntity.getActiveSkill2())
+                .passiveSkill1(friendEntity.getPassiveSkill1())
+                .passiveSkill2(friendEntity.getPassiveSkill2())
+                .friendAttribute(friendEntity.getFriendAttribute())
                 .build();
     }
 
@@ -179,5 +209,19 @@ public class FriendEntity extends BaseTimeEntity {
 
     public void friendOnSale() {
         this.onSale = true;
+    }
+
+    public void cancelSelling() {
+        this.onSale = false;
+    }
+
+    public void registerNewUser(final long buyerId) {
+        this.userId = buyerId;
+        this.onSale = false;
+        this.available = true;
+    }
+
+    public void paidDone() {
+        this.onSale = false;
     }
 }
