@@ -50,4 +50,8 @@ public class UserItemMapEntity extends BaseTimeEntity{
         }
         this.quantity -= 1;
     }
+
+    public void increaseQuantity(int quantity) {
+        this.quantity += quantity;
+    }
 }
