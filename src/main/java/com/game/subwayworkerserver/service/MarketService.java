@@ -4,6 +4,7 @@ import com.game.subwayworkerserver.controller.request.FriendFilterRequest;
 import com.game.subwayworkerserver.controller.request.SellingRequest;
 import com.game.subwayworkerserver.controller.response.GlobalFriendsResponse;
 import com.game.subwayworkerserver.controller.response.MyFriendsMarketResponse;
+import com.game.subwayworkerserver.controller.response.PaymentSuccessResponse;
 import com.game.subwayworkerserver.domain.market.FriendOnSale;
 import com.game.subwayworkerserver.entity.FriendEntity;
 import com.game.subwayworkerserver.entity.FriendMarketEntity;
@@ -58,7 +59,7 @@ public class MarketService {
 
     public MyFriendsMarketResponse getMyFriendsOnSale(final String uuid) {
         UserEntity user = findUserByUuid(uuid);
-        List<FriendMarketEntity> friendsOnSale = friendMarketRepository.findAllBySellerIdAndAvailableTrue(user.getId());
+        List<FriendMarketEntity> friendsOnSale = friendMarketRepository.findAllBySellerId(user.getId());
         List<Long> friendIds = getFriendIds(friendsOnSale);
         List<FriendEntity> friendsOnSaleByFriendIds = findFriendsOnSaleByFriendIds(friendIds);
         List<FriendOnSale> friendOnSalesDomainList = FriendOnSale.toDomain(friendsOnSale, friendsOnSaleByFriendIds);
@@ -75,8 +76,12 @@ public class MarketService {
                 () -> new BaseException(NOT_FOUND, "Friend not found.")
         );
 
-        if(friendEntity.isInUse()) {
+        if (friendEntity.isInUse()) {
             throw new BaseException(BAD_REQUEST, "Friend is already in use.");
+        }
+        boolean friendOnMarket = friendMarketRepository.existsByFriendIdAndSellerId(request.friendId(), userId);
+        if (friendOnMarket) {
+            throw new BaseException(BAD_REQUEST, "동료는 이미 판매중입니다.");
         }
 
         friendEntity.friendOnSale();
@@ -89,6 +94,67 @@ public class MarketService {
         boolean ableToBuy = user.hasCoinMoreThanItemPrice(registrationFee);
         if (!ableToBuy) {
             throw new BaseException(BAD_REQUEST, "Not enough coin");
+        }
+    }
+
+    @Transactional
+    public void cancelSellingMyFriend(final String uuid, final long marketId) {
+        UserEntity user = findUserByUuid(uuid);
+        FriendMarketEntity friendMarketEntity = friendMarketRepository.findByIdAndAvailableTrueAndSoldFalse(marketId).orElseThrow(
+                () -> new BaseException(NOT_FOUND, "Friend already sold.")
+        );
+        FriendEntity friendEntity = friendRepository.findByUserIdAndId(user.getId(), friendMarketEntity.getFriendId()).orElseThrow(
+                () -> new BaseException(NOT_FOUND, "Friend not found.")
+        );
+        friendEntity.cancelSelling();
+        friendMarketRepository.delete(friendMarketEntity);
+    }
+
+    @Transactional
+    public PaymentSuccessResponse getFriendSoldPayment(final String uuid, final long marketId) {
+        UserEntity user = findUserByUuid(uuid);
+        FriendMarketEntity friendMarketEntity =
+                friendMarketRepository.findByIdAndSellerIdAndSoldTrueAndIsPaidFalseAndAvailableFalse(marketId, user.getId())
+                        .orElseThrow(
+                                () -> new BaseException(NOT_FOUND, "Friend not found on market.")
+                        );
+        int friendRealPrice = friendMarketEntity.getPrice() - friendMarketEntity.getCommission();
+        user.getPaid(friendRealPrice);
+        friendMarketEntity.paidDone();
+        friendRepository.findByIdAndOnSaleTrue(friendMarketEntity.getFriendId()).ifPresent(FriendEntity::paidDone);
+        return PaymentSuccessResponse.of(
+                friendMarketEntity.getPrice(),
+                friendMarketEntity.getCommission(),
+                friendRealPrice
+        );
+    }
+
+    @Transactional
+    public void purchaseFriend(final String uuid, final long marketId) {
+        UserEntity user = findUserByUuid(uuid);
+        FriendMarketEntity friendMarketEntity = friendMarketRepository.findByIdAndAvailableTrueAndSoldFalse(marketId)
+                .orElseThrow(
+                        () -> new BaseException(NOT_FOUND, "방금 판매된 동료에요.")
+                );
+        checkUserVacationTicket(user, friendMarketEntity.getPrice());
+        friendMarketEntity.purchase(user.getId());
+
+        friendRepository.findByIdAndOnSaleTrue(friendMarketEntity.getFriendId())
+                .ifPresent(soldFriend -> {
+                    FriendEntity newOwner = FriendEntity.copyEntityForRegistration(soldFriend);
+                    FriendEntity saved = friendRepository.save(newOwner);
+                    soldFriend.registerNewUser(user.getId());
+                    friendMarketEntity.changeFriendId(saved.getId());
+                });
+
+        int friendRealPrice = friendMarketEntity.getPrice() - friendMarketEntity.getCommission();
+        user.purchaseWithVacationTickets(friendRealPrice);
+    }
+
+    private static void checkUserVacationTicket(final UserEntity user, final int price) {
+        boolean ableToBuy = user.hasEnoughVacationTickets(price);
+        if (!ableToBuy) {
+            throw new BaseException(BAD_REQUEST, "휴가티켓이 부족해요!");
         }
     }
 }
