@@ -176,4 +176,8 @@ public class FriendEntity extends BaseTimeEntity {
                 PassiveSkillCard.from(this.getPassiveSkill2())
         );
     }
+
+    public void friendOnSale() {
+        this.onSale = true;
+    }
 }
