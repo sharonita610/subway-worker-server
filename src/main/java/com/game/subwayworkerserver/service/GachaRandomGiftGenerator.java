@@ -59,7 +59,7 @@ public class GachaRandomGiftGenerator {
 
                 if (config.type().equals("TREASURE")) {
                     GachaTreasure treasure = GachaTreasure.getRandom();
-                    rewards.add(new ExtraGift(treasure.getItemName(), 1));
+                    rewards.add(new ExtraGift(treasure.name(), 1));
 
                 } else {
                     rewards.add(new ExtraGift(config.type(), 1));
