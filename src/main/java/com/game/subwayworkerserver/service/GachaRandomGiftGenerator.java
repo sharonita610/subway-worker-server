@@ -1,6 +1,7 @@
 package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.domain.baseinfo.GachaTreasure;
+import com.game.subwayworkerserver.entity.ItemName;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +17,10 @@ public class GachaRandomGiftGenerator {
     private static final double SKEW_FACTOR = 3.5; // 낮은 값에 치우친 분포를 위한 인자
 
     private static final List<RewardConfig> EXTRA_REWARDS_CONFIGS = List.of(
-            new RewardConfig("BRIEFCASE", 10),
-            new RewardConfig("BUSINESS_CARRIER", 5),
-            new RewardConfig("SILVER_SHOVEL", 10),
-            new RewardConfig("GOLD_SHOVEL", 5),
+            new RewardConfig(ItemName.BRIEFCASE.name(), 10),
+            new RewardConfig(ItemName.BUSINESS_CARRIER.name(), 5),
+            new RewardConfig(ItemName.SILVER_SHOVEL.name(), 10),
+            new RewardConfig(ItemName.GOLD_SHOVEL.name(), 5),
             new RewardConfig("EXTRA_FRIEND", 3),
             new RewardConfig("TREASURE", 10)
     );
