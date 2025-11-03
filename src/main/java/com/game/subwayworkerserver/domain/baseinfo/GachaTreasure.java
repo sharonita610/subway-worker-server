@@ -48,18 +48,10 @@ public enum GachaTreasure {
         throw new IllegalArgumentException("유효하지 않은 아이템 이름입니다: " + itemName);
     }
 
-    public static List<GachaTreasure> getRandom() {
+    public static GachaTreasure getRandom() {
         GachaTreasure[] allTreasures = GachaTreasure.values();
         int count = allTreasures.length;
-        List<GachaTreasure> randomPicks = new ArrayList<>(3);
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-
-        // 3번 반복하여 각각 독립적으로 랜덤 아이템을 선택합니다.
-        for (int i = 0; i < 3; i++) {
-            int randomIndex = random.nextInt(count);
-            randomPicks.add(allTreasures[randomIndex]);
-        }
-
-        return randomPicks;
+        int randomIndex = ThreadLocalRandom.current().nextInt(count);
+        return allTreasures[randomIndex];
     }
 }
