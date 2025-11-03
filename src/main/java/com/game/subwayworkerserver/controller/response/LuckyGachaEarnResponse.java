@@ -4,35 +4,23 @@ import com.game.subwayworkerserver.domain.baseinfo.GachaTreasure;
 import com.game.subwayworkerserver.service.GachaRandomGiftGenerator.DefaultGift;
 import com.game.subwayworkerserver.service.GachaRandomGiftGenerator.ExtraGift;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public record LuckyGachaEarnResponse(
-        List<TreasureRewardInfo> treasureList,
         List<DefaultRewardInfo> defaultRewardList,
-        List<ExtraRewardInfo> extraRewardList
+        ExtraRewardInfo extraReward
 ) {
     public static LuckyGachaEarnResponse of(
-            List<GachaTreasure> randomGacha,
             List<DefaultGift> defaultReward,
             List<ExtraGift> extraReward
     ) {
         return new LuckyGachaEarnResponse(
-                randomGacha.stream()
-                        .map(TreasureRewardInfo::from)
-                        .toList(),
                 defaultReward.stream()
                         .map(DefaultRewardInfo::from)
                         .toList(),
-                extraReward.stream()
-                        .map(ExtraRewardInfo::from)
-                        .toList()
+                ExtraRewardInfo.from(extraReward)
         );
-    }
-
-    private record TreasureRewardInfo(String name, int quantity) {
-        public static TreasureRewardInfo from(final GachaTreasure gachaTreasure) {
-            return new TreasureRewardInfo(gachaTreasure.getItemName(), 1);
-        }
     }
 
     private record DefaultRewardInfo(String name, int quantity) {
@@ -41,9 +29,38 @@ public record LuckyGachaEarnResponse(
         }
     }
 
-    private record ExtraRewardInfo(String name, int quantity) {
-        public static ExtraRewardInfo from(final ExtraGift extraGift) {
-            return new ExtraRewardInfo(extraGift.type(), extraGift.quantity());
+    private record ExtraRewardInfo(
+            TreasureRewardInfo treasure,
+            List<TreasureRewardInfo> items
+    ) {
+        public static ExtraRewardInfo from(final List<ExtraGift> extraGiftList) {
+
+            TreasureRewardInfo singleTreasure = null;
+            List<TreasureRewardInfo> itemsList = new ArrayList<>();
+
+            for (ExtraGift extraGift : extraGiftList) {
+                String giftName = extraGift.type();
+                int quantity = extraGift.quantity();
+
+                if (GachaTreasure.isGacha(giftName)) {
+                    TreasureRewardInfo currentTreasure = new TreasureRewardInfo(giftName, quantity);
+                    if (singleTreasure == null) {
+                        singleTreasure = currentTreasure;
+                    } else {
+                        itemsList.add(currentTreasure);
+                    }
+                } else {
+                    itemsList.add(new TreasureRewardInfo(giftName, quantity));
+                }
+            }
+
+            return new ExtraRewardInfo(singleTreasure, itemsList);
         }
+
+
+    }
+
+    private record TreasureRewardInfo(String name, int quantity) {
+
     }
 }
