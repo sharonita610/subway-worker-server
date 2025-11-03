@@ -1,10 +1,12 @@
 package com.game.subwayworkerserver.domain.baseinfo;
 
+import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static java.util.Arrays.*;
 
 @Getter
 public enum GachaTreasure {
@@ -40,12 +42,12 @@ public enum GachaTreasure {
     }
 
     public static GachaTreasure fromItemName(final String itemName) {
-        for (GachaTreasure effect : GachaTreasure.values()) {
-            if (effect.itemName.equalsIgnoreCase(itemName)) {
-                return effect;
+        for (GachaTreasure treasure : GachaTreasure.values()) {
+            if (treasure.name().equalsIgnoreCase(itemName)) {
+                return treasure;
             }
         }
-        throw new IllegalArgumentException("유효하지 않은 아이템 이름입니다: " + itemName);
+        throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "유효하지 않은 아이템 이름입니다: " + itemName);
     }
 
     public static GachaTreasure getRandom() {
@@ -53,5 +55,10 @@ public enum GachaTreasure {
         int count = allTreasures.length;
         int randomIndex = ThreadLocalRandom.current().nextInt(count);
         return allTreasures[randomIndex];
+    }
+
+    public static boolean isGacha(final String type) {
+        return stream(GachaTreasure.values())
+                .anyMatch(treasure -> treasure.name().equalsIgnoreCase(type));
     }
 }
