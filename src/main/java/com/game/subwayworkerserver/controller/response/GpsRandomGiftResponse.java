@@ -39,6 +39,9 @@ public record GpsRandomGiftResponse(
     ) {
 
         public static BonusGiftInfo of(String itemKoreanName, int quantity) {
+            if (itemKoreanName.equals("gachaTicket")){
+                return new BonusGiftInfo("GACHA_TICKET", "가챠티켓", "가챠티켓", quantity);
+            }
             ItemName itemName = ItemName.fromKoreanName(itemKoreanName);
             return new BonusGiftInfo(itemName.toString(), itemKoreanName, itemName.getDescription(), quantity);
         }
