@@ -10,7 +10,7 @@ public enum CurrencyType {
     VACATION_TICKET("vacationTicket"),
     CASH("cash"),
     FREE("free"),
-    GACHA_TICKET("gotchaTicket");
+    GACHA_TICKET("gachaTicket");
 
     private final String currencyType;
 
@@ -30,7 +30,7 @@ public enum CurrencyType {
         }
 
         throw new BaseException(
-                ErrorCode.BAD_REQUEST, "유효하지 않은 재화 타입입니다. 'vacation_ticket' 또는 'gacha_ticket'만 허용됩니다."
+                ErrorCode.BAD_REQUEST, "유효하지 않은 재화 타입입니다. 'vacationTicket' 또는 'gachaTicket' 만 허용됩니다."
         );
     }
 }

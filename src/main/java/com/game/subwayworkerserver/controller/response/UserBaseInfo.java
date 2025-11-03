@@ -9,7 +9,7 @@ public record UserBaseInfo(
         int coin,
         int stageLevel,
         int vacationTicket,
-        int gotchaTicket,
+        int gachaTicket,
         boolean hasPendingReward,
         boolean hasTrappedSomething
 
@@ -22,7 +22,7 @@ public record UserBaseInfo(
                 user.getCoin(),
                 user.getStage(),
                 user.getVacationTicket(),
-                user.getGotchaTicket(),
+                user.getGachaTicket(),
                 user.isHasPendingReward(),
                 user.isTrapSuccess()
         );

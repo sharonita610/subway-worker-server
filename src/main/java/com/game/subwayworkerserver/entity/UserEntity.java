@@ -43,7 +43,7 @@ public class UserEntity extends BaseTimeEntity {
     private int vacationTicket;
 
     @Column(nullable = false)
-    private int gotchaTicket;
+    private int gachaTicket;
 
     @Column(nullable = false)
     private int stage;
@@ -55,7 +55,7 @@ public class UserEntity extends BaseTimeEntity {
     private boolean hasPendingReward = false;
 
     public UserEntity(String name, String uuid, int exp, int level, int totalExp, int coin, int vacationTicket,
-                      int gotchaTicket, int stage, Gender gender) {
+                      int gachaTicket, int stage, Gender gender) {
         this.name = name;
         this.uuid = uuid;
         this.exp = exp;
@@ -63,7 +63,7 @@ public class UserEntity extends BaseTimeEntity {
         this.totalExp = totalExp;
         this.coin = coin;
         this.vacationTicket = vacationTicket;
-        this.gotchaTicket = gotchaTicket;
+        this.gachaTicket = gachaTicket;
         this.stage = stage;
         this.gender = gender;
     }
@@ -79,8 +79,8 @@ public class UserEntity extends BaseTimeEntity {
         this.totalExp += totalExperience;
     }
 
-    public void increaseGotchaTicket() {
-        this.gotchaTicket++;
+    public void increaseGachaTicket() {
+        this.gachaTicket++;
     }
 
     public void updateTrapSuccess() {
@@ -120,7 +120,7 @@ public class UserEntity extends BaseTimeEntity {
         if (currencyType.equals("vacationTicket")) {
             return this.vacationTicket >= itemPrice;
         } else {
-            return this.gotchaTicket >= itemPrice;
+            return this.gachaTicket >= itemPrice;
         }
     }
 
@@ -128,7 +128,7 @@ public class UserEntity extends BaseTimeEntity {
         if (currencyType.equals("vacationTicket")) {
             this.vacationTicket -= itemPrice;
         } else {
-            this.gotchaTicket -= itemPrice;
+            this.gachaTicket -= itemPrice;
         }
     }
 

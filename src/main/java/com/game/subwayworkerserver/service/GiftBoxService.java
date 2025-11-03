@@ -105,8 +105,8 @@ public class GiftBoxService {
         // 4. 추가 아이템 인벤토리 업데이트 (재료, 도구 등)
         for (ExtraGift item : bonusGifts) {
 
-            if(item.name().equals("gotchaTicket")) {
-                user.increaseGotchaTicket();
+            if(item.name().equals("gachaTicket")) {
+                user.increaseGachaTicket();
                 continue;
             }
             ItemName itemName = ItemName.fromKoreanName(item.name());
@@ -195,7 +195,7 @@ public class GiftBoxService {
                 ItemName.BRIEFCASE.getName(), 5,
 
                 // 럭키 가챠 티켓 1개: 10% (BUSINESS_CARRIER로 대체)
-                "gotchaTicket", 10
+                "gachaTicket", 10
         );
 
         // Map을 순회하며 각 아이템에 대해 독립적으로 확률을 검사합니다.
