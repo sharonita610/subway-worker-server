@@ -18,14 +18,13 @@ public enum CurrencyType {
         this.currencyType = currencyType;
     }
 
-    public static CurrencyType confirm(String currencyType) {
-        String upperCaseType = currencyType.toUpperCase();
+    public static CurrencyType confirm(String requestCurrencyType) {
 
-        if (upperCaseType.equals(VACATION_TICKET.name())) {
+        if (requestCurrencyType.equals(VACATION_TICKET.getCurrencyType())) {
             return VACATION_TICKET;
         }
 
-        if (upperCaseType.equals(GACHA_TICKET.name())) {
+        if (requestCurrencyType.equals(GACHA_TICKET.getCurrencyType())) {
             return GACHA_TICKET;
         }
 
