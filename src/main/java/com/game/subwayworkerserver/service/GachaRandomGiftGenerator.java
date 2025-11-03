@@ -31,13 +31,26 @@ public class GachaRandomGiftGenerator {
     public static List<DefaultGift> getDefaultReward() {
         ThreadLocalRandom random = ThreadLocalRandom.current();
 
-        long coinRange = COIN_MAX - COIN_MIN;
-        double skewedRandomCoin = Math.pow(random.nextDouble(0, 1), SKEW_FACTOR);
-        long coins = (long) (COIN_MIN + skewedRandomCoin * coinRange);
+        final long COIN_MIN_ADJUSTED = 15000;
+        final long COIN_MAX_ADJUSTED = 150000;
+        // ⭐ 오류 수정: MAX - MIN = 135000 ⭐
+        final long COIN_RANGE = COIN_MAX_ADJUSTED - COIN_MIN_ADJUSTED;
 
-        int ticketRange = TICKET_MAX - TICKET_MIN;
+        // 1. 0~1 사이의 난수를 생성하고 SKEW_FACTOR 제곱하여 0에 가깝게 만듭니다.
+        double skewedRandomCoin = Math.pow(ThreadLocalRandom.current().nextDouble(0, 1), SKEW_FACTOR);
+        // 2. 이 값을 범위에 적용하여 낮은 코인 값을 생성합니다.
+        long coins = (long) (COIN_MIN_ADJUSTED + skewedRandomCoin * COIN_RANGE);
+
+        // TICKET_RANGE 계산 오류 수정 및 조정된 값 사용
+        final int TICKET_MIN_ADJUSTED = 5;
+        final int TICKET_MAX_ADJUSTED = 100;
+        // ⭐ 오류 수정: MAX - MIN = 95 ⭐
+        final int TICKET_RANGE = TICKET_MAX_ADJUSTED - TICKET_MIN_ADJUSTED;
+
+        // 2. 휴가티켓 계산
         double skewedRandomTicket = Math.pow(random.nextDouble(0, 1), SKEW_FACTOR);
-        int tickets = (int) (TICKET_MIN + skewedRandomTicket * ticketRange);
+        int tickets = (int) (TICKET_MIN_ADJUSTED + skewedRandomTicket * TICKET_RANGE);
+
 
         List<DefaultGift> defaultGiftList = new ArrayList<>();
         defaultGiftList.add(new DefaultGift("coin", "코인", (int) coins));

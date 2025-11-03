@@ -37,12 +37,13 @@ public class GiftBoxService {
     private static final String USER_ACQUIRED_PREFIX = "user:acquired:";
     private static final double SEARCH_RADIUS_METER = 50.0;
 
-    // --- 보상 상수 (이전 답변에서 사용된 것 재활용) ---
     private static final int BASE_EXP = 20;
-    private static final long COIN_MIN = 10000;
-    private static final long COIN_MAX = 200000;
-    private static final int TICKET_MIN = 3;
-    private static final int TICKET_MAX = 200;
+
+    // --- 보상 상수 (이전 답변에서 사용된 것 재활용) ---
+    private static final long COIN_MIN_ORIGINAL = 10000; // 원본 값
+    private static final long COIN_MAX_ORIGINAL = 200000; // 원본 값
+    private static final int TICKET_MIN_ORIGINAL = 3; // 원본 값
+    private static final int TICKET_MAX_ORIGINAL = 200; // 원본 값
 
     @Transactional
     public GpsRandomGiftResponse getRandomGift(GpsRandomGiftRequest request, String userUuid) {
@@ -153,18 +154,27 @@ public class GiftBoxService {
         // 코인 (기대값 30,000, 범위 1만~20만)
         // 낮은 값에 치우친 분포를 만들기 위해 높은 skewFactor(3.5)를 적용합니다.
         final double SKEW_FACTOR = 3.5;
-        final long COIN_RANGE = COIN_MAX - COIN_MIN;
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+
+        final long COIN_MIN_ADJUSTED = 15000;
+        final long COIN_MAX_ADJUSTED = 150000;
+        // ⭐ 오류 수정: MAX - MIN = 135000 ⭐
+        final long COIN_RANGE = COIN_MAX_ADJUSTED - COIN_MIN_ADJUSTED;
 
         // 1. 0~1 사이의 난수를 생성하고 SKEW_FACTOR 제곱하여 0에 가깝게 만듭니다.
         double skewedRandomCoin = Math.pow(ThreadLocalRandom.current().nextDouble(0, 1), SKEW_FACTOR);
         // 2. 이 값을 범위에 적용하여 낮은 코인 값을 생성합니다.
-        long coins = (long) (COIN_MIN + skewedRandomCoin * COIN_RANGE);
+        long coins = (long) (COIN_MIN_ADJUSTED + skewedRandomCoin * COIN_RANGE);
 
+        // TICKET_RANGE 계산 오류 수정 및 조정된 값 사용
+        final int TICKET_MIN_ADJUSTED = 5;
+        final int TICKET_MAX_ADJUSTED = 100;
+        // ⭐ 오류 수정: MAX - MIN = 95 ⭐
+        final int TICKET_RANGE = TICKET_MAX_ADJUSTED - TICKET_MIN_ADJUSTED;
 
-        // 휴가티켓 (기대값 20, 범위 3~200)
-        final int TICKET_RANGE = TICKET_MAX - TICKET_MIN;
-        double skewedRandomTicket = Math.pow(ThreadLocalRandom.current().nextDouble(0, 1), SKEW_FACTOR);
-        int tickets = (int) (TICKET_MIN + skewedRandomTicket * TICKET_RANGE);
+        // 2. 휴가티켓 계산
+        double skewedRandomTicket = Math.pow(random.nextDouble(0, 1), SKEW_FACTOR);
+        int tickets = (int) (TICKET_MIN_ADJUSTED + skewedRandomTicket * TICKET_RANGE);
 
         List<DefaultGift> defaultGiftList = new ArrayList<>();
         defaultGiftList.add(new DefaultGift("coin", "코인", (int) coins));
