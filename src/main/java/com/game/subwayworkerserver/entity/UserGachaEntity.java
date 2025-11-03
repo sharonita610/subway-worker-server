@@ -44,7 +44,7 @@ public class UserGachaEntity extends BaseTimeEntity {
                 .map(treasure -> UserGachaEntity.builder()
                         .userId(userId)
                         .gacha(treasure)
-                        .gachaCount(0) // 초기 사용 횟수 0
+                        .gachaCount(0)
                         .build())
                 .toList();
     }
