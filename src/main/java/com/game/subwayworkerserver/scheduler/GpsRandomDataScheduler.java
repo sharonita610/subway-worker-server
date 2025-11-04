@@ -29,8 +29,8 @@ public class GpsRandomDataScheduler {
     private static final String FRIEND_LOCATIONS_KEY = "friend:locations";
     private static final String RANDOM_GIFT_BOX_KEY = "giftbox:locations";
     private static final String FRIEND_DATA_PREFIX = "friend:data:";
-    private static final long MAP_DATA_TTL_HOURS = 3;
-
+//    private static final long MAP_DATA_TTL_HOURS = 4;
+    private static final long MAP_DATA_TTL_MINUTES = 6;
     // 대한민국 지도 범위 (대략적)
     private static final double MIN_LAT = 33.0;
     private static final double MAX_LAT = 38.5;
@@ -45,7 +45,7 @@ public class GpsRandomDataScheduler {
 
     // Grid 셀당 생성할 아이템 수
     private static final int FRIENDS_PER_CELL = 5;
-    private static final int GIFTS_PER_CELL = 2; // 선물상자 수
+    private static final int GIFTS_PER_CELL = 5; // 선물상자 수
     private static final double MAX_JITTER = 0.003; // 셀 내에서 흩뿌릴 최대 오프셋
 
     // --- 스케줄링 및 초기화 ---
@@ -65,7 +65,7 @@ public class GpsRandomDataScheduler {
      * 2. 30분마다 맵의 동료와 선물 상자 데이터를 재생성합니다.
      * fixedRate = 1800000ms (30분)
      */
-    @Scheduled(fixedRate = 10800000)
+    @Scheduled(fixedRate = 300000)
     public void scheduledMapRegeneration() {
         log.info("--- [Scheduler] 30분 주기 맵 재생성 시작 ---");
         // Item 생성/삭제를 건너뛰고, 동료와 선물상자만 재생성
@@ -136,7 +136,6 @@ public class GpsRandomDataScheduler {
 
         if (!locations.isEmpty()) {
             redisTemplate.opsForGeo().add(key, locations);
-            redisTemplate.expire(key, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
         }
     }
 
@@ -147,7 +146,7 @@ public class GpsRandomDataScheduler {
         }
         String instanceKey = FRIEND_DATA_PREFIX + friendId;
         redisTemplate.opsForHash().putAll(instanceKey, dataToSave);
-        redisTemplate.expire(instanceKey, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
+        redisTemplate.expire(instanceKey, MAP_DATA_TTL_MINUTES, TimeUnit.MINUTES);
     }
 
     private double generateRandomCoordinate(double center, double maxOffset) {
