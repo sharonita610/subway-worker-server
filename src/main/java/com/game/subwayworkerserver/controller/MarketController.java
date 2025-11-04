@@ -5,7 +5,7 @@ import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.FriendFilterRequest;
 import com.game.subwayworkerserver.controller.request.SellingRequest;
 import com.game.subwayworkerserver.controller.response.*;
-import com.game.subwayworkerserver.service.MarketService;
+import com.game.subwayworkerserver.service.FriendMarketService;
 import io.micrometer.common.lang.Nullable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class MarketController {
 
-    private final MarketService marketService;
+    private final FriendMarketService friendMarketService;
 
     @Operation(
             summary = "영입 가능한 동료 리스트 조회 [완]",
@@ -28,7 +28,7 @@ public class MarketController {
     @PostMapping("/market/global/friends")
     public ResponseEntity<GlobalFriendsResponse> getFriendsOnSale(@Nullable @RequestBody FriendFilterRequest request) {
         String uuid = SecurityUtils.getCurrentUserUuid();
-        return ResponseEntity.ok(marketService.getFriendMarket(uuid, request));
+        return ResponseEntity.ok(friendMarketService.getFriendMarket(uuid, request));
     }
 
     @Operation(
@@ -38,7 +38,7 @@ public class MarketController {
     @PostMapping("/market/friend/selling-list")
     public ResponseEntity<MyFriendsMarketResponse> getMyFriendSellingList(){
         String uuid = SecurityUtils.getCurrentUserUuid();
-        return ResponseEntity.ok(marketService.getMyFriendsOnSale(uuid));
+        return ResponseEntity.ok(friendMarketService.getMyFriendsOnSale(uuid));
     }
 
     @Operation(
@@ -48,7 +48,7 @@ public class MarketController {
     @PostMapping("/market/global/buy-friend")
     public ResponseEntity<Void> buyFriend(@RequestParam("id") long marketId){
         String uuid = SecurityUtils.getCurrentUserUuid();
-        marketService.purchaseFriend(uuid, marketId);
+        friendMarketService.purchaseFriend(uuid, marketId);
         return ResponseEntity.ok().build();
     }
 
@@ -59,7 +59,7 @@ public class MarketController {
     @PostMapping("/market/friend/sell")
     public ResponseEntity<HttpStatus> sellFriend(@RequestBody SellingRequest request){
         String uuid = SecurityUtils.getCurrentUserUuid();
-        marketService.registerFriendOnMarket(uuid, request);
+        friendMarketService.registerFriendOnMarket(uuid, request);
         return ResponseEntity.ok(HttpStatus.NO_CONTENT);
     }
 
@@ -70,7 +70,7 @@ public class MarketController {
     @PostMapping("/market/friend/cancel")
     public ResponseEntity<Void> cancelSellingFriend(@RequestParam("id") long marketId){
         String uuid = SecurityUtils.getCurrentUserUuid();
-        marketService.cancelSellingMyFriend(uuid, marketId);
+        friendMarketService.cancelSellingMyFriend(uuid, marketId);
         return ResponseEntity.ok().build();
     }
 
@@ -81,7 +81,7 @@ public class MarketController {
     @GetMapping("/market/friend/get-paid")
     public ResponseEntity<PaymentSuccessResponse> getFriendPaid(@RequestParam("id") long marketId){
         String uuid = SecurityUtils.getCurrentUserUuid();
-        return ResponseEntity.ok(marketService.getFriendSoldPayment(uuid, marketId));
+        return ResponseEntity.ok(friendMarketService.getFriendSoldPayment(uuid, marketId));
     }
 
     @Operation(

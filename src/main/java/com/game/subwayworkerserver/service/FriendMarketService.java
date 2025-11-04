@@ -23,7 +23,7 @@ import static com.game.subwayworkerserver.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
-public class MarketService {
+public class FriendMarketService {
 
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
