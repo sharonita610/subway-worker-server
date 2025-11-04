@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class GachaRandomGiftGenerator {
 
-    private static final String EXTRA_FRIEND = "EXTRA_FRIEND";
+    private static final String MATERIAL_FRIEND = "MATERIAL_FRIEND";
     private static final String TREASURE = "TREASURE";
 
     private static final double SKEW_FACTOR = 3.5;
@@ -25,7 +25,7 @@ public class GachaRandomGiftGenerator {
             new RewardConfig(ItemName.BUSINESS_CARRIER.name(), 5),
             new RewardConfig(ItemName.SILVER_SHOVEL.name(), 10),
             new RewardConfig(ItemName.GOLD_SHOVEL.name(), 5),
-            new RewardConfig(EXTRA_FRIEND, 3),
+            new RewardConfig(MATERIAL_FRIEND, 3),
             new RewardConfig(TREASURE, 10)
     );
 
