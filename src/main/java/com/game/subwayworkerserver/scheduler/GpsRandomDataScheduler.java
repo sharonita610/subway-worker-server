@@ -1,6 +1,7 @@
 package com.game.subwayworkerserver.scheduler;
 
 import com.game.subwayworkerserver.service.FriendDataCreator;
+import com.game.subwayworkerserver.service.UserService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -22,15 +24,14 @@ import java.util.concurrent.TimeUnit;
 public class GpsRandomDataScheduler {
 
     private final FriendDataCreator friendDataCreator;
-
+    private final UserService userService;
     private final RedisTemplate<String, String> redisTemplate;
 
     // Redis Key 상수
     private static final String FRIEND_LOCATIONS_KEY = "friend:locations";
     private static final String RANDOM_GIFT_BOX_KEY = "giftbox:locations";
     private static final String FRIEND_DATA_PREFIX = "friend:data:";
-//    private static final long MAP_DATA_TTL_HOURS = 4;
-    private static final long MAP_DATA_TTL_MINUTES = 6;
+    private static final long MAP_DATA_TTL_DAYS = 1;
     // 대한민국 지도 범위 (대략적)
     private static final double MIN_LAT = 33.0;
     private static final double MAX_LAT = 38.5;
@@ -65,12 +66,12 @@ public class GpsRandomDataScheduler {
      * 2. 30분마다 맵의 동료와 선물 상자 데이터를 재생성합니다.
      * fixedRate = 1800000ms (30분)
      */
-    @Scheduled(fixedRate = 300000)
+    @Scheduled(fixedRate = 10800000)
     public void scheduledMapRegeneration() {
-        log.info("--- [Scheduler] 30분 주기 맵 재생성 시작 ---");
+        log.info("--- [Scheduler] 3시간 주기 맵 재생성 시작 ---");
         // Item 생성/삭제를 건너뛰고, 동료와 선물상자만 재생성
         generateFullMapData(true);
-        log.info("--- [Scheduler] 30분 주기 맵 재생성 완료 ---");
+        log.info("--- [Scheduler] 3시간 주기 맵 재생성 완료 ---");
     }
 
     /**
@@ -83,6 +84,7 @@ public class GpsRandomDataScheduler {
             // 1. 기존 데이터 삭제 (Item_Locations_Key는 제외)
             redisTemplate.delete(FRIEND_LOCATIONS_KEY);
             redisTemplate.delete(RANDOM_GIFT_BOX_KEY);
+            weeklyAcquiredKeyCleanup();
             log.info("--- 동료/선물상자 기존 데이터 삭제 완료 ---");
         }
 
@@ -121,7 +123,7 @@ public class GpsRandomDataScheduler {
         Map<String, Point> locations = new HashMap<>();
 
         for (int i = 0; i < count; i++) {
-            String memberName = prefix + "_" + UUID.randomUUID().toString().substring(0, 8);
+            String memberName = prefix + "_" + UUID.randomUUID().toString().substring(0, 12);
 
             // 셀 중심 좌표에서 MAX_JITTER 내에서 랜덤하게 위치를 흩뿌립니다.
             double randomLat = generateRandomCoordinate(centerLat, MAX_JITTER);
@@ -146,11 +148,27 @@ public class GpsRandomDataScheduler {
         }
         String instanceKey = FRIEND_DATA_PREFIX + friendId;
         redisTemplate.opsForHash().putAll(instanceKey, dataToSave);
-        redisTemplate.expire(instanceKey, MAP_DATA_TTL_MINUTES, TimeUnit.MINUTES);
+        redisTemplate.expire(instanceKey, MAP_DATA_TTL_DAYS, TimeUnit.DAYS);
     }
 
     private double generateRandomCoordinate(double center, double maxOffset) {
         double offset = ThreadLocalRandom.current().nextDouble(-maxOffset, maxOffset);
         return Math.round((center + offset) * 1000000.0) / 1000000.0;
+    }
+
+    public void weeklyAcquiredKeyCleanup() {
+
+        // 1. 모든 사용자 UUID 목록을 조회합니다. (예: DB 또는 다른 Redis 키에서)
+        List<String> allUserUuids = userService.getAllUserUuids();
+
+        // 2. 모든 사용자의 획득 기록 키를 삭제합니다.
+        for (String uuid : allUserUuids) {
+            String friendKey = "user:acquired:" + uuid + ":friend:locations";
+            String giftBoxKey = "user:acquired:" + uuid + ":giftbox:locations";
+
+            redisTemplate.delete(friendKey);
+            redisTemplate.delete(giftBoxKey);
+        }
+        log.info("Weekly acquired key cleanup finished.");
     }
 }
