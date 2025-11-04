@@ -4,8 +4,10 @@ package com.game.subwayworkerserver.controller;
 import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.FriendFilterRequest;
 import com.game.subwayworkerserver.controller.request.SellingRequest;
+import com.game.subwayworkerserver.controller.request.SkillCardFilterRequest;
 import com.game.subwayworkerserver.controller.response.*;
 import com.game.subwayworkerserver.service.FriendMarketService;
+import com.game.subwayworkerserver.service.SkillCardMarketService;
 import io.micrometer.common.lang.Nullable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class MarketController {
 
     private final FriendMarketService friendMarketService;
+    private final SkillCardMarketService skillCardMarketService;
 
     @Operation(
             summary = "영입 가능한 동료 리스트 조회 [완]",
@@ -89,10 +92,11 @@ public class MarketController {
             description = "장터에 올라온 모든 스킬 카드의 리스트를 필터링 기능을 포함하여 조회"
     )
     @PostMapping("/market/global/skill")
-    public ResponseEntity<GlobalSkillCardResponse> getGlobalSkillCardOnSale(){
+    public ResponseEntity<GlobalSkillCardResponse> getGlobalSkillCardOnSale(
+            @Nullable @RequestBody SkillCardFilterRequest request
+    ){
         String uuid = SecurityUtils.getCurrentUserUuid();
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(skillCardMarketService.getSkillCardMarket(uuid, request));
     }
 
     @Operation(
