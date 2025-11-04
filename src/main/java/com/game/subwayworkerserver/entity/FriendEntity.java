@@ -19,6 +19,10 @@ import static com.game.subwayworkerserver.util.SkillRandomizer.getRandomPassiveS
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FriendEntity extends BaseTimeEntity {
 
+    private static final int DEFAULT = 0;
+    private static final int ZERO = 0;
+    private static final int ONE = 1;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -79,16 +83,18 @@ public class FriendEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private int passiveSkill2;
 
-
     @Column(nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
     private FriendAttribute friendAttribute;
+
+    @Column(nullable = false)
+    private boolean isMaterial = false;
 
     @Builder
     public FriendEntity(String name, FriendLevel level, int currentExp, long userId, FriendType friendType, long hp,
                         long mana, long maxMana, long manaRecovery, long attack, long defense, boolean inUse,
                         boolean onSale, int activeSkill1, int activeSkill2, int passiveSkill1, int passiveSkill2,
-                        FriendAttribute friendAttribute, boolean available
+                        FriendAttribute friendAttribute, boolean available,  boolean isMaterial
     ) {
         this.name = name;
         this.level = level;
@@ -109,6 +115,7 @@ public class FriendEntity extends BaseTimeEntity {
         this.passiveSkill2 = passiveSkill2;
         this.friendAttribute = friendAttribute;
         this.available = available;
+        this.isMaterial = isMaterial;
     }
 
     public static FriendEntity of(final long userId, final FriendType friendType) {
@@ -118,8 +125,8 @@ public class FriendEntity extends BaseTimeEntity {
 
         return FriendEntity.builder()
                 .name(friendType.getKoreanName())
-                .level(FriendLevel.of(1))
-                .currentExp(0)
+                .level(FriendLevel.of(ONE))
+                .currentExp(DEFAULT)
                 .userId(userId)
                 .friendType(friendType)
                 .hp(stats.hp())
@@ -131,10 +138,10 @@ public class FriendEntity extends BaseTimeEntity {
                 .onSale(false)
                 .inUse(true)
                 .available(true)
-                .activeSkill1(randomActiveSkills.get(0).getId())
-                .activeSkill2(randomActiveSkills.get(1).getId())
-                .passiveSkill1(randomPassiveSkills.get(0).getId())
-                .passiveSkill2(randomPassiveSkills.get(1).getId())
+                .activeSkill1(randomActiveSkills.get(ZERO).getId())
+                .activeSkill2(randomActiveSkills.get(ONE).getId())
+                .passiveSkill1(randomPassiveSkills.get(ZERO).getId())
+                .passiveSkill2(randomPassiveSkills.get(ONE).getId())
                 .friendAttribute(stats.attribute())
                 .build();
     }
@@ -149,7 +156,7 @@ public class FriendEntity extends BaseTimeEntity {
         return FriendEntity.builder()
                 .name(friendName)
                 .level(FriendLevel.of(friendLevel))
-                .currentExp(0)
+                .currentExp(DEFAULT)
                 .userId(userId)
                 .friendType(friendType)
                 .hp(stats.hp())
@@ -161,10 +168,10 @@ public class FriendEntity extends BaseTimeEntity {
                 .onSale(false)
                 .inUse(false)
                 .available(true)
-                .activeSkill1(randomActiveSkills.get(0).getId())
-                .activeSkill2(randomActiveSkills.get(1).getId())
-                .passiveSkill1(randomPassiveSkills.get(0).getId())
-                .passiveSkill2(randomPassiveSkills.get(1).getId())
+                .activeSkill1(randomActiveSkills.get(ZERO).getId())
+                .activeSkill2(randomActiveSkills.get(ONE).getId())
+                .passiveSkill1(randomPassiveSkills.get(ZERO).getId())
+                .passiveSkill2(randomPassiveSkills.get(ONE).getId())
                 .friendAttribute(stats.attribute())
                 .build();
     }
@@ -190,6 +197,31 @@ public class FriendEntity extends BaseTimeEntity {
                 .passiveSkill1(friendEntity.getPassiveSkill1())
                 .passiveSkill2(friendEntity.getPassiveSkill2())
                 .friendAttribute(friendEntity.getFriendAttribute())
+                .build();
+    }
+
+    public static FriendEntity of(final long userId, final FriendType friendType, final FriendLevel level) {
+        return FriendEntity.builder()
+                .name(friendType.getKoreanName())
+                .level(level)
+                .currentExp(DEFAULT)
+                .userId(userId)
+                .friendType(friendType)
+                .hp(DEFAULT)
+                .mana(DEFAULT)
+                .maxMana(DEFAULT)
+                .manaRecovery(DEFAULT)
+                .attack(DEFAULT)
+                .defense(DEFAULT)
+                .onSale(false)
+                .inUse(false)
+                .available(false)
+                .activeSkill1(DEFAULT)
+                .activeSkill2(DEFAULT)
+                .passiveSkill1(DEFAULT)
+                .passiveSkill2(DEFAULT)
+                .isMaterial(true)
+                .friendAttribute(FriendAttribute.getRandomAttribute())
                 .build();
     }
 
