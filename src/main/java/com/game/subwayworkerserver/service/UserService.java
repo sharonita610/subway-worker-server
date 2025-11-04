@@ -120,4 +120,8 @@ public class UserService {
         List<FriendEntity> sortedFriendList = friendListFilter.sort(friendEntityList);
         return FriendListResponse.of(sortedFriendList);
     }
+
+    public List<String> getAllUserUuids() {
+        return userRepository.getAllUserUuid();
+    }
 }
