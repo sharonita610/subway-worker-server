@@ -19,7 +19,10 @@ public class SkillCardEntity extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String engName;
+
+    @Column(nullable = false)
+    private String korName;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
