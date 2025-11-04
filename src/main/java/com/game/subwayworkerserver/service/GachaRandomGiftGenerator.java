@@ -35,14 +35,10 @@ public class GachaRandomGiftGenerator {
         ThreadLocalRandom random = ThreadLocalRandom.current();
 
         final long COIN_RANGE = COIN_MAX_ADJUSTED - COIN_MIN_ADJUSTED;
-
         double skewedRandomCoin = Math.pow(ThreadLocalRandom.current().nextDouble(0, 1), SKEW_FACTOR);
         long coins = (long) (COIN_MIN_ADJUSTED + skewedRandomCoin * COIN_RANGE);
 
-
-        // ⭐ 오류 수정: MAX - MIN = 95 ⭐
         final int TICKET_RANGE = TICKET_MAX_ADJUSTED - TICKET_MIN_ADJUSTED;
-
         double skewedRandomTicket = Math.pow(random.nextDouble(0, 1), SKEW_FACTOR);
         int tickets = (int) (TICKET_MIN_ADJUSTED + skewedRandomTicket * TICKET_RANGE);
 
