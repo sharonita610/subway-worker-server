@@ -3,7 +3,7 @@ package com.game.subwayworkerserver.service;
 import com.game.subwayworkerserver.controller.request.OpenLuckyGachaRequest;
 import com.game.subwayworkerserver.controller.response.LuckyGachaEarnResponse;
 import com.game.subwayworkerserver.controller.response.LuckyGachaListResponse;
-import com.game.subwayworkerserver.domain.baseinfo.FriendType;
+import com.game.subwayworkerserver.domain.baseinfo.GachaPaymentOption;
 import com.game.subwayworkerserver.domain.baseinfo.GachaTreasure;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
@@ -47,19 +47,26 @@ public class GachaService {
     public LuckyGachaEarnResponse openLuckyGacha(final String uuid, final OpenLuckyGachaRequest request) {
         UserEntity user = getUserByUuid(uuid);
         CurrencyType currencyType = CurrencyType.confirm(request.payCondition());
-        boolean enoughTickets = user.hasEnoughTickets(currencyType.getCurrencyType(), request.price());
-        if (!enoughTickets) {
-            throw new BaseException(ErrorCode.BAD_REQUEST, "Not enough tickets");
-        }
+        GachaPaymentOption gachaPaymentOption = GachaPaymentOption.confirmCountAndPrice(currencyType, request.price());
 
-        List<DefaultGift> defaultReward = GachaRandomGiftGenerator.getDefaultReward();
-        List<ExtraGift> extraReward = GachaRandomGiftGenerator.getExtraReward();
+        checkUserHasEnoughTicketsToPay(request, user, currencyType);
+
+        List<DefaultGift> defaultReward = GachaRandomGiftGenerator.getDefaultReward(gachaPaymentOption.getCount());
+        List<ExtraGift> extraReward = GachaRandomGiftGenerator.getExtraReward(gachaPaymentOption.getCount());
 
         user.purchaseWithTickets(currencyType.getCurrencyType(), request.price());
+
         processExtraGift(extraReward, user.getId());
         processDefaultGift(defaultReward, user);
 
         return LuckyGachaEarnResponse.of(defaultReward, extraReward);
+    }
+
+    private void checkUserHasEnoughTicketsToPay(OpenLuckyGachaRequest request, UserEntity user, CurrencyType currencyType) {
+        boolean enoughTickets = user.hasEnoughTickets(currencyType.getCurrencyType(), request.price());
+        if (!enoughTickets) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "Not enough tickets.");
+        }
     }
 
 
