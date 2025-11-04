@@ -69,7 +69,6 @@ public class GachaService {
         }
     }
 
-
     private void processExtraGift(final List<ExtraGift> extraReward, final long userId) {
         extraReward.forEach(
                 gift -> {
