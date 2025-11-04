@@ -5,6 +5,7 @@ import com.game.subwayworkerserver.entity.ItemName;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,32 @@ public class GachaRandomGiftGenerator {
     private record RewardConfig(String type, int chancePercent) {
     }
 
-    public static List<DefaultGift> getDefaultReward() {
+    public static List<DefaultGift> getDefaultReward(final int count) {
+        List<DefaultGift> rawRewards = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            rawRewards.addAll(calculateSingleDefaultReward());
+        }
+
+        if (rawRewards.isEmpty()) {
+            return List.of();
+        }
+
+        Map<String, Integer> summedMap = rawRewards.stream()
+                .collect(Collectors.groupingBy(
+                        DefaultGift::type,
+                        Collectors.summingInt(DefaultGift::quantity)
+                ));
+
+        return summedMap.entrySet().stream()
+                .map(entry -> new DefaultGift(
+                        entry.getKey(),
+                        entry.getKey(),
+                        entry.getValue()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    private static List<DefaultGift> calculateSingleDefaultReward() {
         ThreadLocalRandom random = ThreadLocalRandom.current();
 
         final long COIN_RANGE = COIN_MAX_ADJUSTED - COIN_MIN_ADJUSTED;
@@ -49,7 +75,31 @@ public class GachaRandomGiftGenerator {
         return defaultGiftList;
     }
 
-    public static List<ExtraGift> getExtraReward() {
+    public static List<ExtraGift> getExtraReward(int count) {
+        List<ExtraGift> rawRewards = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            rawRewards.addAll(calculateSingleExtraReward());
+        }
+
+        if (rawRewards.isEmpty()) {
+            return List.of();
+        }
+
+        Map<String, Integer> summedMap = rawRewards.stream()
+                .collect(Collectors.groupingBy(
+                        ExtraGift::type,
+                        Collectors.summingInt(ExtraGift::quantity)
+                ));
+
+        return summedMap.entrySet().stream()
+                .map(entry -> new ExtraGift(
+                        entry.getKey(),
+                        entry.getValue()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    private static List<ExtraGift> calculateSingleExtraReward() {
         List<ExtraGift> rewards = new ArrayList<>();
         ThreadLocalRandom random = ThreadLocalRandom.current();
 
