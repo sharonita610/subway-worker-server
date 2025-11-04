@@ -2,6 +2,8 @@ package com.game.subwayworkerserver.domain.baseinfo;
 
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
@@ -68,5 +70,18 @@ public enum FriendLevel{
             }
         }
         return levels[0];
+    }
+
+    public static FriendLevel getSpecialFriendLevel() {
+        List<FriendLevel> targetLevels = Arrays.stream(FriendLevel.values())
+                .filter(level -> level.level >= 1 && level.level <= 4)
+                .toList();
+
+        if (targetLevels.isEmpty()) {
+            return INTERN;
+        }
+
+        int randomIndex = ThreadLocalRandom.current().nextInt(targetLevels.size());
+        return targetLevels.get(randomIndex);
     }
 }
