@@ -3,11 +3,14 @@ package com.game.subwayworkerserver.service;
 import com.game.subwayworkerserver.controller.request.OpenLuckyGachaRequest;
 import com.game.subwayworkerserver.controller.response.LuckyGachaEarnResponse;
 import com.game.subwayworkerserver.controller.response.LuckyGachaListResponse;
+import com.game.subwayworkerserver.domain.baseinfo.FriendLevel;
+import com.game.subwayworkerserver.domain.baseinfo.FriendType;
 import com.game.subwayworkerserver.domain.baseinfo.GachaPaymentOption;
 import com.game.subwayworkerserver.domain.baseinfo.GachaTreasure;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
+import com.game.subwayworkerserver.repository.FriendRepository;
 import com.game.subwayworkerserver.repository.UserGachaRepository;
 import com.game.subwayworkerserver.repository.UserItemMapRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
@@ -27,9 +30,10 @@ public class GachaService {
 
     private final UserRepository userRepository;
     private final UserGachaRepository gachaRepository;
+    private final FriendRepository friendRepository;
     private final UserItemMapRepository userItemMapRepository;
 
-    private static final String EXTRA_FRIEND_TYPE = "EXTRA_FRIEND";
+    private static final String MATERIAL_FRIEND = "MATERIAL_FRIEND";
 
     public LuckyGachaListResponse getGachaList(final String uuid) {
         UserEntity user = getUserByUuid(uuid);
@@ -62,7 +66,9 @@ public class GachaService {
         return LuckyGachaEarnResponse.of(defaultReward, extraReward);
     }
 
-    private void checkUserHasEnoughTicketsToPay(OpenLuckyGachaRequest request, UserEntity user, CurrencyType currencyType) {
+    private void checkUserHasEnoughTicketsToPay(
+            final OpenLuckyGachaRequest request, final UserEntity user, final CurrencyType currencyType
+    ) {
         boolean enoughTickets = user.hasEnoughTickets(currencyType.getCurrencyType(), request.price());
         if (!enoughTickets) {
             throw new BaseException(ErrorCode.BAD_REQUEST, "Not enough tickets.");
@@ -74,7 +80,7 @@ public class GachaService {
                 gift -> {
                     String giftType = gift.type();
 
-                    if (giftType.equals(EXTRA_FRIEND_TYPE)) {
+                    if (giftType.equals(MATERIAL_FRIEND)) {
                         processExtraFriendReward(userId);
                     } else if (GachaTreasure.isGacha(giftType)) {
                         processGachaTreasureReward(userId, giftType);
@@ -123,8 +129,10 @@ public class GachaService {
         log.info("User {} Gacha Treasure {} count increased.", userId, treasure.getItemName());
     }
 
-    private static void processExtraFriendReward(long userId) {
-        log.info("User {} received EXTRA_FRIEND reward.", userId);
+    private void processExtraFriendReward(final long userId) {
+        FriendEntity friendEntity = FriendEntity.of(userId, FriendType.getRandomAttribute(), FriendLevel.getSpecialFriendLevel());
+        friendRepository.save(friendEntity);
+        log.info("User {} received MATERIAL_FRIEND reward.", userId);
     }
 
     private void processDefaultGift(final List<DefaultGift> defaultReward, final UserEntity user) {
