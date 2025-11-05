@@ -2,6 +2,8 @@ package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.domain.baseinfo.GachaTreasure;
 import com.game.subwayworkerserver.entity.ItemName;
+import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +12,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class GachaRandomGiftGenerator {
+
+    private static final int MAX_TREASURE_COUNT = 20;
 
     private static final String MATERIAL_FRIEND = "MATERIAL_FRIEND";
     private static final String TREASURE = "TREASURE";
@@ -75,10 +79,10 @@ public class GachaRandomGiftGenerator {
         return defaultGiftList;
     }
 
-    public static List<ExtraGift> getExtraReward(int count) {
+    public static List<ExtraGift> getExtraReward(int count, Map<GachaTreasure, Integer> userTreasureCounts) {
         List<ExtraGift> rawRewards = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            rawRewards.addAll(calculateSingleExtraReward());
+            rawRewards.addAll(calculateSingleExtraReward(userTreasureCounts));
         }
 
         if (rawRewards.isEmpty()) {
@@ -99,7 +103,7 @@ public class GachaRandomGiftGenerator {
                 .collect(Collectors.toList());
     }
 
-    private static List<ExtraGift> calculateSingleExtraReward() {
+    private static List<ExtraGift> calculateSingleExtraReward(final Map<GachaTreasure, Integer> userTreasureCounts) {
         List<ExtraGift> rewards = new ArrayList<>();
         ThreadLocalRandom random = ThreadLocalRandom.current();
 
@@ -111,7 +115,7 @@ public class GachaRandomGiftGenerator {
             if (roll < requiredProbability) {
 
                 if (config.type().equals(TREASURE)) {
-                    GachaTreasure treasure = GachaTreasure.getRandom();
+                    GachaTreasure treasure = substituteRandomAvailableTreasure(userTreasureCounts);
                     rewards.add(new ExtraGift(treasure.name(), 1));
 
                 } else {
@@ -121,6 +125,21 @@ public class GachaRandomGiftGenerator {
         }
         return rewards;
     }
+
+    private static GachaTreasure substituteRandomAvailableTreasure(final Map<GachaTreasure, Integer> userTreasureCounts) {
+        List<GachaTreasure> allTreasures = List.of(GachaTreasure.values());
+
+        List<GachaTreasure> maxedOutTreasures = allTreasures.stream()
+                .filter(treasure -> userTreasureCounts.getOrDefault(treasure, 0) == MAX_TREASURE_COUNT)
+                .toList();
+
+        if (maxedOutTreasures.size() == MAX_TREASURE_COUNT) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "모든 보물의 최대 보유 한도(20개)에 도달했습니다.");
+        }
+
+        return GachaTreasure.getRandom(maxedOutTreasures);
+    }
+
 
     public record DefaultGift(String type, String displayName, int quantity) {
     }
