@@ -4,6 +4,7 @@ import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.PartnerConfigureRequest;
 import com.game.subwayworkerserver.controller.response.CoworkerListResponse;
 import com.game.subwayworkerserver.controller.response.CoworkerTypesResponse;
+import com.game.subwayworkerserver.controller.response.SkillListResponse;
 import com.game.subwayworkerserver.service.CoworkerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -37,14 +38,27 @@ public class CoworkerController {
     }
 
     @Operation(
-            summary = "동료를 파트너로 지정하기",
+            summary = "동료를 파트너로 지정하기 [완]",
             description = "동료의 id 리스트를 통해 파트너로 지정한다."
     )
-    @PostMapping("/coworkers")
+    @PostMapping("/coworker/partners")
     public ResponseEntity<HttpStatus> addCoworkerAsAPartner(@Valid @RequestBody PartnerConfigureRequest request) {
         String uuid = SecurityUtils.getCurrentUserUuid();
         coworkerService.configurePartners(uuid, request);
         return ResponseEntity.ok(HttpStatus.NO_CONTENT);
+    }
+
+    @Operation(
+            summary = "스킬 리스트 조회",
+            description = "스킬 리스트 조회",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "트랩 리스트")
+            }
+    )
+    @GetMapping("/coworker/skills")
+    public ResponseEntity<SkillListResponse> getSkillListByUser( ) {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        return ResponseEntity.ok().build();
     }
 
 }

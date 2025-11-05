@@ -105,19 +105,6 @@ public class UserController {
     }
 
     @Operation(
-            summary = "스킬 리스트 조회",
-            description = "스킬 리스트 조회",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "트랩 리스트")
-            }
-    )
-    @GetMapping("/user/skills")
-    public ResponseEntity<SkillListResponse> getSkillListByUser( ) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
-        return ResponseEntity.ok().build();
-    }
-
-    @Operation(
             summary = "유저 삭제 [완]",
             description = "유저 삭제 기능",
             responses = {
