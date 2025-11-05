@@ -22,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -54,9 +56,10 @@ public class GachaService {
         GachaPaymentOption gachaPaymentOption = GachaPaymentOption.confirmCountAndPrice(currencyType, request.price());
 
         checkUserHasEnoughTicketsToPay(request, user, currencyType);
+        Map<GachaTreasure, Integer> userTreasureCounts = getUserTreasureCounts(user.getId());
 
         List<DefaultGift> defaultReward = GachaRandomGiftGenerator.getDefaultReward(gachaPaymentOption.getCount());
-        List<ExtraGift> extraReward = GachaRandomGiftGenerator.getExtraReward(gachaPaymentOption.getCount());
+        List<ExtraGift> extraReward = GachaRandomGiftGenerator.getExtraReward(gachaPaymentOption.getCount(), userTreasureCounts);
 
         user.purchaseWithTickets(currencyType.getCurrencyType(), request.price());
 
@@ -64,6 +67,15 @@ public class GachaService {
         processDefaultGift(defaultReward, user);
 
         return LuckyGachaEarnResponse.of(defaultReward, extraReward);
+    }
+
+    private Map<GachaTreasure, Integer> getUserTreasureCounts(final long userId) {
+        List<UserGachaEntity> userGachaRecords = gachaRepository.findAllByUserId(userId);
+        return userGachaRecords.stream()
+                .collect(Collectors.toMap(
+                        UserGachaEntity::getGacha,
+                        UserGachaEntity::getGachaCount
+                ));
     }
 
     private void checkUserHasEnoughTicketsToPay(
