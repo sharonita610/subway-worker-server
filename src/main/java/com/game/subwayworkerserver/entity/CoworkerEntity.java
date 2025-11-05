@@ -7,17 +7,17 @@ import lombok.*;
 
 import java.util.List;
 
-import static com.game.subwayworkerserver.util.CharacterGenerator.generateDefaultFriendStats;
-import static com.game.subwayworkerserver.util.CharacterGenerator.getRandomFriendStat;
+import static com.game.subwayworkerserver.util.CharacterGenerator.generateDefaultCoworkerStats;
+import static com.game.subwayworkerserver.util.CharacterGenerator.getRandomCoworkerStat;
 import static com.game.subwayworkerserver.util.SkillRandomizer.getRandomActiveSkills;
 import static com.game.subwayworkerserver.util.SkillRandomizer.getRandomPassiveSkills;
 
 @Getter
 @Entity
-@Table(name = "friend")
+@Table(name = "coworker")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FriendEntity extends BaseTimeEntity {
+public class CoworkerEntity extends BaseTimeEntity {
 
     private static final int DEFAULT = 0;
     private static final int ZERO = 0;
@@ -32,7 +32,7 @@ public class FriendEntity extends BaseTimeEntity {
 
     @Column(nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
-    private FriendLevel level;
+    private CoworkerLevel level;
 
     @Column(nullable = false)
     private int currentExp;
@@ -42,7 +42,7 @@ public class FriendEntity extends BaseTimeEntity {
 
     @Column(nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
-    private FriendType friendType;
+    private CoworkerType coworkerType;
 
     @Column(nullable = false)
     private long hp;
@@ -85,22 +85,22 @@ public class FriendEntity extends BaseTimeEntity {
 
     @Column(nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
-    private FriendAttribute friendAttribute;
+    private CoworkerElement coworkerElement;
 
     @Column(nullable = false)
     private boolean isMaterial = false;
 
     @Builder
-    public FriendEntity(String name, FriendLevel level, int currentExp, long userId, FriendType friendType, long hp,
-                        long mana, long maxMana, long manaRecovery, long attack, long defense, boolean inUse,
-                        boolean onSale, int activeSkill1, int activeSkill2, int passiveSkill1, int passiveSkill2,
-                        FriendAttribute friendAttribute, boolean available,  boolean isMaterial
+    public CoworkerEntity(String name, CoworkerLevel level, int currentExp, long userId, CoworkerType coworkerType, long hp,
+                          long mana, long maxMana, long manaRecovery, long attack, long defense, boolean inUse,
+                          boolean onSale, int activeSkill1, int activeSkill2, int passiveSkill1, int passiveSkill2,
+                          CoworkerElement coworkerElement, boolean available, boolean isMaterial
     ) {
         this.name = name;
         this.level = level;
         this.currentExp = currentExp;
         this.userId = userId;
-        this.friendType = friendType;
+        this.coworkerType = coworkerType;
         this.hp = hp;
         this.mana = mana;
         this.maxMana = maxMana;
@@ -113,22 +113,22 @@ public class FriendEntity extends BaseTimeEntity {
         this.activeSkill2 = activeSkill2;
         this.passiveSkill1 = passiveSkill1;
         this.passiveSkill2 = passiveSkill2;
-        this.friendAttribute = friendAttribute;
+        this.coworkerElement = coworkerElement;
         this.available = available;
         this.isMaterial = isMaterial;
     }
 
-    public static FriendEntity of(final long userId, final FriendType friendType) {
-        CharacterGenerator.CharacterStats stats = generateDefaultFriendStats(friendType);
+    public static CoworkerEntity of(final long userId, final CoworkerType coworkerType) {
+        CharacterGenerator.CharacterStats stats = generateDefaultCoworkerStats(coworkerType);
         List<PassiveSkillCard> randomPassiveSkills = getRandomPassiveSkills(2);
         List<ActiveSkillCard> randomActiveSkills = getRandomActiveSkills(2);
 
-        return FriendEntity.builder()
-                .name(friendType.getKoreanName())
-                .level(FriendLevel.of(ONE))
+        return CoworkerEntity.builder()
+                .name(coworkerType.getKoreanName())
+                .level(CoworkerLevel.of(ONE))
                 .currentExp(DEFAULT)
                 .userId(userId)
-                .friendType(friendType)
+                .coworkerType(coworkerType)
                 .hp(stats.hp())
                 .mana(stats.mpNow())
                 .maxMana(stats.mpMax())
@@ -142,23 +142,23 @@ public class FriendEntity extends BaseTimeEntity {
                 .activeSkill2(randomActiveSkills.get(ONE).getId())
                 .passiveSkill1(randomPassiveSkills.get(ZERO).getId())
                 .passiveSkill2(randomPassiveSkills.get(ONE).getId())
-                .friendAttribute(stats.attribute())
+                .coworkerElement(stats.attribute())
                 .build();
     }
 
 
-    public static FriendEntity of(final long userId, String friendName, int friendLevel) {
-        FriendType friendType = FriendType.fromName(friendName);
-        CharacterGenerator.CharacterStats stats = getRandomFriendStat(friendType);
+    public static CoworkerEntity of(final long userId, String coworkerName, int coworkerLevel) {
+        CoworkerType coworkerType = CoworkerType.fromName(coworkerName);
+        CharacterGenerator.CharacterStats stats = getRandomCoworkerStat(coworkerType);
         List<PassiveSkillCard> randomPassiveSkills = getRandomPassiveSkills(2);
         List<ActiveSkillCard> randomActiveSkills = getRandomActiveSkills(2);
 
-        return FriendEntity.builder()
-                .name(friendName)
-                .level(FriendLevel.of(friendLevel))
+        return CoworkerEntity.builder()
+                .name(coworkerName)
+                .level(CoworkerLevel.of(coworkerLevel))
                 .currentExp(DEFAULT)
                 .userId(userId)
-                .friendType(friendType)
+                .coworkerType(coworkerType)
                 .hp(stats.hp())
                 .mana(stats.mpNow())
                 .maxMana(stats.mpMax())
@@ -172,41 +172,41 @@ public class FriendEntity extends BaseTimeEntity {
                 .activeSkill2(randomActiveSkills.get(ONE).getId())
                 .passiveSkill1(randomPassiveSkills.get(ZERO).getId())
                 .passiveSkill2(randomPassiveSkills.get(ONE).getId())
-                .friendAttribute(stats.attribute())
+                .coworkerElement(stats.attribute())
                 .build();
     }
 
-    public static FriendEntity copyEntityForRegistration(final FriendEntity friendEntity) {
-        return FriendEntity.builder()
-                .name(friendEntity.getName())
-                .level(friendEntity.getLevel())
-                .currentExp(friendEntity.getCurrentExp())
-                .userId(friendEntity.getUserId())
-                .friendType(friendEntity.getFriendType())
-                .hp(friendEntity.getHp())
-                .mana(friendEntity.getMana())
-                .maxMana(friendEntity.getMaxMana())
-                .manaRecovery(friendEntity.getManaRecovery())
-                .attack(friendEntity.getAttack())
-                .defense(friendEntity.getDefense())
+    public static CoworkerEntity copyEntityForRegistration(final CoworkerEntity coworkerEntity) {
+        return CoworkerEntity.builder()
+                .name(coworkerEntity.getName())
+                .level(coworkerEntity.getLevel())
+                .currentExp(coworkerEntity.getCurrentExp())
+                .userId(coworkerEntity.getUserId())
+                .coworkerType(coworkerEntity.getCoworkerType())
+                .hp(coworkerEntity.getHp())
+                .mana(coworkerEntity.getMana())
+                .maxMana(coworkerEntity.getMaxMana())
+                .manaRecovery(coworkerEntity.getManaRecovery())
+                .attack(coworkerEntity.getAttack())
+                .defense(coworkerEntity.getDefense())
                 .onSale(true)
                 .inUse(false)
                 .available(false)
-                .activeSkill1(friendEntity.getActiveSkill1())
-                .activeSkill2(friendEntity.getActiveSkill2())
-                .passiveSkill1(friendEntity.getPassiveSkill1())
-                .passiveSkill2(friendEntity.getPassiveSkill2())
-                .friendAttribute(friendEntity.getFriendAttribute())
+                .activeSkill1(coworkerEntity.getActiveSkill1())
+                .activeSkill2(coworkerEntity.getActiveSkill2())
+                .passiveSkill1(coworkerEntity.getPassiveSkill1())
+                .passiveSkill2(coworkerEntity.getPassiveSkill2())
+                .coworkerElement(coworkerEntity.getCoworkerElement())
                 .build();
     }
 
-    public static FriendEntity of(final long userId, final FriendType friendType, final FriendLevel level) {
-        return FriendEntity.builder()
-                .name(friendType.getKoreanName())
+    public static CoworkerEntity of(final long userId, final CoworkerType coworkerType, final CoworkerLevel level) {
+        return CoworkerEntity.builder()
+                .name(coworkerType.getKoreanName())
                 .level(level)
                 .currentExp(DEFAULT)
                 .userId(userId)
-                .friendType(friendType)
+                .coworkerType(coworkerType)
                 .hp(DEFAULT)
                 .mana(DEFAULT)
                 .maxMana(DEFAULT)
@@ -221,7 +221,7 @@ public class FriendEntity extends BaseTimeEntity {
                 .passiveSkill1(DEFAULT)
                 .passiveSkill2(DEFAULT)
                 .isMaterial(true)
-                .friendAttribute(FriendAttribute.getRandomAttribute())
+                .coworkerElement(CoworkerElement.getRandomAttribute())
                 .build();
     }
 
@@ -239,7 +239,7 @@ public class FriendEntity extends BaseTimeEntity {
         );
     }
 
-    public void friendOnSale() {
+    public void coworkerOnSale() {
         this.onSale = true;
     }
 

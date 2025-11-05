@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.scheduler;
 
-import com.game.subwayworkerserver.service.FriendDataCreator;
+import com.game.subwayworkerserver.service.CoworkerDataCreator;
 import com.game.subwayworkerserver.service.UserService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -23,14 +23,14 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class GpsRandomDataScheduler {
 
-    private final FriendDataCreator friendDataCreator;
+    private final CoworkerDataCreator coworkerDataCreator;
     private final UserService userService;
     private final RedisTemplate<String, String> redisTemplate;
 
     // Redis Key 상수
-    private static final String FRIEND_LOCATIONS_KEY = "friend:locations";
+    private static final String COWORKER_LOCATIONS_KEY = "coworker:locations";
     private static final String RANDOM_GIFT_BOX_KEY = "giftbox:locations";
-    private static final String FRIEND_DATA_PREFIX = "friend:data:";
+    private static final String COWORKER_DATA_PREFIX = "coworker:data:";
     private static final long MAP_DATA_TTL_DAYS = 1;
     // 대한민국 지도 범위 (대략적)
     private static final double MIN_LAT = 33.0;
@@ -45,7 +45,7 @@ public class GpsRandomDataScheduler {
     private static final double LON_STEP = 0.055;
 
     // Grid 셀당 생성할 아이템 수
-    private static final int FRIENDS_PER_CELL = 5;
+    private static final int COWORKER_PER_CELL = 5;
     private static final int GIFTS_PER_CELL = 5; // 선물상자 수
     private static final double MAX_JITTER = 0.003; // 셀 내에서 흩뿌릴 최대 오프셋
 
@@ -82,14 +82,14 @@ public class GpsRandomDataScheduler {
 
         if (!isScheduledExecution) {
             // 1. 기존 데이터 삭제 (Item_Locations_Key는 제외)
-            redisTemplate.delete(FRIEND_LOCATIONS_KEY);
+            redisTemplate.delete(COWORKER_LOCATIONS_KEY);
             redisTemplate.delete(RANDOM_GIFT_BOX_KEY);
             weeklyAcquiredKeyCleanup();
             log.info("--- 동료/선물상자 기존 데이터 삭제 완료 ---");
         }
 
         int totalCells = 0;
-        int totalFriendsAndGifts = 0;
+        int totalCoworkersAndGifts = 0;
 
         // 2. 대한민국 Grid 순회 및 데이터 생성
         for (double lat = MIN_LAT; lat < MAX_LAT; lat += LAT_STEP) {
@@ -99,16 +99,16 @@ public class GpsRandomDataScheduler {
                 double cellCenterLon = lon + (LON_STEP / 2);
 
                 // 동료 생성 (1개)
-                createItemsInCell(cellCenterLat, cellCenterLon, FRIENDS_PER_CELL, FRIEND_LOCATIONS_KEY, "FRIEND");
+                createItemsInCell(cellCenterLat, cellCenterLon, COWORKER_PER_CELL, COWORKER_LOCATIONS_KEY, "COWORKER");
 
                 // 선물 상자 생성 (2개)
                 createItemsInCell(cellCenterLat, cellCenterLon, GIFTS_PER_CELL, RANDOM_GIFT_BOX_KEY, "GIFT");
                 totalCells++;
-                totalFriendsAndGifts += FRIENDS_PER_CELL + GIFTS_PER_CELL;
+                totalCoworkersAndGifts += COWORKER_PER_CELL + GIFTS_PER_CELL;
             }
         }
 
-        log.info(String.format("    - 신규 동료/선물상자 데이터 생성 완료. [총 셀 수: %d, 총 객체 수: %d]", totalCells, totalFriendsAndGifts));
+        log.info(String.format("    - 신규 동료/선물상자 데이터 생성 완료. [총 셀 수: %d, 총 객체 수: %d]", totalCells, totalCoworkersAndGifts));
         if (!isScheduledExecution) {
             log.info("    - 일반 아이템 (ITEM_LOCATIONS_KEY) 생성 완료.");
         }
@@ -131,8 +131,8 @@ public class GpsRandomDataScheduler {
 
             locations.put(memberName, new Point(randomLon, randomLat));
 
-            if (key.equals(FRIEND_LOCATIONS_KEY)) {
-                createAndSaveFriendHashData(memberName);
+            if (key.equals(COWORKER_LOCATIONS_KEY)) {
+                createAndSaveCoworkerHashData(memberName);
             }
         }
 
@@ -141,12 +141,12 @@ public class GpsRandomDataScheduler {
         }
     }
 
-    private void createAndSaveFriendHashData(final String friendId) {
-        Map<String, String> dataToSave = friendDataCreator.createRandomFriendAttribute();
+    private void createAndSaveCoworkerHashData(final String coworkerId) {
+        Map<String, String> dataToSave = coworkerDataCreator.createRandomCoworkerAttribute();
         if(dataToSave.isEmpty()) {
             return;
         }
-        String instanceKey = FRIEND_DATA_PREFIX + friendId;
+        String instanceKey = COWORKER_DATA_PREFIX + coworkerId;
         redisTemplate.opsForHash().putAll(instanceKey, dataToSave);
         redisTemplate.expire(instanceKey, MAP_DATA_TTL_DAYS, TimeUnit.DAYS);
     }
@@ -163,10 +163,10 @@ public class GpsRandomDataScheduler {
 
         // 2. 모든 사용자의 획득 기록 키를 삭제합니다.
         for (String uuid : allUserUuids) {
-            String friendKey = "user:acquired:" + uuid + ":friend:locations";
+            String coworkerKey = "user:acquired:" + uuid + ":coworker:locations";
             String giftBoxKey = "user:acquired:" + uuid + ":giftbox:locations";
 
-            redisTemplate.delete(friendKey);
+            redisTemplate.delete(coworkerKey);
             redisTemplate.delete(giftBoxKey);
         }
         log.info("Weekly acquired key cleanup finished.");

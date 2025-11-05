@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.util;
 
-import com.game.subwayworkerserver.domain.baseinfo.FriendAttribute;
-import com.game.subwayworkerserver.domain.baseinfo.FriendType;
+import com.game.subwayworkerserver.domain.baseinfo.CoworkerElement;
+import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 
 import java.util.Random;
 
@@ -28,7 +28,7 @@ public class CharacterGenerator {
      * 생성된 캐릭터의 최종 스탯을 저장하는 Record.
      */
     public record CharacterStats(
-            FriendAttribute attribute, //
+            CoworkerElement attribute, //
             int hp,
             int mpNow, // 현재 마나
             int mpMax, // 최대 마나
@@ -47,12 +47,12 @@ public class CharacterGenerator {
     }
 
     /**
-     * 특정 FriendType(스탯 프로필)을 기반으로 랜덤 스탯을 생성합니다.
+     * 특정 CoworkerType(스탯 프로필)을 기반으로 랜덤 스탯을 생성합니다.
      *
-     * @param type 스탯 계산에 사용할 FriendType Enum
+     * @param type 스탯 계산에 사용할 CoworkerType Enum
      * @return 랜덤 스탯이 부여된 CharacterStats 객체
      */
-    public static CharacterStats generateStats(FriendType type) {
+    public static CharacterStats generateStats(CoworkerType type) {
 
         // 1. HP: 단일 값으로 계산
         int hpValue = getRandomStat(type.getHpRange().min(), type.getHpRange().max());
@@ -70,9 +70,9 @@ public class CharacterGenerator {
         int attack = getRandomStat(type.getAttackRange().min(), type.getAttackRange().max());
         int defense = getRandomStat(type.getDefenseRange().min(), type.getDefenseRange().max());
 
-        // FriendType의 getJob() 대신 getJob()의 역할을 하던 필드를 type으로 사용
+        // CoworkerType getJob() 대신 getJob()의 역할을 하던 필드를 type으로 사용
         return new CharacterStats(
-                FriendAttribute.getRandomAttribute(),
+                CoworkerElement.getRandomAttribute(),
                 hpValue,
                 initialMp, // 현재 MP
                 maxMp,     // 최대 MP
@@ -82,9 +82,9 @@ public class CharacterGenerator {
         );
     }
 
-    public static CharacterStats generateDefaultFriendStats(final FriendType type) {
+    public static CharacterStats generateDefaultCoworkerStats(final CoworkerType type) {
         return new CharacterStats(
-                FriendAttribute.getRandomAttribute(),
+                CoworkerElement.getRandomAttribute(),
                 type.getHpRange().min(),
                 type.getMpNowRange().min(),
                 type.getMpMaxRange().min(),
@@ -94,13 +94,13 @@ public class CharacterGenerator {
         );
     }
 
-    public static CharacterGenerator.CharacterStats getRandomFriendStat(FriendType friendType) {
-        return generateStats(friendType);
+    public static CharacterGenerator.CharacterStats getRandomCoworkerStat(CoworkerType coworkerType) {
+        return generateStats(coworkerType);
     }
         // --- 예시 사용 ---
     public static void main(String[] args) {
-        CharacterStats tanker = generateStats(FriendType.MOONGSHIL);
-        CharacterStats defenseTanker = generateStats(FriendType.POOBY);
+        CharacterStats tanker = generateStats(CoworkerType.MOONGSHIL);
+        CharacterStats defenseTanker = generateStats(CoworkerType.POOBY);
 
         System.out.println("--- 랜덤 스탯 생성 결과 ---");
         System.out.println(tanker);

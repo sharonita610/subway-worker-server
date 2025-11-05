@@ -3,7 +3,7 @@ package com.game.subwayworkerserver.controller;
 import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.*;
 import com.game.subwayworkerserver.controller.response.*;
-import com.game.subwayworkerserver.service.CaptureFriendService;
+import com.game.subwayworkerserver.service.CaptureCoworkerService;
 import com.game.subwayworkerserver.service.GiftBoxService;
 import com.game.subwayworkerserver.service.GpsService;
 import com.game.subwayworkerserver.service.TrapService;
@@ -25,7 +25,7 @@ public class GpsController {
 
     private final GpsService gpsService;
     private final GiftBoxService giftBoxService;
-    private final CaptureFriendService captureFriendService;
+    private final CaptureCoworkerService captureCoworkerService;
     private final TrapService trapService;
 
     @Operation(
@@ -85,9 +85,9 @@ public class GpsController {
             }
     )
     @PostMapping("/gps/capture")
-    public ResponseEntity<CaptureResponse> captureFriend(@RequestBody CaptureFriendRequest request) {
+    public ResponseEntity<CaptureResponse> captureCoworker(@RequestBody CaptureCoworkerRequest request) {
         String uuid = SecurityUtils.getCurrentUserUuid();
-        return ResponseEntity.ok(captureFriendService.tryToCapture(uuid,request));
+        return ResponseEntity.ok(captureCoworkerService.tryToCapture(uuid,request));
     }
 
     @Operation(
@@ -95,7 +95,7 @@ public class GpsController {
             description = "포획 성공 시, 포획한 동료의 정보 리스트를, 아니라면 빈 배열을 반환한다."
     )
     @GetMapping("/gps/trap-success-reward")
-    public ResponseEntity<FriendListResponse> getTrapSuccessReward(){
+    public ResponseEntity<CoworkerListResponse> getTrapSuccessReward(){
         String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok(trapService.getTrapSuccessReward(uuid));
     }

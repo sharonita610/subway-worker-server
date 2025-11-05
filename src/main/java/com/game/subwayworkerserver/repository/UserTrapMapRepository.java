@@ -17,8 +17,8 @@ public interface UserTrapMapRepository extends JpaRepository<UserTrapMapEntity, 
     // 💡 3. 스케줄러용: 모든 사용자 기준, 만료되지 않고 성공하지 않은 트랩 조회
     List<UserTrapMapEntity> findByExpiresAtAfterAndIsTrappedFalse(LocalDateTime now);
 
-    // 💡 4. 성공 처리 시: 사용자 ID 기준, 성공했으며, 아직 처리되지 않은 트랩 (CapturedFriendId가 존재하는) 조회
-    Optional<UserTrapMapEntity> findByUserIdAndIsTrappedTrueAndCapturedFriendIdIsNotNull(Long userId);
+    // 💡 4. 성공 처리 시: 사용자 ID 기준, 성공했으며, 아직 처리되지 않은 트랩 (CapturedCoworkerId가 존재하는) 조회
+    Optional<UserTrapMapEntity> findByUserIdAndIsTrappedTrueAndCapturedCoworkerIdIsNotNull(Long userId);
 
     // 💡 만료 시간이 지났고 (Before) 성공하지 못한 (False) 트랩을 조회 (정리용)
     List<UserTrapMapEntity> findByExpiresAtBeforeAndIsTrappedFalse(LocalDateTime now);

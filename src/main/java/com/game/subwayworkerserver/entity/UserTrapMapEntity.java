@@ -40,7 +40,7 @@ public class UserTrapMapEntity {
     @Column(nullable = false)
     private boolean isTrapped = false;
 
-    private String capturedFriendId;
+    private String capturedCoworkerId;
 
     @Builder
     public UserTrapMapEntity(Long userId, ItemName trapItemName, double latitude, double longitude, LocalDateTime expiresAt) {
@@ -61,9 +61,9 @@ public class UserTrapMapEntity {
                 .build();
     }
 
-    public void markSuccess(String capturedFriendId) {
+    public void markSuccess(String capturedCoworkerId) {
         this.isTrapped = true;
-        this.capturedFriendId = capturedFriendId;
+        this.capturedCoworkerId = capturedCoworkerId;
     }
 
     public void setIsSuccessful() {

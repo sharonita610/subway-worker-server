@@ -2,11 +2,10 @@ package com.game.subwayworkerserver.controller;
 
 
 import com.game.subwayworkerserver.controller.response.MonsterResponse;
-import com.game.subwayworkerserver.controller.response.StageFriendListResponse;
+import com.game.subwayworkerserver.controller.response.StageCoworkerListResponse;
 import com.game.subwayworkerserver.controller.sampleData.MonsterSampleData;
 import com.game.subwayworkerserver.service.StageService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +23,8 @@ public class StageController {
 
     private final StageService stageService;
 
-    @GetMapping("/stage/friends")
-    public ResponseEntity<StageFriendListResponse>  getStageFriends(){
+    @GetMapping("/stage/coworkers")
+    public ResponseEntity<StageCoworkerListResponse>  getStageCoworkers() {
         return ResponseEntity.ok().build();
     }
 

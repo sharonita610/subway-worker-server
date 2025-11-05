@@ -1,12 +1,12 @@
 package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.GpsAddTrapRequest;
-import com.game.subwayworkerserver.controller.response.FriendListResponse;
+import com.game.subwayworkerserver.controller.response.CoworkerListResponse;
 import com.game.subwayworkerserver.controller.response.UserTrapListResponse;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
-import com.game.subwayworkerserver.repository.FriendRepository;
+import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
 import com.game.subwayworkerserver.repository.UserItemMapRepository;
 import com.game.subwayworkerserver.repository.UserTrapMapRepository;
@@ -29,11 +29,11 @@ public class TrapService {
     private final UserRepository userRepository;
     private final UserItemMapRepository userItemMapRepository;
     private final UserTrapMapRepository userTrapMapRepository;
-    private final FriendRepository friendRepository;
+    private final CoworkerRepository coworkerRepository;
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    private static final String TRAPPED_FRIEND_DATA_PREFIX = "trapped:friend:data:";
+    private static final String COWORKER_COWORKER_DATA_PREFIX = "trapped:coworker:data:";
     private static final long TRAP_VALID_HOURS = 12;
 
     /**
@@ -101,15 +101,15 @@ public class TrapService {
     }
 
     @Transactional
-    public FriendListResponse getTrapSuccessReward(final String uuid) {
+    public CoworkerListResponse getTrapSuccessReward(final String uuid) {
         UserEntity user = getUserByUuid(uuid);
         List<UserTrapMapEntity> userTrapMapList = userTrapMapRepository.findByUserIdAndIsTrappedTrue(user.getId());
-        List<FriendEntity> friendEntityList = saveUserTrapIfSuccess(userTrapMapList);
+        List<CoworkerEntity> coworkerEntityList = saveUserTrapIfSuccess(userTrapMapList);
         user.updateTrapDone();
-        return friendEntityList.isEmpty() ? FriendListResponse.empty() : FriendListResponse.of(friendEntityList);
+        return coworkerEntityList.isEmpty() ? CoworkerListResponse.empty() : CoworkerListResponse.of(coworkerEntityList);
     }
 
-    private List<FriendEntity> saveUserTrapIfSuccess(final List<UserTrapMapEntity> userTrapMapList) {
+    private List<CoworkerEntity> saveUserTrapIfSuccess(final List<UserTrapMapEntity> userTrapMapList) {
         return userTrapMapList.stream().map(trapMap -> {
                     ItemName trapItemName = trapMap.getTrapItemName();
 
@@ -119,8 +119,8 @@ public class TrapService {
                         return null;
                     }
 
-                    String capturedFriendId = trapMap.getCapturedFriendId();
-                    String trappedKey = TRAPPED_FRIEND_DATA_PREFIX + capturedFriendId;
+                    String capturedCoworkerId = trapMap.getCapturedCoworkerId();
+                    String trappedKey = COWORKER_COWORKER_DATA_PREFIX + capturedCoworkerId;
                     Map<Object, Object> hashData = redisTemplate.opsForHash().entries(trappedKey);
 
                     if (hashData.isEmpty()) {
@@ -130,16 +130,16 @@ public class TrapService {
                         return null;
                     }
 
-                    String friendName = (String) hashData.get("friendName");
-                    String levelString = (String) hashData.get("friendLevel");
+                    String coworkerName = (String) hashData.get("coworkerName");
+                    String levelString = (String) hashData.get("coworkerLevel");
 
-                    if (friendName != null && levelString != null) {
+                    if (coworkerName != null && levelString != null) {
                         try {
-                            int friendLevel = Integer.parseInt(levelString);
+                            int coworkerLevel = Integer.parseInt(levelString);
 
-                            // 3. DB에 FriendEntity 저장
-                            FriendEntity friendEntity = FriendEntity.of(trapMap.getUserId(), friendName, friendLevel);
-                            FriendEntity savedFriend = friendRepository.save(friendEntity);
+                            // 3. DB에 CoworkerEntity 저장
+                            CoworkerEntity coworkerEntity = CoworkerEntity.of(trapMap.getUserId(), coworkerName, coworkerLevel);
+                            CoworkerEntity savedCoworker = coworkerRepository.save(coworkerEntity);
 
                             // 4. ⭐ 트랩 상태 업데이트: 성공 처리 및 즉시 만료 ⭐
                             trapMap.setIsSuccessful();
@@ -147,9 +147,9 @@ public class TrapService {
                             redisTemplate.delete(trappedKey);
 
                             // 5. 성공한 친구 엔티티를 수집하기 위해 반환
-                            return savedFriend;
+                            return savedCoworker;
                         } catch (NumberFormatException e) {
-                            log.error("Invalid friendLevel format: {}", levelString);
+                            log.error("Invalid coworkerLevel format: {}", levelString);
                             return null;
                         }
                     }

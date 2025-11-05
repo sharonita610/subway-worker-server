@@ -5,7 +5,7 @@ public record PaymentSuccessResponse(
         int commissionPrice,
         int profit
 ) {
-    public static PaymentSuccessResponse of(int price, int commission, int friendRealPrice) {
-        return new PaymentSuccessResponse(price, commission, friendRealPrice);
+    public static PaymentSuccessResponse of(int price, int commission, int coworkerRealPrice) {
+        return new PaymentSuccessResponse(price, commission, coworkerRealPrice);
     }
 }

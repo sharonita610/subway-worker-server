@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.controller;
 
-import com.game.subwayworkerserver.controller.response.FriendTypesResponse;
-import com.game.subwayworkerserver.service.FriendService;
+import com.game.subwayworkerserver.controller.response.CoworkerTypesResponse;
+import com.game.subwayworkerserver.service.CoworkerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,12 +10,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Friend API", description = "동료 관련 API")
+@Tag(name = "Coworker API", description = "동료 관련 API")
 @RestController
 @RequiredArgsConstructor
-public class FriendController {
+public class CoworkerController {
 
-    private final FriendService friendService;
+    private final CoworkerService coworkerService;
 
     @Operation(
             summary = "유저 생성시 사용할 동료 속성 리스트 [완]",
@@ -24,8 +24,8 @@ public class FriendController {
                     @ApiResponse(responseCode = "200", description = "동료의 속성 리스트를 조회")
             }
     )
-    @GetMapping("/friend-types")
-    public ResponseEntity<FriendTypesResponse> getFriendAttributes() {
-        return ResponseEntity.ok(friendService.getFriendAttributes());
+    @GetMapping("/coworker-types")
+    public ResponseEntity<CoworkerTypesResponse> getCoworkerElements() {
+        return ResponseEntity.ok(coworkerService.getCoworkerElements());
     }
 }

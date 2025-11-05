@@ -12,7 +12,7 @@ public record UserCreateRequest(
         String username,
 
         @NotBlank(message = "친구이름은 필수 입력 항목입니다.")
-        String friendName,
+        String coworkerName,
 
         @NotNull(message = "성별은 필수 입력 항목입니다.")
         String gender

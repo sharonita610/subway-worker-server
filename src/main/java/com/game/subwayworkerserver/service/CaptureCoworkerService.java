@@ -1,25 +1,16 @@
 package com.game.subwayworkerserver.service;
 
-import com.game.subwayworkerserver.controller.request.CaptureAvailableFriendRequest;
-import com.game.subwayworkerserver.controller.request.CaptureFriendRequest;
-import com.game.subwayworkerserver.controller.response.CaptureAvailableFriendResponse;
+import com.game.subwayworkerserver.controller.request.CaptureCoworkerRequest;
 import com.game.subwayworkerserver.controller.response.CaptureResponse;
-import com.game.subwayworkerserver.domain.baseinfo.FriendAttribute;
-import com.game.subwayworkerserver.domain.baseinfo.FriendLevel;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CaptureRecordRepository;
-import com.game.subwayworkerserver.repository.FriendRepository;
+import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.UserItemMapRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.geo.Circle;
-import org.springframework.data.geo.Distance;
-import org.springframework.data.geo.GeoResults;
-import org.springframework.data.geo.Point;
-import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -28,32 +19,32 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
-public class CaptureFriendService {
+public class CaptureCoworkerService {
 
     private final RedisTemplate<String, String> redisTemplate;
 
     private final UserRepository userRepository;
     private final CaptureRecordRepository captureRecordRepository;
     private final UserItemMapRepository  userItemMapRepository;
-    private final FriendRepository friendRepository;
+    private final CoworkerRepository coworkerRepository;
 
-    private static final String FRIEND_LOCATIONS_KEY = "friend:locations";
+    private static final String COWORKER_LOCATIONS_KEY = "coworker:locations";
     private static final String USER_ACQUIRED_PREFIX = "user:acquired:";
-    private static final String FRIEND_DATA_PREFIX = "friend:data:";
+    private static final String COWORKER_DATA_PREFIX = "coworker:data:";
 
     @Transactional
-    public CaptureResponse tryToCapture(final String uuid, final CaptureFriendRequest request) {
+    public CaptureResponse tryToCapture(final String uuid, final CaptureCoworkerRequest request) {
 
-        final String acquiredKey = USER_ACQUIRED_PREFIX + uuid + ":" + FRIEND_LOCATIONS_KEY;
-        final String friendId = request.friendId();
+        final String acquiredKey = USER_ACQUIRED_PREFIX + uuid + ":" + COWORKER_LOCATIONS_KEY;
+        final String coworkerId = request.coworkerId();
 
-        // Redis Set에 해당 friendId가 이미 존재하는지 확인
-        Boolean isAlreadyHidden = redisTemplate.opsForSet().isMember(acquiredKey, friendId);
+        // Redis Set에 해당 coworkerId가 이미 존재하는지 확인
+        Boolean isAlreadyHidden = redisTemplate.opsForSet().isMember(acquiredKey, coworkerId);
         if (isAlreadyHidden != null && isAlreadyHidden) {
             throw new BaseException(ErrorCode.BAD_REQUEST, "이미 획득했거나 도망쳐서 포획할 수 없는 동료입니다.");
         }
 
-        String instanceKey = FRIEND_DATA_PREFIX + request.friendId();
+        String instanceKey = COWORKER_DATA_PREFIX + request.coworkerId();
         Map<Object, Object> hashData = redisTemplate.opsForHash().entries(instanceKey);
 
         if (hashData.isEmpty()) {
@@ -91,17 +82,17 @@ public class CaptureFriendService {
 
         boolean succeed = ItemName.canCaptureSucceed(request.captureItemName());
         if (succeed) {
-            String friendName = (String) hashData.get("friendName");
-            int friendLevel = Integer.parseInt((String) hashData.get("friendLevel"));
+            String coworkerName = (String) hashData.get("coworkerName");
+            int coworkerLevel = Integer.parseInt((String) hashData.get("coworkerLevel"));
             String position = (String) hashData.get("position");
 
-            FriendEntity friendEntity = FriendEntity.of(userId, friendName, friendLevel);
-            friendRepository.save(friendEntity);
+            CoworkerEntity coworkerEntity = CoworkerEntity.of(userId, coworkerName, coworkerLevel);
+            coworkerRepository.save(coworkerEntity);
 
-            hideFriendFromUser(request.friendId(), acquiredKey);
+            hideCoworkerFromUser(request.coworkerId(), acquiredKey);
             captureRecord.increaseSuccessCount();
 
-            return CaptureResponse.of(captureAttemptCount, friendEntity, position);
+            return CaptureResponse.of(captureAttemptCount, coworkerEntity, position);
         }
 
         // 3. 포획 실패 (Failure)
@@ -119,7 +110,7 @@ public class CaptureFriendService {
             if (randomRoll < ESCAPE_PROBABILITY) {
                 // 3-2-1. 도망 성공 (Escape - 30%)
                 // 도망갔으므로, 해당 동료 인스턴스를 Redis에서 삭제하는 로직이 필요합니다.
-                hideFriendFromUser(request.friendId(), acquiredKey);
+                hideCoworkerFromUser(request.coworkerId(), acquiredKey);
                 return CaptureResponse.of(false, true);
 
             } else {
@@ -129,7 +120,7 @@ public class CaptureFriendService {
         }
     }
 
-    private void hideFriendFromUser(final String friendId,  final String acquiredKey) {
-        redisTemplate.opsForSet().add(acquiredKey, friendId);
+    private void hideCoworkerFromUser(final String coworkerId, final String acquiredKey) {
+        redisTemplate.opsForSet().add(acquiredKey, coworkerId);
     }
 }

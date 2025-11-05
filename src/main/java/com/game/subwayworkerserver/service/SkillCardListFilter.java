@@ -8,7 +8,7 @@ import java.util.List;
 
 @Component
 public class SkillCardListFilter {
-    public List<SkillCardOnSale> filter(List<SkillCardOnSale> friendOnSalesDomainList, SkillCardFilterRequest request) {
+    public List<SkillCardOnSale> filter(List<SkillCardOnSale> coworkerOnSalesDomainList, SkillCardFilterRequest request) {
         return null;
     }
 }

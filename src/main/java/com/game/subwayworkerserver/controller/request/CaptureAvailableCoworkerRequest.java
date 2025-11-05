@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.controller.request;
 
-public record CaptureAvailableFriendRequest(
+public record CaptureAvailableCoworkerRequest(
         double latitude,
         double longitude
 ) {

@@ -1,19 +1,19 @@
 package com.game.subwayworkerserver.controller.response;
 
-import com.game.subwayworkerserver.domain.baseinfo.FriendType;
+import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 
 import java.util.List;
 
 public record RandomGpsResponse(
-        List<RandomFriendLocationResponse> friends,
+        List<RandomCoworkerLocationResponse> coworkerLocations,
         List<ItemLocationResponse> giftBoxes
 ) {
 
-    public record RandomFriendLocationResponse(
-            String friendId,
+    public record RandomCoworkerLocationResponse(
+            String coworkerId,
             String engName,
             String korName,
-            int friendLevel,
+            int coworkerLevel,
             String position,
             Double latitude,
             Double longitude,
@@ -22,20 +22,20 @@ public record RandomGpsResponse(
 
         private final static String EMPTY = "empty";
 
-        public static RandomFriendLocationResponse of(
-                final String friendId,
-                final String friendName,
-                final int friendLevel,
+        public static RandomCoworkerLocationResponse of(
+                final String coworkerId,
+                final String coworkerKorName,
+                final int coworkerLevel,
                 final String position,
                 final double latitude,
                 final double longitude,
                 final Double distance
         ) {
-            return new RandomFriendLocationResponse(
-                    friendId,
-                    String.valueOf(FriendType.fromName(friendName)),
-                    friendName,
-                    friendLevel,
+            return new RandomCoworkerLocationResponse(
+                    coworkerId,
+                    String.valueOf(CoworkerType.fromName(coworkerKorName)),
+                    coworkerKorName,
+                    coworkerLevel,
                     position,
                     latitude,
                     longitude,
@@ -43,8 +43,8 @@ public record RandomGpsResponse(
             );
         }
 
-        public static RandomFriendLocationResponse empty() {
-            return new RandomFriendLocationResponse(EMPTY, EMPTY, EMPTY, 0, EMPTY, 0.0, 0.0,0.0);
+        public static RandomCoworkerLocationResponse empty() {
+            return new RandomCoworkerLocationResponse(EMPTY, EMPTY, EMPTY, 0, EMPTY, 0.0, 0.0,0.0);
         }
     }
 

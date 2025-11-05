@@ -1,13 +1,13 @@
 package com.game.subwayworkerserver.controller.response;
 
 import com.game.subwayworkerserver.domain.baseinfo.*;
-import com.game.subwayworkerserver.entity.FriendEntity;
+import com.game.subwayworkerserver.entity.CoworkerEntity;
 import lombok.Builder;
 
 import java.util.List;
 
-public record CapturedFriendInfo(
-        String friendName,
+public record CapturedCoworkerInfo(
+        String coworkerName,
         String position,
         String baseHpRange,
         String baseManaRange,
@@ -23,18 +23,18 @@ public record CapturedFriendInfo(
         long manaRecovery,
         List<SkillBaseInfo> activeSkills,
         List<SkillBaseInfo> passiveSkills,
-        String engAttributeName,
-        String korAttributeName
+        String engElementName,
+        String korElementName
 ) {
 
     @Builder
-    public CapturedFriendInfo {
+    public CapturedCoworkerInfo {
     }
 
-    public static CapturedFriendInfo of(final FriendEntity friend, String position) {
-        FriendType type = friend.getFriendType();
-        return CapturedFriendInfo.builder()
-                .friendName(friend.getName())
+    public static CapturedCoworkerInfo of(final CoworkerEntity coworker, String position) {
+        CoworkerType type = coworker.getCoworkerType();
+        return CapturedCoworkerInfo.builder()
+                .coworkerName(coworker.getName())
                 .position(position)
                 .baseHpRange(type.getHpRange().min() + "~"  + type.getHpRange().max())
                 .baseManaRange(type.getMpNowRange().min() + "~"  + type.getMpNowRange().max())
@@ -42,16 +42,16 @@ public record CapturedFriendInfo(
                 .baseAttackRange(type.getAttackRange().min() + "~" + type.getAttackRange().max())
                 .baseDefenseRange(type.getDefenseRange().min() + "~" + type.getDefenseRange().max())
                 .baseManaRecoveryRange(String.valueOf(type.getManaRecovery()))
-                .hp(friend.getHp())
-                .mana(friend.getMana())
-                .maxMana(friend.getMaxMana())
-                .attack(friend.getAttack())
-                .defense(friend.getDefense())
-                .manaRecovery(friend.getManaRecovery())
-                .activeSkills(SkillBaseInfo.activeSkill(friend.getActiveSkill1(), friend.getActiveSkill2()))
-                .passiveSkills(SkillBaseInfo.passiveSkill(friend.getPassiveSkill1(), friend.getPassiveSkill2()))
-                .engAttributeName(friend.getFriendAttribute().name())
-                .korAttributeName(friend.getFriendAttribute().getKoreanName())
+                .hp(coworker.getHp())
+                .mana(coworker.getMana())
+                .maxMana(coworker.getMaxMana())
+                .attack(coworker.getAttack())
+                .defense(coworker.getDefense())
+                .manaRecovery(coworker.getManaRecovery())
+                .activeSkills(SkillBaseInfo.activeSkill(coworker.getActiveSkill1(), coworker.getActiveSkill2()))
+                .passiveSkills(SkillBaseInfo.passiveSkill(coworker.getPassiveSkill1(), coworker.getPassiveSkill2()))
+                .engElementName(coworker.getCoworkerElement().name())
+                .korElementName(coworker.getCoworkerElement().getKoreanName())
                 .build();
     }
 }

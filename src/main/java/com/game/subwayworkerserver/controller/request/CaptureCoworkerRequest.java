@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.controller.request;
 
-public record CaptureFriendRequest(
-        String friendId,
+public record CaptureCoworkerRequest(
+        String coworkerId,
         String captureItemName
 ) {
 

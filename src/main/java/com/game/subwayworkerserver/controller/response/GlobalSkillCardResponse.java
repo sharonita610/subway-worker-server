@@ -7,7 +7,7 @@ import java.util.List;
 public record GlobalSkillCardResponse(
         List<GlobalSkillCardInfo> skillCardList
 ) {
-    public static GlobalSkillCardResponse of(List<SkillCardOnSale> filteredFriends) {
+    public static GlobalSkillCardResponse of(List<SkillCardOnSale> filteredCoworkers) {
         return null;
     }
 }

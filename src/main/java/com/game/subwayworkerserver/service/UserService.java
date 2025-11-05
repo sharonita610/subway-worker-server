@@ -3,11 +3,11 @@ package com.game.subwayworkerserver.service;
 import com.game.subwayworkerserver.controller.request.CaptureItemListResponse;
 import com.game.subwayworkerserver.controller.request.UserCreateRequest;
 import com.game.subwayworkerserver.controller.response.*;
-import com.game.subwayworkerserver.domain.baseinfo.FriendType;
+import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
-import com.game.subwayworkerserver.repository.FriendRepository;
+import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.UserGachaRepository;
 import com.game.subwayworkerserver.repository.UserItemMapRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
@@ -23,9 +23,9 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final FriendRepository friendRepository;
+    private final CoworkerRepository coworkerRepository;
     private final UserItemMapRepository userItemMapRepository;
-    private final FriendListFilter friendListFilter;
+    private final CoworkerListFilter coworkerListFilter;
     private final UserGachaRepository gachaRepository;
 
 
@@ -39,7 +39,7 @@ public class UserService {
 
     @Transactional
     public String createUser(final UserCreateRequest request) {
-        FriendType friendType = FriendType.valueOf(request.friendName());
+        CoworkerType coworkerType = CoworkerType.valueOf(request.coworkerName());
 
         if (userRepository.existsByName(request.username())) {
             throw new BaseException(ErrorCode.USERNAME_ALREADY_EXISTS);
@@ -49,8 +49,8 @@ public class UserService {
         UserEntity userEntity = UserEntity.of(request.username(), UUID.randomUUID().toString(), userGender);
         UserEntity savedUser = userRepository.save(userEntity);
 
-        FriendEntity friendEntity = FriendEntity.of(savedUser.getId(), friendType);
-        friendRepository.save(friendEntity);
+        CoworkerEntity coworkerEntity = CoworkerEntity.of(savedUser.getId(), coworkerType);
+        coworkerRepository.save(coworkerEntity);
 
         List<UserGachaEntity> gachaEntities = UserGachaEntity.from(userEntity.getId());
         gachaRepository.saveAll(gachaEntities);
@@ -60,12 +60,12 @@ public class UserService {
     public UserResponse getUserInfos(final String uuid) {
 
         UserEntity user = findUserBy(uuid);
-        List<FriendEntity> friendInUse = friendRepository.findByUserIdAndInUseTrue(user.getId());
+        List<CoworkerEntity> coworkerInUse = coworkerRepository.findByUserIdAndInUseTrue(user.getId());
 
         return new UserResponse(
                 UserBaseInfo.of(user),
                 UserLevelInfo.of(user),
-                FriendInUseInfo.of(friendInUse)
+                CoworkerInUseInfo.of(coworkerInUse)
         );
     }
 
@@ -114,11 +114,11 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    public FriendListResponse getFriendListByUser(final String uuid) {
+    public CoworkerListResponse getCoworkerListByUser(final String uuid) {
         UserEntity user = findUserBy(uuid);
-        List<FriendEntity> friendEntityList = friendRepository.findByUserIdAndOnSaleFalseAndAvailableTrue(user.getId());
-        List<FriendEntity> sortedFriendList = friendListFilter.sort(friendEntityList);
-        return FriendListResponse.of(sortedFriendList);
+        List<CoworkerEntity> coworkerEntityList = coworkerRepository.findByUserIdAndOnSaleFalseAndAvailableTrue(user.getId());
+        List<CoworkerEntity> sortedCoworkerList = coworkerListFilter.sort(coworkerEntityList);
+        return CoworkerListResponse.of(sortedCoworkerList);
     }
 
     public List<String> getAllUserUuids() {

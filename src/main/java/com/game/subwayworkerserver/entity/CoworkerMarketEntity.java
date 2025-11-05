@@ -11,10 +11,10 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@Table(name = "friend_market")
+@Table(name = "coworker_market")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FriendMarketEntity extends BaseTimeEntity {
+public class CoworkerMarketEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +34,7 @@ public class FriendMarketEntity extends BaseTimeEntity {
     private long sellerId;
 
     @Column(nullable = false)
-    private long friendId;
+    private long coworkerId;
 
     private long buyerId;
 
@@ -50,25 +50,25 @@ public class FriendMarketEntity extends BaseTimeEntity {
     private LocalDateTime soldTime;
 
 
-    public FriendMarketEntity(
-           long sellerId,  int price, int commission, CurrencyType currency, long friendId, boolean available
+    public CoworkerMarketEntity(
+            long sellerId, int price, int commission, CurrencyType currency, long coworkerId, boolean available
     ) {
         this.sellerId = sellerId;
         this.price = price;
         this.commission = commission;
         this.currency = currency;
-        this.friendId = friendId;
+        this.coworkerId = coworkerId;
         this.available = available;
     }
 
 
-    public static FriendMarketEntity of(final long userId, final SellingRequest request) {
-        return new FriendMarketEntity(
+    public static CoworkerMarketEntity of(final long userId, final SellingRequest request) {
+        return new CoworkerMarketEntity(
                 userId,
                 request.sellingPrice(),
                 request.sellingCommission(),
                 CurrencyType.VACATION_TICKET,
-                request.friendId(),
+                request.coworkerId(),
                 true
         );
     }
@@ -84,7 +84,7 @@ public class FriendMarketEntity extends BaseTimeEntity {
         this.available = false;
     }
 
-    public void changeFriendId(final long newFriendId) {
-        this.friendId = newFriendId;
+    public void changeCoworkerId(final long newCoworkerId) {
+        this.coworkerId = newCoworkerId;
     }
 }

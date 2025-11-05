@@ -5,6 +5,6 @@ import java.util.List;
 public record UserResponse(
      UserBaseInfo baseInfo,
      UserLevelInfo levelInfo,
-     List<FriendInUseInfo> friendInUseInfoList
+     List<CoworkerInUseInfo> coworkerInUseInfoList
 ) {
 }

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
-public enum FriendLevel{
+public enum CoworkerLevel {
 
     INTERN(1, "인턴", 200, 200, 30000, 0.0, 1.0),
     WORKER(2, "사원", 300, 500, 50000, 0.05, 1.06), // level 2: 이전 * 105% (0.05 증가)
@@ -25,7 +25,7 @@ public enum FriendLevel{
     private final double levelUpStatIncreaseRate; // 레벨업 시 수치 증가 (이전 대비 증가율) (예: 105% -> 0.05)
     private final double statRatioToInitial;  // 초기 능력치 대비 비율
 
-    FriendLevel(
+    CoworkerLevel(
             int level,
             String title,
             int requiredExpToNextLevel,
@@ -43,8 +43,8 @@ public enum FriendLevel{
         this.statRatioToInitial = statRatioToInitial;
     }
 
-    public static FriendLevel of(int level) {
-        for (FriendLevel sl : values()) {
+    public static CoworkerLevel of(int level) {
+        for (CoworkerLevel sl : values()) {
             if (sl.level == level) {
                 return sl;
             }
@@ -52,8 +52,8 @@ public enum FriendLevel{
         throw new IllegalArgumentException("유효하지 않은 SkillLevel 번호입니다: " + level);
     }
 
-    public static FriendLevel getRandomLevel() {
-        FriendLevel[] levels = FriendLevel.values();
+    public static CoworkerLevel getRandomLevel() {
+        CoworkerLevel[] levels = CoworkerLevel.values();
 
         double totalWeight = 0;
         for (int i = 0; i < levels.length; i++) {
@@ -62,7 +62,7 @@ public enum FriendLevel{
         double randomValue = ThreadLocalRandom.current().nextDouble(0, totalWeight);
 
         double cumulativeWeight = 0;
-        for (FriendLevel level : levels) {
+        for (CoworkerLevel level : levels) {
             cumulativeWeight += 1.0 / level.level;
 
             if (randomValue <= cumulativeWeight) {
@@ -72,8 +72,8 @@ public enum FriendLevel{
         return levels[0];
     }
 
-    public static FriendLevel getSpecialFriendLevel() {
-        List<FriendLevel> targetLevels = Arrays.stream(FriendLevel.values())
+    public static CoworkerLevel getSpecialCoworkerLevel() {
+        List<CoworkerLevel> targetLevels = Arrays.stream(CoworkerLevel.values())
                 .filter(level -> level.level >= 1 && level.level <= 4)
                 .toList();
 

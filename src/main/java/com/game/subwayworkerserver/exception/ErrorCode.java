@@ -10,7 +10,6 @@ public enum ErrorCode {
 
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST,  "Invalid input value."),
     USERNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "Username already exists."),
-    INVALID_FRIEND_ATTRIBUTE(HttpStatus.BAD_REQUEST, "Invalid friend attribute value."),
     NOT_VALID_ID(HttpStatus.BAD_REQUEST, "Not Valid ID" ),
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "Bad Request."),
 

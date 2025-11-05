@@ -15,7 +15,7 @@ public class GachaRandomGiftGenerator {
 
     private static final int MAX_TREASURE_COUNT = 20;
 
-    private static final String MATERIAL_FRIEND = "MATERIAL_FRIEND";
+    private static final String MATERIAL_COWORKER = "MATERIAL_COWORKER";
     private static final String TREASURE = "TREASURE";
 
     private static final double SKEW_FACTOR = 3.5;
@@ -29,7 +29,7 @@ public class GachaRandomGiftGenerator {
             new RewardConfig(ItemName.BUSINESS_CARRIER.name(), 5),
             new RewardConfig(ItemName.SILVER_SHOVEL.name(), 10),
             new RewardConfig(ItemName.GOLD_SHOVEL.name(), 5),
-            new RewardConfig(MATERIAL_FRIEND, 3),
+            new RewardConfig(MATERIAL_COWORKER, 3),
             new RewardConfig(TREASURE, 10)
     );
 

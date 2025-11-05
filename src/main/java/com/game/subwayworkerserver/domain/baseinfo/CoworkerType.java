@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * 각 상수는 해당 직업의 초기 스탯 범위를 관리합니다.
  */
 @Getter
-public enum FriendType {
+public enum CoworkerType {
 
     MOONGSHIL("뭉실", new CharacterGenerator.Range(58, 91), new CharacterGenerator.Range(0, 5), new CharacterGenerator.Range(23, 36), 10, new CharacterGenerator.Range(14, 21), new CharacterGenerator.Range(3, 7)),
     MOKA("모카", new CharacterGenerator.Range(44, 83), new CharacterGenerator.Range(0, 5), new CharacterGenerator.Range(23, 36), 10, new CharacterGenerator.Range(16, 23), new CharacterGenerator.Range(8, 15)),
@@ -29,7 +29,7 @@ public enum FriendType {
     private final CharacterGenerator.Range attackRange;
     private final CharacterGenerator.Range defenseRange;
 
-    FriendType(String koreanName, CharacterGenerator.Range hpRange, CharacterGenerator.Range mpNowRange, CharacterGenerator.Range mpMaxRange, int manaRecovery, CharacterGenerator.Range attackRange, CharacterGenerator.Range defenseRange) {
+    CoworkerType(String koreanName, CharacterGenerator.Range hpRange, CharacterGenerator.Range mpNowRange, CharacterGenerator.Range mpMaxRange, int manaRecovery, CharacterGenerator.Range attackRange, CharacterGenerator.Range defenseRange) {
         this.koreanName = koreanName;
         this.hpRange = hpRange;
         this.mpNowRange = mpNowRange;
@@ -39,22 +39,22 @@ public enum FriendType {
         this.defenseRange = defenseRange;
     }
 
-    public static FriendType fromName(final String type) {
-        for (FriendType friendType : FriendType.values()) {
-            if (friendType.koreanName.equalsIgnoreCase(type)) {
-                return friendType;
+    public static CoworkerType fromName(final String type) {
+        for (CoworkerType coworkerType : CoworkerType.values()) {
+            if (coworkerType.koreanName.equalsIgnoreCase(type)) {
+                return coworkerType;
             }
         }
-        throw new BaseException(ErrorCode.BAD_REQUEST, "유효하지 않은 FriendType 직업 이름입니다: " + type);
+        throw new BaseException(ErrorCode.BAD_REQUEST, "유효하지 않은 Coworker type 직업 이름입니다: " + type);
     }
 
-    public static FriendType getRandomAttribute() {
-        FriendType[] attributes = FriendType.values();
+    public static CoworkerType getRandomAttribute() {
+        CoworkerType[] attributes = CoworkerType.values();
         int randomIndex = ThreadLocalRandom.current().nextInt(attributes.length);
         return attributes[randomIndex];
     }
 
-    public static List<FriendType> getAll() {
-        return List.of(FriendType.values());
+    public static List<CoworkerType> getAll() {
+        return List.of(CoworkerType.values());
     }
 }

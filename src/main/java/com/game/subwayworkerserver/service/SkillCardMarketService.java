@@ -32,9 +32,9 @@ public class SkillCardMarketService {
         List<Long> skillCardIds = getSkillCardIds(marketSkillCardLists);
 
         List<SkillCardEntity> skillCardOnSaleByCardIds = findSkillCardOnSaleByCardIds(skillCardIds);
-        List<SkillCardOnSale> friendOnSalesDomainList = SkillCardOnSale.toDomain(marketSkillCardLists, skillCardOnSaleByCardIds);
-        List<SkillCardOnSale> filteredFriends = skillCardListFilter.filter(friendOnSalesDomainList, request);
-        return GlobalSkillCardResponse.of(filteredFriends);
+        List<SkillCardOnSale> coworkerOnSalesDomainList = SkillCardOnSale.toDomain(marketSkillCardLists, skillCardOnSaleByCardIds);
+        List<SkillCardOnSale> filteredCoworkers = skillCardListFilter.filter(coworkerOnSalesDomainList, request);
+        return GlobalSkillCardResponse.of(filteredCoworkers);
     }
 
     private UserEntity findUserByUuid(String uuid) {

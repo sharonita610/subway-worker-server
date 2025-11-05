@@ -31,12 +31,12 @@ public class TrapCheckerScheduler {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    private static final String FRIEND_LOCATIONS_KEY = "friend:locations";
+    private static final String COWORKER_LOCATIONS_KEY = "coworker:locations";
     private static final String USER_ACQUIRED_PREFIX = "user:acquired:";
     private static final double TRAP_CAPTURE_RADIUS_METER = 25.0;
 
-    private static final String FRIEND_DATA_PREFIX = "friend:data:";
-    private static final String TRAPPED_FRIEND_DATA_PREFIX = "trapped:friend:data:";
+    private static final String COWORKER_DATA_PREFIX = "coworker:data:";
+    private static final String TRAPPED_COWORKER_DATA_PREFIX = "trapped:coworker:data:";
     private static final long TRAPPED_DATA_TTL_DAYS = 14;
 
     /**
@@ -77,28 +77,28 @@ public class TrapCheckerScheduler {
             RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().limit(1);
 
             GeoResults<RedisGeoCommands.GeoLocation<String>> results = redisTemplate.opsForGeo()
-                    .radius(FRIEND_LOCATIONS_KEY, searchArea, args);
+                    .radius(COWORKER_LOCATIONS_KEY, searchArea, args);
 
             if (results != null && !results.getContent().isEmpty()) {
                 // 2-2. 겹치는 동료 발견 (트랩 성공!)
-                RedisGeoCommands.GeoLocation<String> friendLocation = results.getContent().get(0).getContent();
-                String friendId = friendLocation.getName();
+                RedisGeoCommands.GeoLocation<String> coworkerLocation = results.getContent().get(0).getContent();
+                String coworkerId = coworkerLocation.getName();
 
-                String friendDataKey = FRIEND_DATA_PREFIX + friendId;
-                String trappedFriendDataKey = TRAPPED_FRIEND_DATA_PREFIX + friendId;
+                String coworkerDataKey = COWORKER_DATA_PREFIX + coworkerId;
+                String trappedCoworkerDataKey = TRAPPED_COWORKER_DATA_PREFIX + coworkerId;
 
-                Map<Object, Object> friendAttributes = redisTemplate.opsForHash().entries(friendDataKey);
-                if (!friendAttributes.isEmpty()) {
-                    redisTemplate.opsForHash().putAll(trappedFriendDataKey, friendAttributes);
+                Map<Object, Object> coworkerAttributes = redisTemplate.opsForHash().entries(coworkerDataKey);
+                if (!coworkerAttributes.isEmpty()) {
+                    redisTemplate.opsForHash().putAll(trappedCoworkerDataKey, coworkerAttributes);
                     // 2. 백업 데이터의 유효 기간(TTL)을 설정합니다.
-                    redisTemplate.expire(trappedFriendDataKey, TRAPPED_DATA_TTL_DAYS, TimeUnit.DAYS);
-                    log.info("ID {} 동료 속성 백업 완료. 키: {}", friendId, trappedFriendDataKey);
+                    redisTemplate.expire(trappedCoworkerDataKey, TRAPPED_DATA_TTL_DAYS, TimeUnit.DAYS);
+                    log.info("ID {} 동료 속성 백업 완료. 키: {}", coworkerId, trappedCoworkerDataKey);
                 } else {
-                    log.warn("ID {} 동료 상세 데이터({})가 Redis에 존재하지 않아 백업에 실패했습니다.", friendId, friendDataKey);
+                    log.warn("ID {} 동료 상세 데이터({})가 Redis에 존재하지 않아 백업에 실패했습니다.", coworkerId, coworkerDataKey);
                 }
                 // 2-3. 트랩 및 유저 정보 업데이트
                 // a) UserSetTrapEntity에 성공 기록
-                trap.markSuccess(friendId);
+                trap.markSuccess(coworkerId);
 
                 // b) UserEntity에 성공 플래그 설정 (로그인 시 알림용)
                 userRepository.findById(trap.getUserId()).ifPresent(user -> {
@@ -107,8 +107,8 @@ public class TrapCheckerScheduler {
                 });
 
                 userRepository.findById(trap.getUserId()).ifPresent(user -> {
-                    final String acquiredKey = USER_ACQUIRED_PREFIX + user.getUuid() + ":" + FRIEND_LOCATIONS_KEY;
-                    redisTemplate.opsForSet().add(acquiredKey, friendId);
+                    final String acquiredKey = USER_ACQUIRED_PREFIX + user.getUuid() + ":" + COWORKER_LOCATIONS_KEY;
+                    redisTemplate.opsForSet().add(acquiredKey, coworkerId);
                 });
 
                 successCount++;

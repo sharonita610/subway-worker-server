@@ -3,7 +3,7 @@ package com.game.subwayworkerserver.controller;
 import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.CaptureItemListResponse;
 import com.game.subwayworkerserver.controller.request.UserCreateRequest;
-import com.game.subwayworkerserver.controller.response.FriendListResponse;
+import com.game.subwayworkerserver.controller.response.CoworkerListResponse;
 import com.game.subwayworkerserver.controller.response.SkillListResponse;
 import com.game.subwayworkerserver.controller.response.TrapItemListResponse;
 import com.game.subwayworkerserver.controller.response.UserResponse;
@@ -98,10 +98,10 @@ public class UserController {
                     @ApiResponse(responseCode = "200", description = "동료 리스트")
             }
     )
-    @GetMapping("/user/friends")
-    public ResponseEntity<FriendListResponse> getFriendListByUser( ) {
+    @GetMapping("/user/coworkers")
+    public ResponseEntity<CoworkerListResponse> getCoworkersListByUser( ) {
         String uuid = SecurityUtils.getCurrentUserUuid();
-        return ResponseEntity.ok(userService.getFriendListByUser(uuid));
+        return ResponseEntity.ok(userService.getCoworkerListByUser(uuid));
     }
 
     @Operation(
