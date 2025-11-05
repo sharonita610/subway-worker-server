@@ -49,7 +49,7 @@ public record CapturedFriendInfo(
                 .defense(friend.getDefense())
                 .manaRecovery(friend.getManaRecovery())
                 .activeSkills(SkillBaseInfo.activeSkill(friend.getActiveSkill1(), friend.getActiveSkill2()))
-                .passiveSkills(SkillBaseInfo.passiveSkill(friend.getActiveSkill1(), friend.getPassiveSkill2()))
+                .passiveSkills(SkillBaseInfo.passiveSkill(friend.getPassiveSkill1(), friend.getPassiveSkill2()))
                 .engAttributeName(friend.getFriendAttribute().name())
                 .korAttributeName(friend.getFriendAttribute().getKoreanName())
                 .build();
