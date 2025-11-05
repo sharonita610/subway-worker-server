@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.controller.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import lombok.Builder;
@@ -7,6 +8,7 @@ import lombok.Builder;
 import java.util.List;
 import java.util.stream.Stream;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record SkillBaseInfo(
         long id,
         String engName,
