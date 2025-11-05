@@ -16,6 +16,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserGachaEntity extends BaseTimeEntity {
 
+    private static final int MAX_COUNT = 20;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -58,6 +60,8 @@ public class UserGachaEntity extends BaseTimeEntity {
     }
 
     public void increaseGachaCount() {
-        this.gachaCount += 1;
+        if (this.gachaCount < MAX_COUNT) {
+            this.gachaCount += 1;
+        }
     }
 }
