@@ -1,13 +1,19 @@
 package com.game.subwayworkerserver.controller;
 
+import com.game.subwayworkerserver.config.SecurityUtils;
+import com.game.subwayworkerserver.controller.request.PartnerConfigureRequest;
+import com.game.subwayworkerserver.controller.response.CoworkerListResponse;
 import com.game.subwayworkerserver.controller.response.CoworkerTypesResponse;
 import com.game.subwayworkerserver.service.CoworkerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Coworker API", description = "동료 관련 API")
@@ -28,4 +34,16 @@ public class CoworkerController {
     public ResponseEntity<CoworkerTypesResponse> getCoworkerElements() {
         return ResponseEntity.ok(coworkerService.getCoworkerElements());
     }
+
+    @Operation(
+            summary = "동료를 파트너로 지정하기",
+            description = "동료의 id 리스트를 통해 파트너로 지정한다."
+    )
+    @PostMapping("/coworkers")
+    public ResponseEntity<HttpStatus> addCoworkerAsAPartner(@RequestBody PartnerConfigureRequest request) {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        coworkerService.configurePartners(uuid, request);
+        return ResponseEntity.ok(HttpStatus.NO_CONTENT);
+    }
+
 }

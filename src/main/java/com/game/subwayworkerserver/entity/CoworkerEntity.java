@@ -256,4 +256,12 @@ public class CoworkerEntity extends BaseTimeEntity {
     public void paidDone() {
         this.onSale = false;
     }
+
+    public void setInUseFalse() {
+        this.inUse = false;
+    }
+
+    public void setInUseTrue() {
+        this.inUse = true;
+    }
 }
