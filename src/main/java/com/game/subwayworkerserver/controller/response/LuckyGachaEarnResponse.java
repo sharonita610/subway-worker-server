@@ -9,7 +9,7 @@ import java.util.List;
 
 public record LuckyGachaEarnResponse(
         List<DefaultRewardInfo> defaultRewardList,
-        ExtraRewardInfo extraReward
+        ExtraRewardInfo extraRewardList
 ) {
     public static LuckyGachaEarnResponse of(
             List<DefaultGift> defaultReward,
@@ -30,12 +30,12 @@ public record LuckyGachaEarnResponse(
     }
 
     private record ExtraRewardInfo(
-            TreasureRewardInfo treasure,
-            List<TreasureRewardInfo> items
+            List<TreasureRewardInfo> treasureList,
+            List<TreasureRewardInfo> itemList
     ) {
         public static ExtraRewardInfo from(final List<ExtraGift> extraGiftList) {
 
-            TreasureRewardInfo singleTreasure = null;
+            List<TreasureRewardInfo> treasureList = new ArrayList<>();
             List<TreasureRewardInfo> itemsList = new ArrayList<>();
 
             for (ExtraGift extraGift : extraGiftList) {
@@ -43,21 +43,14 @@ public record LuckyGachaEarnResponse(
                 int quantity = extraGift.quantity();
 
                 if (GachaTreasure.isGacha(giftName)) {
-                    TreasureRewardInfo currentTreasure = new TreasureRewardInfo(giftName, quantity);
-                    if (singleTreasure == null) {
-                        singleTreasure = currentTreasure;
-                    } else {
-                        itemsList.add(currentTreasure);
-                    }
+                    treasureList.add(new TreasureRewardInfo(giftName, quantity));
                 } else {
                     itemsList.add(new TreasureRewardInfo(giftName, quantity));
                 }
             }
 
-            return new ExtraRewardInfo(singleTreasure, itemsList);
+            return new ExtraRewardInfo(treasureList, itemsList);
         }
-
-
     }
 
     private record TreasureRewardInfo(String name, int quantity) {
