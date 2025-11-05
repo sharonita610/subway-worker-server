@@ -28,7 +28,7 @@ public record MyCoworkersMarketResponse(
                     coworkerOnSale.marketId(),
                     coworkerOnSale.isPaid(),
                     coworkerOnSale.isSold(),
-                    CoworkerBaseInfo.from(coworkerOnSale)
+                    CoworkerBaseInfo.fromDomain(coworkerOnSale)
             );
         }
     }

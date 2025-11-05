@@ -13,7 +13,7 @@ public record GlobalCoworkerInfo(
                 coworkerOnSale.price(),
                 coworkerOnSale.sellerId(),
                 coworkerOnSale.marketId(),
-                CoworkerBaseInfo.from(coworkerOnSale)
+                CoworkerBaseInfo.fromDomain(coworkerOnSale)
         );
     }
 }

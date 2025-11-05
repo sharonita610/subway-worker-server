@@ -23,7 +23,7 @@ public record CoworkerBaseInfo(
     public CoworkerBaseInfo {
     }
 
-    public static CoworkerBaseInfo from(CoworkerOnSale coworkerOnSale) {
+    public static CoworkerBaseInfo fromDomain(CoworkerOnSale coworkerOnSale) {
         return CoworkerBaseInfo.builder()
                 .id(coworkerOnSale.coworkerId())
                 .engName(coworkerOnSale.engName())
@@ -40,7 +40,7 @@ public record CoworkerBaseInfo(
 
     }
 
-    public static CoworkerBaseInfo of(CoworkerEntity coworker) {
+    public static CoworkerBaseInfo fromEntity(CoworkerEntity coworker) {
         return CoworkerBaseInfo.builder()
                 .id(coworker.getId())
                 .engName(String.valueOf(coworker.getCoworkerType()))
@@ -58,8 +58,12 @@ public record CoworkerBaseInfo(
     }
 
     private record StatBaseInfo(
-            int power, int treasure, int total
+            long defaultPower, long treasure, long total
     ) {
+
+        public static StatBaseInfo of(long defaultPower) {
+            return new StatBaseInfo(defaultPower, 0, defaultPower);
+        }
     }
 
     private record StatsInfos(
@@ -70,12 +74,18 @@ public record CoworkerBaseInfo(
             StatBaseInfo defense,
             StatBaseInfo manaRecovery
     ) {
-        public static StatsInfos of(CoworkerEntity coworker) {
-
-            return null;
+        public static StatsInfos of(final CoworkerEntity coworker) {
+            return new StatsInfos(
+                    StatBaseInfo.of(coworker.getHp()),
+                    StatBaseInfo.of(coworker.getMana()),
+                    StatBaseInfo.of(coworker.getMaxMana()),
+                    StatBaseInfo.of(coworker.getHp()),
+                    StatBaseInfo.of(coworker.getHp()),
+                    StatBaseInfo.of(coworker.getHp())
+            );
         }
 
-        public static StatsInfos of(CoworkerOnSale coworkerOnSale) {
+        public static StatsInfos of(final CoworkerOnSale coworkerOnSale) {
 
             return null;
         }
@@ -85,8 +95,11 @@ public record CoworkerBaseInfo(
             int level, int now, int max
     ) {
         public static ExpInfo of(CoworkerEntity coworkerEntity) {
-
-            return null;
+            return new ExpInfo(
+                    coworkerEntity.getLevel().getLevel(),
+                    coworkerEntity.getCurrentExp(),
+                    coworkerEntity.getLevel().getRequiredExpToNextLevel()
+            );
         }
 
         public static ExpInfo of(int level) {
