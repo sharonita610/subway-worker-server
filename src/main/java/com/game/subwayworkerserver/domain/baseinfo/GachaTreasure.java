@@ -4,6 +4,8 @@ import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.util.Arrays.*;
@@ -50,11 +52,20 @@ public enum GachaTreasure {
         throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "유효하지 않은 아이템 이름입니다: " + itemName);
     }
 
-    public static GachaTreasure getRandom() {
+    public static GachaTreasure getRandom(List<GachaTreasure> treasuresToExclude) {
         GachaTreasure[] allTreasures = GachaTreasure.values();
-        int count = allTreasures.length;
+        List<GachaTreasure> availableTreasures = Arrays.stream(allTreasures)
+                .filter(treasure -> !treasuresToExclude.contains(treasure))
+                .toList();
+
+        if (availableTreasures.isEmpty()) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "획득 가능한 보물 아이템이 남아있지 않습니다.");
+        }
+
+        int count = availableTreasures.size();
         int randomIndex = ThreadLocalRandom.current().nextInt(count);
-        return allTreasures[randomIndex];
+
+        return availableTreasures.get(randomIndex);
     }
 
     public static boolean isGacha(final String type) {
