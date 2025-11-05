@@ -8,6 +8,7 @@ import com.game.subwayworkerserver.service.CoworkerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,7 @@ public class CoworkerController {
             description = "동료의 id 리스트를 통해 파트너로 지정한다."
     )
     @PostMapping("/coworkers")
-    public ResponseEntity<HttpStatus> addCoworkerAsAPartner(@RequestBody PartnerConfigureRequest request) {
+    public ResponseEntity<HttpStatus> addCoworkerAsAPartner(@Valid @RequestBody PartnerConfigureRequest request) {
         String uuid = SecurityUtils.getCurrentUserUuid();
         coworkerService.configurePartners(uuid, request);
         return ResponseEntity.ok(HttpStatus.NO_CONTENT);
