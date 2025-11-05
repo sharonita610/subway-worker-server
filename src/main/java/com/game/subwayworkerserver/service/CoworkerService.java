@@ -33,6 +33,9 @@ public class CoworkerService {
         ).getId();
 
         List<Long> requestCoworkerIds = request.coworkerIds();
+        if (requestCoworkerIds.isEmpty()) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "파트너는 최소 1명, 최대 3명까지 지정 가능해요");
+        }
         List<CoworkerEntity> currentPartners = coworkerRepository.findByUserIdAndInUseTrue(userId);
 
         currentPartners.stream()
