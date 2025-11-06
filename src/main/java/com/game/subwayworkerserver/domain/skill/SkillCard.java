@@ -47,7 +47,7 @@ public record SkillCard(
                             .actualCount(card.getCount())
                             .inUse(card.isInUse())
                             .onSale(card.isOnSale())
-                            .coworkerId(card.getCoworkerId())
+                            .coworkerId(card.getCoworkerId() != null ? card.getCoworkerId() : 0L)
                             .cardType(card.getType().name())
                             .build();
                 })
@@ -77,7 +77,7 @@ public record SkillCard(
                             .onSale(card.isOnSale())
                             .otherCoworkerUsing(otherCoworker)
                             .thisCoworkerUsing(thisCoworker)
-                            .coworkerId(card.getCoworkerId())
+                            .coworkerId(card.getCoworkerId() != null ? card.getCoworkerId() : 0L)
                             .cardType(card.getType().name())
                             .build();
                 })

@@ -1,11 +1,10 @@
 package com.game.subwayworkerserver.entity;
 
+import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
+import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import com.game.subwayworkerserver.domain.skill.SkillCardType;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @Entity
@@ -18,6 +17,7 @@ public class SkillCardEntity extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private Long coworkerId;
 
     @Column(nullable = false)
@@ -54,13 +54,66 @@ public class SkillCardEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private boolean available = true;
 
+    @Builder
+    public SkillCardEntity(Long userId, String engName, String korName, SkillCardType type,
+                           int currentLevel, int requiredCount, int count, int skillCardEnumId, boolean inUse,
+                           boolean onSale, boolean available, Long coworkerId
+    ) {
+        this.userId = userId;
+        this.engName = engName;
+        this.korName = korName;
+        this.type = type;
+        this.currentLevel = currentLevel;
+        this.requiredCount = requiredCount;
+        this.count = count;
+        this.skillCardEnumId = skillCardEnumId;
+        this.inUse = inUse;
+        this.onSale = onSale;
+        this.available = available;
+        this.coworkerId = coworkerId;
+    }
+
+    public static SkillCardEntity of(final long userId, final ActiveSkillCard randomCard) {
+        return SkillCardEntity.builder()
+                .userId(userId)
+                .engName(randomCard.name())
+                .korName(randomCard.getKoreanName())
+                .type(SkillCardType.ACTIVE)
+                .currentLevel(1)
+                .requiredCount(2)
+                .count(1)
+                .skillCardEnumId(randomCard.getId())
+                .inUse(false)
+                .onSale(false)
+                .available(true)
+                .coworkerId(0L)
+                .build();
+    }
+
+    public static SkillCardEntity of(final long userId, PassiveSkillCard randomCard) {
+        return SkillCardEntity.builder()
+                .userId(userId)
+                .engName(randomCard.name())
+                .korName(randomCard.getKoreanName())
+                .type(SkillCardType.PASSIVE)
+                .currentLevel(1)
+                .requiredCount(2)
+                .count(1)
+                .skillCardEnumId(randomCard.getId())
+                .inUse(false)
+                .onSale(false)
+                .available(true)
+                .coworkerId(0L)
+                .build();
+    }
+
     public void activateCoworkerId(final long coworkerId) {
         this.coworkerId = coworkerId;
         this.inUse = true;
     }
 
     public void deactivateCoworkerId() {
-        this.coworkerId = null;
+        this.coworkerId = 0L;
         this.inUse = false;
     }
 }
