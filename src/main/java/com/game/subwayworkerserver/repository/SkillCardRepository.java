@@ -10,7 +10,7 @@ public interface SkillCardRepository extends JpaRepository<SkillCardEntity, Long
 
     List<SkillCardEntity> findAllByIdInAndOnSaleTrue(List<Long> skillCardIds);
 
-    List<SkillCardEntity> findAllUserIdAndAvailableTrueAndSkillCardEnumIdIn(Long id, List<Integer> activeSkills);
+    List<SkillCardEntity> findAllUserIdAndAvailableTrueAndSkillCardEnumIdInAndOnSaleFalse(Long id, List<Integer> activeSkills);
 
     List<SkillCardEntity> findAllByUserIdAndTypeAndAvailableTrueAndOnSaleFalse(Long id, SkillCardType skillCardType);
 }
