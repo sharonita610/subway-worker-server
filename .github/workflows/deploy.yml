@@ -50,6 +50,7 @@ jobs:
         with:
           name: subway-worker-server-jar
           path: ${{ env.JAR_FILE }}
+          retention-days: 3
 
   # ===============================================
   # 2. DEPLOY - UPLOAD JOB (파일 전송 문제 해결 및 경로 안정화)
