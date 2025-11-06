@@ -8,4 +8,6 @@ import java.util.List;
 public interface SkillCardRepository extends JpaRepository<SkillCardEntity, Long> {
 
     List<SkillCardEntity> findAllByIdInAndOnSaleTrue(List<Long> skillCardIds);
+
+    List<SkillCardEntity> findAllByCoworkerIdAndAvailableTrueAndSkillCardEnumIdIn(Long id, List<Integer> activeSkills);
 }

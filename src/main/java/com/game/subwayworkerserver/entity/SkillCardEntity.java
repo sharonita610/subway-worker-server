@@ -19,6 +19,9 @@ public class SkillCardEntity extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
+    private Long coworkerId;
+
+    @Column(nullable = false)
     private String engName;
 
     @Column(nullable = false)
@@ -38,8 +41,14 @@ public class SkillCardEntity extends BaseTimeEntity {
     private int quantity = 1;
 
     @Column(nullable = false)
+    private int skillCardEnumId;
+
+    @Column(nullable = false)
     private boolean inUse = false;
 
     @Column(nullable = false)
     private boolean onSale = false;
+
+    @Column(nullable = false)
+    private boolean available = true;
 }
