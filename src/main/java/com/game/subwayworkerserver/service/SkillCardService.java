@@ -1,6 +1,7 @@
 package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.SkillByUserRequest;
+import com.game.subwayworkerserver.controller.response.SkillByCoworkerResponse;
 import com.game.subwayworkerserver.controller.response.SkillByUserResponse;
 import com.game.subwayworkerserver.domain.skill.SkillCardType;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
@@ -25,10 +26,8 @@ public class SkillCardService {
     private final CoworkerRepository coworkerId;
     private final SkillCardRepository skillCardRepository;
 
-    public SkillByUserResponse getSkillListByUser(String uuid, SkillByUserRequest request) {
-        UserEntity user = userRepository.findByUuid(uuid).orElseThrow(
-                () -> new BaseException(ErrorCode.USER_NOT_FOUND)
-        );
+    public SkillByCoworkerResponse getSkillListByUser(String uuid, SkillByUserRequest request) {
+        UserEntity user = getUserEntityByUuid(uuid);
 
         CoworkerEntity coworkerEntity = coworkerId.findById(request.coworkerId()).orElseThrow(
                 () -> new BaseException(ErrorCode.NOT_FOUND, "Coworker not found.")
@@ -47,8 +46,20 @@ public class SkillCardService {
         }
 
         List<SkillCardEntity> skillCardEntityList =
-                skillCardRepository.findAllByCoworkerIdAndAvailableTrueAndSkillCardEnumIdIn(user.getId(), requestedSkill);
+                skillCardRepository.findAllUserIdAndAvailableTrueAndSkillCardEnumIdIn(user.getId(), requestedSkill);
+        return SkillByCoworkerResponse.of(skillCardType, requestedSkill, skillCardEntityList);
+    }
 
-        return SkillByUserResponse.of(skillCardType, requestedSkill, skillCardEntityList);
+    private UserEntity getUserEntityByUuid(final String uuid) {
+        return userRepository.findByUuid(uuid).orElseThrow(
+                () -> new BaseException(ErrorCode.USER_NOT_FOUND)
+        );
+    }
+
+    public SkillByUserResponse getUserSkillCards(final String uuid, final String cardType) {
+        UserEntity user = getUserEntityByUuid(uuid);
+        SkillCardType skillCardType = SkillCardType.valueOf(cardType.toUpperCase());
+        List<SkillCardEntity> skillList = skillCardRepository.findAllByUserIdAndTypeAndAvailableTrue(user.getId(), skillCardType);
+        return SkillByUserResponse.of(skillCardType, skillList);
     }
 }
