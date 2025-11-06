@@ -18,6 +18,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.game.subwayworkerserver.domain.skill.SkillCardType.ACTIVE;
+import static com.game.subwayworkerserver.domain.skill.SkillCardType.PASSIVE;
+
 @Service
 @RequiredArgsConstructor
 public class SkillCardService {
@@ -25,6 +28,7 @@ public class SkillCardService {
     private final UserRepository userRepository;
     private final CoworkerRepository coworkerId;
     private final SkillCardRepository skillCardRepository;
+    private final SkillCardListFilter skillCardListFilter;
 
     public SkillByCoworkerResponse getSkillListByUserAndCoworker(String uuid, SkillByUserRequest request) {
         UserEntity user = getUserEntityByUuid(uuid);
@@ -37,7 +41,7 @@ public class SkillCardService {
 
         List<Integer> requestedSkill = new ArrayList<>();
 
-        if (skillCardType.equals(SkillCardType.ACTIVE)) {
+        if (skillCardType.equals(ACTIVE)) {
             requestedSkill.add(coworkerEntity.getActiveSkill1());
             requestedSkill.add(coworkerEntity.getActiveSkill2());
         } else{
@@ -46,7 +50,7 @@ public class SkillCardService {
         }
 
         List<SkillCardEntity> skillCardEntityList =
-                skillCardRepository.findAllUserIdAndAvailableTrueAndSkillCardEnumIdIn(user.getId(), requestedSkill);
+                skillCardRepository.findAllUserIdAndAvailableTrueAndSkillCardEnumIdInAndOnSaleFalse(user.getId(), requestedSkill);
         return SkillByCoworkerResponse.of(skillCardEntityList, coworkerEntity.getId());
     }
 
@@ -56,10 +60,15 @@ public class SkillCardService {
         );
     }
 
-    public SkillByUserResponse getUserSkillCards(final String uuid, final String cardType) {
+    public SkillByUserResponse getUserSkillCards(final String uuid) {
         UserEntity user = getUserEntityByUuid(uuid);
-        SkillCardType skillCardType = SkillCardType.valueOf(cardType.toUpperCase());
-        List<SkillCardEntity> skillList = skillCardRepository.findAllByUserIdAndTypeAndAvailableTrue(user.getId(), skillCardType);
-        return SkillByUserResponse.of(skillCardType, skillList);
+        List<SkillCardEntity> activeSkillCards
+                = skillCardRepository.findAllByUserIdAndTypeAndAvailableTrueAndOnSaleFalse(user.getId(), ACTIVE);
+        List<SkillCardEntity> passiveSkillCards
+                = skillCardRepository.findAllByUserIdAndTypeAndAvailableTrueAndOnSaleFalse(user.getId(), PASSIVE);
+        List<SkillCardEntity> filteredActiveSkillCards = skillCardListFilter.defaultFilter(activeSkillCards);
+        List<SkillCardEntity> filteredPassiveSkillCards = skillCardListFilter.defaultFilter(passiveSkillCards);
+
+        return SkillByUserResponse.of(filteredActiveSkillCards, filteredPassiveSkillCards);
     }
 }
