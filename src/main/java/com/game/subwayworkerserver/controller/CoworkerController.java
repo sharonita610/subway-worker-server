@@ -4,7 +4,7 @@ import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.PartnerConfigureRequest;
 import com.game.subwayworkerserver.controller.request.SkillByUserRequest;
 import com.game.subwayworkerserver.controller.response.CoworkerTypesResponse;
-import com.game.subwayworkerserver.controller.response.SkillByUserResponse;
+import com.game.subwayworkerserver.controller.response.SkillByCoworkerResponse;
 import com.game.subwayworkerserver.service.CoworkerService;
 import com.game.subwayworkerserver.service.SkillCardService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,11 +51,11 @@ public class CoworkerController {
     }
 
     @Operation(
-            summary = "스킬 리스트 조회 [완 - 필드 확인 필요]",
+            summary = "스킬 리스트 조회 [완]",
             description = "스킬 리스트 조회"
     )
     @GetMapping("/coworker/skills")
-    public ResponseEntity<SkillByUserResponse> getSkillListByUser(@RequestBody SkillByUserRequest request) {
+    public ResponseEntity<SkillByCoworkerResponse> getSkillListByUser(@RequestBody SkillByUserRequest request) {
         String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok(skillCardService.getSkillListByUser(uuid, request));
     }
