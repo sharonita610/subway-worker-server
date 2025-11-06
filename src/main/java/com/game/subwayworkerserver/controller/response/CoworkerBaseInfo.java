@@ -1,15 +1,22 @@
 package com.game.subwayworkerserver.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerLevel;
 import com.game.subwayworkerserver.domain.baseinfo.GachaTreasure;
+import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import com.game.subwayworkerserver.domain.market.CoworkerOnSale;
+import com.game.subwayworkerserver.domain.skill.SkillCard;
+import com.game.subwayworkerserver.domain.skill.SkillCardType;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
+import com.game.subwayworkerserver.entity.SkillCardEntity;
 import com.game.subwayworkerserver.entity.UserGachaEntity;
 import lombok.Builder;
+import org.aspectj.weaver.ast.Literal;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -25,7 +32,7 @@ public record CoworkerBaseInfo(
         ExpInfo exp,
         StatsInfos statList,
         EnabledSkills enabledSkills,
-        SelectedSkills selectedSkills
+        List<SkillCard> selectedSkills
 
 ) {
     @Builder
@@ -44,12 +51,16 @@ public record CoworkerBaseInfo(
                 .exp(ExpInfo.of(coworkerOnSale.level(), coworkerOnSale.exp(), coworkerOnSale.totalExp()))
                 .statList(StatsInfos.of(coworkerOnSale))
                 .enabledSkills(EnabledSkills.of(coworkerOnSale))
-                .selectedSkills(SelectedSkills.of(coworkerOnSale))
+                .selectedSkills(List.of())
                 .build();
 
     }
 
-    public static CoworkerBaseInfo fromEntity(CoworkerEntity coworker, List<UserGachaEntity> userGachaEntities) {
+    public static CoworkerBaseInfo fromEntity(
+            CoworkerEntity coworker,
+            List<UserGachaEntity> userGachaEntities,
+            List<SkillCardEntity> skillCardEntityList
+    ) {
         return CoworkerBaseInfo.builder()
                 .id(coworker.getId())
                 .engName(String.valueOf(coworker.getCoworkerType()))
@@ -62,8 +73,34 @@ public record CoworkerBaseInfo(
                 .exp(ExpInfo.of(coworker))
                 .statList(StatsInfos.of(coworker, userGachaEntities))
                 .enabledSkills(EnabledSkills.of(coworker))
-                .selectedSkills(SelectedSkills.of(coworker))
+                .selectedSkills(getSelectedSkill(coworker.getId(), skillCardEntityList))
                 .build();
+    }
+
+    private static List<SkillCard> getSelectedSkill(final long userId, List<SkillCardEntity> skillCardEntityList) {
+        return skillCardEntityList.stream()
+                .map(card -> {
+
+                    if (!Objects.equals(userId, card.getCoworkerId())) {
+                        return null;
+                    }
+                    return SkillCard.builder()
+                            .id(card.getId())
+                            .engName(card.getEngName())
+                            .korName(card.getKorName())
+                            .description(getDescription(card))
+                            .level(card.getCurrentLevel())
+                            .requiredCount(card.getRequiredCount())
+                            .actualCount(card.getCount())
+                            .inUse(card.isInUse())
+                            .thisCoworkerUsing(true)
+                            .otherCoworkerUsing(false)
+                            .onSale(card.isOnSale())
+                            .coworkerId(card.getCoworkerId() != null ? card.getCoworkerId() : 0L)
+                            .cardType(card.getType().name())
+                            .build();
+                })
+                .toList();
     }
 
     public static CoworkerBaseInfo fromEntity(CoworkerEntity coworker) {
@@ -79,7 +116,7 @@ public record CoworkerBaseInfo(
                 .exp(ExpInfo.of(coworker))
                 .statList(StatsInfos.of(coworker, List.of()))
                 .enabledSkills(EnabledSkills.of(coworker))
-                .selectedSkills(SelectedSkills.of(coworker))
+                .selectedSkills(List.of())
                 .build();
     }
 
@@ -151,5 +188,17 @@ public record CoworkerBaseInfo(
         public static ExpInfo of(int level, int exp, int total) {
             return new ExpInfo(level, exp, CoworkerLevel.of(level).getRequiredExpToNextLevel(), total);
         }
+    }
+
+    private static String getDescription(SkillCardEntity card) {
+        String description;
+        if (card.getType().equals(SkillCardType.ACTIVE)) {
+            ActiveSkillCard activeCard = ActiveSkillCard.from(card.getSkillCardEnumId());
+            description = activeCard.getDescription();
+        } else {
+            PassiveSkillCard passiveCard = PassiveSkillCard.from(card.getSkillCardEnumId());
+            description = passiveCard.getDescription();
+        }
+        return description;
     }
 }
