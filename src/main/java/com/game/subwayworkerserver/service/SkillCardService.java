@@ -1,6 +1,7 @@
 package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.SkillByUserRequest;
+import com.game.subwayworkerserver.controller.request.SkillCardConfigureRequest;
 import com.game.subwayworkerserver.controller.response.SkillByCoworkerResponse;
 import com.game.subwayworkerserver.controller.response.SkillByUserResponse;
 import com.game.subwayworkerserver.domain.skill.SkillCardType;
@@ -12,11 +13,13 @@ import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.SkillCardRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.game.subwayworkerserver.domain.skill.SkillCardType.ACTIVE;
 import static com.game.subwayworkerserver.domain.skill.SkillCardType.PASSIVE;
@@ -26,16 +29,14 @@ import static com.game.subwayworkerserver.domain.skill.SkillCardType.PASSIVE;
 public class SkillCardService {
 
     private final UserRepository userRepository;
-    private final CoworkerRepository coworkerId;
+    private final CoworkerRepository coworkerRepository;
     private final SkillCardRepository skillCardRepository;
     private final SkillCardListFilter skillCardListFilter;
 
     public SkillByCoworkerResponse getSkillListByUserAndCoworker(String uuid, SkillByUserRequest request) {
         UserEntity user = getUserEntityByUuid(uuid);
 
-        CoworkerEntity coworkerEntity = coworkerId.findById(request.coworkerId()).orElseThrow(
-                () -> new BaseException(ErrorCode.NOT_FOUND, "Coworker not found.")
-        );
+        CoworkerEntity coworkerEntity = getCoworkerEntity(request.coworkerId());
 
         SkillCardType skillCardType = SkillCardType.valueOf(request.cardType().toUpperCase());
 
@@ -44,14 +45,20 @@ public class SkillCardService {
         if (skillCardType.equals(ACTIVE)) {
             requestedSkill.add(coworkerEntity.getActiveSkill1());
             requestedSkill.add(coworkerEntity.getActiveSkill2());
-        } else{
+        } else {
             requestedSkill.add(coworkerEntity.getPassiveSkill1());
             requestedSkill.add(coworkerEntity.getPassiveSkill2());
         }
 
         List<SkillCardEntity> skillCardEntityList =
-                skillCardRepository.findAllUserIdAndAvailableTrueAndSkillCardEnumIdInAndOnSaleFalse(user.getId(), requestedSkill);
+                skillCardRepository.findAllByUserIdAndAvailableTrueAndSkillCardEnumIdInAndOnSaleFalse(user.getId(), requestedSkill);
         return SkillByCoworkerResponse.of(skillCardEntityList, coworkerEntity.getId());
+    }
+
+    private CoworkerEntity getCoworkerEntity(final long coworkerId) {
+        return coworkerRepository.findById(coworkerId).orElseThrow(
+                () -> new BaseException(ErrorCode.NOT_FOUND, "Coworker not found.")
+        );
     }
 
     private UserEntity getUserEntityByUuid(final String uuid) {
@@ -70,5 +77,37 @@ public class SkillCardService {
         List<SkillCardEntity> filteredPassiveSkillCards = skillCardListFilter.defaultFilter(passiveSkillCards);
 
         return SkillByUserResponse.of(filteredActiveSkillCards, filteredPassiveSkillCards);
+    }
+
+    @Transactional
+    public void addSkillCardToCoworker(final String uuid, final SkillCardConfigureRequest request) {
+        UserEntity user = getUserEntityByUuid(uuid);
+        SkillCardType skillCardType = SkillCardType.valueOf(request.skillCardType().toUpperCase());
+        CoworkerEntity coworker = getCoworkerEntity(request.coworkerId());
+        coworker.checkUser(user.getId());
+
+        if (request.skillCardId() == 0) {
+            removeSkillCardFromCoworker(user.getId(), skillCardType);
+            return;
+        }
+
+        SkillCardEntity newSkillCard = getSkillCardEntity(request.skillCardId());
+        if (newSkillCard.isInUse() && !Objects.equals(newSkillCard.getCoworkerId(), coworker.getId())) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "해당 카드는 이미 다른 동료가 사용 중입니다.");
+        }
+        removeSkillCardFromCoworker(coworker.getId(), skillCardType);
+        coworker.checkSkillAvailability(newSkillCard.getSkillCardEnumId());
+        newSkillCard.activateCoworkerId(coworker.getId());
+    }
+
+    private void removeSkillCardFromCoworker(long coworkerId, SkillCardType type) {
+        skillCardRepository.findByCoworkerIdAndTypeAndInUseTrue(coworkerId, type)
+                .ifPresent(SkillCardEntity::deactivateCoworkerId);
+    }
+
+    private SkillCardEntity getSkillCardEntity(final long skillCardId) {
+        return skillCardRepository.findById(skillCardId).orElseThrow(
+                () -> new BaseException(ErrorCode.NOT_FOUND, "Skill card not found.")
+        );
     }
 }
