@@ -13,7 +13,7 @@ public record SkillCard(
         String korName,
         String description,
         int level,
-        int maxLevel,
+        int requiredCard,
         int quantity,
         boolean inUse,
         boolean onSale,
@@ -45,7 +45,7 @@ public record SkillCard(
                             .korName(card.getKorName())
                             .description(description)
                             .level(card.getCurrentLevel())
-                            .maxLevel(card.getMaxLevel())
+                            .requiredCard(card.getRequiredCard())
                             .quantity(card.getQuantity())
                             .inUse(card.isInUse())
                             .onSale(card.isOnSale())
