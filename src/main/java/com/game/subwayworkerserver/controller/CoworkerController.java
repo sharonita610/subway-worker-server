@@ -3,6 +3,7 @@ package com.game.subwayworkerserver.controller;
 import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.PartnerConfigureRequest;
 import com.game.subwayworkerserver.controller.request.SkillByUserRequest;
+import com.game.subwayworkerserver.controller.request.SkillCardConfigureRequest;
 import com.game.subwayworkerserver.controller.response.CoworkerTypesResponse;
 import com.game.subwayworkerserver.controller.response.SkillByCoworkerResponse;
 import com.game.subwayworkerserver.service.CoworkerService;
@@ -59,5 +60,18 @@ public class CoworkerController {
         String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok(skillCardService.getSkillListByUserAndCoworker(uuid, request));
     }
+
+
+    @Operation(
+            summary = "스킬카드를 파트너에게 장착 또는 제거하기",
+            description = "스킬카드를 파트너에게 장착한다."
+    )
+    @PostMapping("/coworker/skill-card")
+    public ResponseEntity<HttpStatus> addSkillCardToCoworker(@Valid @RequestBody SkillCardConfigureRequest request) {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        skillCardService.addSkillCardToCoworker(uuid, request);
+        return ResponseEntity.ok(HttpStatus.NO_CONTENT);
+    }
+
 
 }
