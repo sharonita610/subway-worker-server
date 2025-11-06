@@ -2,10 +2,11 @@ package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.PartnerConfigureRequest;
-import com.game.subwayworkerserver.controller.response.CoworkerListResponse;
+import com.game.subwayworkerserver.controller.request.SkillByUserRequest;
 import com.game.subwayworkerserver.controller.response.CoworkerTypesResponse;
-import com.game.subwayworkerserver.controller.response.SkillListResponse;
+import com.game.subwayworkerserver.controller.response.SkillByUserResponse;
 import com.game.subwayworkerserver.service.CoworkerService;
+import com.game.subwayworkerserver.service.SkillCardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CoworkerController {
 
     private final CoworkerService coworkerService;
+    private final SkillCardService skillCardService;
 
     @Operation(
             summary = "유저 생성시 사용할 동료 속성 리스트 [완]",
@@ -49,16 +51,16 @@ public class CoworkerController {
     }
 
     @Operation(
-            summary = "스킬 리스트 조회",
+            summary = "스킬 리스트 조회 [개발 중]",
             description = "스킬 리스트 조회",
             responses = {
                     @ApiResponse(responseCode = "200", description = "트랩 리스트")
             }
     )
     @GetMapping("/coworker/skills")
-    public ResponseEntity<SkillListResponse> getSkillListByUser( ) {
+    public ResponseEntity<SkillByUserResponse> getSkillListByUser(@RequestBody SkillByUserRequest request) {
         String uuid = SecurityUtils.getCurrentUserUuid();
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(skillCardService.getSkillListByUser(uuid, request));
     }
 
 }
