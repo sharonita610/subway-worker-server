@@ -125,8 +125,8 @@ public class UserController {
             }
     )
     @GetMapping("/user/skillCards")
-    public ResponseEntity<SkillByUserResponse> getUserSkillCards(@RequestParam("type") String type) {
+    public ResponseEntity<SkillByUserResponse> getUserSkillCards() {
         String uuid = SecurityUtils.getCurrentUserUuid();
-        return ResponseEntity.ok(skillCardService.getUserSkillCards(uuid, type));
+        return ResponseEntity.ok(skillCardService.getUserSkillCards(uuid));
     }
 }
