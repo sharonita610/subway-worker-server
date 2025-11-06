@@ -55,9 +55,9 @@ public class CoworkerController {
             description = "스킬 리스트 조회"
     )
     @GetMapping("/coworker/skills")
-    public ResponseEntity<SkillByCoworkerResponse> getSkillListByUser(@RequestBody SkillByUserRequest request) {
+    public ResponseEntity<SkillByCoworkerResponse> getSkillListByUserAndCoworker(@RequestBody SkillByUserRequest request) {
         String uuid = SecurityUtils.getCurrentUserUuid();
-        return ResponseEntity.ok(skillCardService.getSkillListByUser(uuid, request));
+        return ResponseEntity.ok(skillCardService.getSkillListByUserAndCoworker(uuid, request));
     }
 
 }
