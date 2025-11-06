@@ -17,6 +17,7 @@ public record SkillCard(
         int quantity,
         boolean inUse,
         boolean onSale,
+        long coworkerId,
         SkillCardType cardType
 
 ) {
@@ -49,6 +50,7 @@ public record SkillCard(
                             .quantity(card.getQuantity())
                             .inUse(card.isInUse())
                             .onSale(card.isOnSale())
+                            .coworkerId(card.getCoworkerId())
                             .cardType(card.getType())
                             .build();
                 })
