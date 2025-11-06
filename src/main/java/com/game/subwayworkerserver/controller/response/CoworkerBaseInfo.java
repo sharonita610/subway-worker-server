@@ -1,6 +1,7 @@
 package com.game.subwayworkerserver.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.game.subwayworkerserver.domain.baseinfo.CoworkerLevel;
 import com.game.subwayworkerserver.domain.market.CoworkerOnSale;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
 import lombok.Builder;
@@ -34,7 +35,7 @@ public record CoworkerBaseInfo(
                 .korElement(coworkerOnSale.element())
                 .isPartner(coworkerOnSale.inUse())
                 .onSale(coworkerOnSale.onSale())
-                .exp(ExpInfo.of(coworkerOnSale.level()))
+                .exp(ExpInfo.of(coworkerOnSale.level(), coworkerOnSale.exp(), coworkerOnSale.totalExp()))
                 .statList(StatsInfos.of(coworkerOnSale))
                 .enabledSkills(EnabledSkills.of(coworkerOnSale))
                 .selectedSkills(SelectedSkills.of(coworkerOnSale))
@@ -93,18 +94,19 @@ public record CoworkerBaseInfo(
     }
 
     private record ExpInfo(
-            int level, int now, int max
+            int level, int now, int max, int total
     ) {
         public static ExpInfo of(CoworkerEntity coworkerEntity) {
             return new ExpInfo(
                     coworkerEntity.getLevel().getLevel(),
                     coworkerEntity.getCurrentExp(),
-                    coworkerEntity.getLevel().getRequiredExpToNextLevel()
+                    coworkerEntity.getLevel().getRequiredExpToNextLevel(),
+                    coworkerEntity.getTotalExp()
             );
         }
 
-        public static ExpInfo of(int level) {
-            return new ExpInfo(level, 0, 0);
+        public static ExpInfo of(int level, int exp, int total) {
+            return new ExpInfo(level, exp, CoworkerLevel.of(level).getRequiredExpToNextLevel(), total);
         }
     }
 }
