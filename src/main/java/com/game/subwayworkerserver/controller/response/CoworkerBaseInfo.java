@@ -1,9 +1,11 @@
 package com.game.subwayworkerserver.controller.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.game.subwayworkerserver.domain.market.CoworkerOnSale;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
 import lombok.Builder;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record CoworkerBaseInfo(
         long id,
         String engName,
@@ -53,7 +55,6 @@ public record CoworkerBaseInfo(
                 .exp(ExpInfo.of(coworker))
                 .statList(StatsInfos.of(coworker))
                 .enabledSkills(EnabledSkills.of(coworker))
-                .selectedSkills(SelectedSkills.of(coworker))
                 .build();
     }
 
