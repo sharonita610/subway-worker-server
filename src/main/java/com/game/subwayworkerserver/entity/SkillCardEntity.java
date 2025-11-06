@@ -53,4 +53,14 @@ public class SkillCardEntity extends BaseTimeEntity {
 
     @Column(nullable = false)
     private boolean available = true;
+
+    public void activateCoworkerId(final long coworkerId) {
+        this.coworkerId = coworkerId;
+        this.inUse = true;
+    }
+
+    public void deactivateCoworkerId() {
+        this.coworkerId = null;
+        this.inUse = false;
+    }
 }

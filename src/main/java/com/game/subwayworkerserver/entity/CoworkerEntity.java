@@ -1,6 +1,8 @@
 package com.game.subwayworkerserver.entity;
 
 import com.game.subwayworkerserver.domain.baseinfo.*;
+import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.util.CharacterGenerator;
 import jakarta.persistence.*;
 import lombok.*;
@@ -263,5 +265,27 @@ public class CoworkerEntity extends BaseTimeEntity {
 
     public void setInUseTrue() {
         this.inUse = true;
+    }
+
+    public void checkUser(final long userId) {
+        if (this.userId != userId) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "Coworker does not belong to this user");
+        }
+    }
+
+    public void checkSkillAvailability(final int skillCardEnumId) {
+        // 1. 현재 장착된 모든 스킬 ID를 하나의 리스트로 통합
+        // 필드 접근 대신 Getter 메서드를 사용한다고 가정합니다.
+        List<Integer> equippedSkills = List.of(
+                this.getActiveSkill1(),
+                this.getActiveSkill2(),
+                this.getPassiveSkill1(),
+                this.getPassiveSkill2()
+        );
+
+        if (!equippedSkills.contains(skillCardEnumId)) {
+            throw new BaseException(
+                    ErrorCode.BAD_REQUEST, "해당 스킬 카드(ID: " + skillCardEnumId + ")는 장착 불가능합니다.");
+        }
     }
 }
