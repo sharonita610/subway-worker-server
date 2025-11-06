@@ -51,11 +51,8 @@ public class CoworkerController {
     }
 
     @Operation(
-            summary = "스킬 리스트 조회 [개발 중]",
-            description = "스킬 리스트 조회",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "트랩 리스트")
-            }
+            summary = "스킬 리스트 조회 [완 - 필드 확인 필]",
+            description = "스킬 리스트 조회"
     )
     @GetMapping("/coworker/skills")
     public ResponseEntity<SkillByUserResponse> getSkillListByUser(@RequestBody SkillByUserRequest request) {
