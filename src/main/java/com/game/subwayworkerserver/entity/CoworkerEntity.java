@@ -40,6 +40,9 @@ public class CoworkerEntity extends BaseTimeEntity {
     private int currentExp;
 
     @Column(nullable = false)
+    private int totalExp;
+
+    @Column(nullable = false)
     private long userId;
 
     @Column(nullable = false, length = 50)
@@ -96,7 +99,7 @@ public class CoworkerEntity extends BaseTimeEntity {
     public CoworkerEntity(String name, CoworkerLevel level, int currentExp, long userId, CoworkerType coworkerType, long hp,
                           long mana, long maxMana, long manaRecovery, long attack, long defense, boolean inUse,
                           boolean onSale, int activeSkill1, int activeSkill2, int passiveSkill1, int passiveSkill2,
-                          CoworkerElement coworkerElement, boolean available, boolean isMaterial
+                          CoworkerElement coworkerElement, boolean available, boolean isMaterial, int totalExp
     ) {
         this.name = name;
         this.level = level;
@@ -118,6 +121,7 @@ public class CoworkerEntity extends BaseTimeEntity {
         this.coworkerElement = coworkerElement;
         this.available = available;
         this.isMaterial = isMaterial;
+        this.totalExp = totalExp;
     }
 
     public static CoworkerEntity of(final long userId, final CoworkerType coworkerType) {
@@ -129,6 +133,7 @@ public class CoworkerEntity extends BaseTimeEntity {
                 .name(coworkerType.getKoreanName())
                 .level(CoworkerLevel.of(ONE))
                 .currentExp(DEFAULT)
+                .totalExp(DEFAULT)
                 .userId(userId)
                 .coworkerType(coworkerType)
                 .hp(stats.hp())
@@ -155,10 +160,12 @@ public class CoworkerEntity extends BaseTimeEntity {
         List<PassiveSkillCard> randomPassiveSkills = getRandomPassiveSkills(2);
         List<ActiveSkillCard> randomActiveSkills = getRandomActiveSkills(2);
 
+        CoworkerLevel coworkerLevel1 = CoworkerLevel.of(coworkerLevel - 1);
         return CoworkerEntity.builder()
                 .name(coworkerName)
                 .level(CoworkerLevel.of(coworkerLevel))
                 .currentExp(DEFAULT)
+                .totalExp(coworkerLevel1.getCumulativeExp() + 1)
                 .userId(userId)
                 .coworkerType(coworkerType)
                 .hp(stats.hp())
@@ -183,6 +190,7 @@ public class CoworkerEntity extends BaseTimeEntity {
                 .name(coworkerEntity.getName())
                 .level(coworkerEntity.getLevel())
                 .currentExp(coworkerEntity.getCurrentExp())
+                .totalExp(coworkerEntity.getTotalExp())
                 .userId(coworkerEntity.getUserId())
                 .coworkerType(coworkerEntity.getCoworkerType())
                 .hp(coworkerEntity.getHp())
@@ -203,10 +211,12 @@ public class CoworkerEntity extends BaseTimeEntity {
     }
 
     public static CoworkerEntity of(final long userId, final CoworkerType coworkerType, final CoworkerLevel level) {
+        CoworkerLevel coworkerLevel = CoworkerLevel.of(level.getLevel() - 1);
         return CoworkerEntity.builder()
                 .name(coworkerType.getKoreanName())
                 .level(level)
                 .currentExp(DEFAULT)
+                .totalExp(coworkerLevel.getCumulativeExp() + 1)
                 .userId(userId)
                 .coworkerType(coworkerType)
                 .hp(DEFAULT)
@@ -274,8 +284,6 @@ public class CoworkerEntity extends BaseTimeEntity {
     }
 
     public void checkSkillAvailability(final int skillCardEnumId) {
-        // 1. 현재 장착된 모든 스킬 ID를 하나의 리스트로 통합
-        // 필드 접근 대신 Getter 메서드를 사용한다고 가정합니다.
         List<Integer> equippedSkills = List.of(
                 this.getActiveSkill1(),
                 this.getActiveSkill2(),
