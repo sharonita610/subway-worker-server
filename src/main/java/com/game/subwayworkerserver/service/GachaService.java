@@ -142,7 +142,7 @@ public class GachaService {
     }
 
     private void processExtraCoworkerReward(final long userId) {
-        CoworkerEntity coworkerEntity = CoworkerEntity.of(userId, CoworkerType.getRandomAttribute(), CoworkerLevel.getSpecialCoworkerLevel());
+        CoworkerEntity coworkerEntity = CoworkerEntity.of(userId, CoworkerType.ENERZ, CoworkerLevel.getSpecialCoworkerLevel());
         coworkerRepository.save(coworkerEntity);
         log.info("User {} received MATERIAL_COWORKER reward.", userId);
     }
