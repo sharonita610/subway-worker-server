@@ -1,11 +1,18 @@
 package com.game.subwayworkerserver.service;
 
+import com.game.subwayworkerserver.controller.request.OpenLuckyGachaRequest;
+import com.game.subwayworkerserver.controller.request.OpenSkillCardRequest;
 import com.game.subwayworkerserver.controller.request.SkillByUserRequest;
 import com.game.subwayworkerserver.controller.request.SkillCardConfigureRequest;
+import com.game.subwayworkerserver.controller.response.EarnedSkillCardResponse;
 import com.game.subwayworkerserver.controller.response.SkillByCoworkerResponse;
 import com.game.subwayworkerserver.controller.response.SkillByUserResponse;
+import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
+import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
+import com.game.subwayworkerserver.domain.baseinfo.SkillCardPaymentOption;
 import com.game.subwayworkerserver.domain.skill.SkillCardType;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
+import com.game.subwayworkerserver.entity.CurrencyType;
 import com.game.subwayworkerserver.entity.SkillCardEntity;
 import com.game.subwayworkerserver.entity.UserEntity;
 import com.game.subwayworkerserver.exception.BaseException;
@@ -109,5 +116,54 @@ public class SkillCardService {
         return skillCardRepository.findById(skillCardId).orElseThrow(
                 () -> new BaseException(ErrorCode.NOT_FOUND, "Skill card not found.")
         );
+    }
+
+    @Transactional
+    public EarnedSkillCardResponse getRandomSkillCardByType(final String uuid, final OpenSkillCardRequest request) {
+        UserEntity user = getUserEntityByUuid(uuid);
+        CurrencyType currencyType = CurrencyType.confirm(request.payCondition());
+        SkillCardType skillCardType = SkillCardType.valueOf(request.skillCardType().toUpperCase());
+
+        SkillCardPaymentOption skillCardPaymentOption =
+                SkillCardPaymentOption.confirmCountAndPriceAndCardType(currencyType, request.price(), skillCardType);
+        checkUserHasEnoughTicketsToPay(request.price(), user, currencyType);
+
+        int count = skillCardPaymentOption.getCount();
+        List<SkillCardEntity> skillCardEntityList = List.of();
+
+        if (skillCardPaymentOption.getCardType().equals(ACTIVE)) {
+
+            List<ActiveSkillCard> randomCardList = ActiveSkillCard.getRandomCard(count);
+            skillCardEntityList = saveActiveSkillCards(user.getId(), randomCardList);
+        } else if (skillCardPaymentOption.getCardType().equals(PASSIVE)) {
+
+            List<PassiveSkillCard> randomCardList = PassiveSkillCard.getRandomCard(count);
+            skillCardEntityList = savePassiveSkillCards(user.getId(), randomCardList);
+
+        }
+        skillCardRepository.saveAll(skillCardEntityList);
+        return EarnedSkillCardResponse.of(skillCardEntityList);
+    }
+
+    private List<SkillCardEntity> saveActiveSkillCards(final long userId, List<ActiveSkillCard> activeSkillCards) {
+        return activeSkillCards.stream()
+                .map(activeSkillCard -> SkillCardEntity.of(userId, activeSkillCard))
+                .toList();
+    }
+
+    private List<SkillCardEntity> savePassiveSkillCards(final long userId, List<PassiveSkillCard> passiveSkillCards) {
+        return passiveSkillCards.stream()
+                .map(passiveSkillCard -> SkillCardEntity.of(userId, passiveSkillCard))
+                .toList();
+    }
+
+
+    private void checkUserHasEnoughTicketsToPay(
+            final int price, final UserEntity user, final CurrencyType currencyType
+    ) {
+        boolean enoughTickets = user.hasEnoughTickets(currencyType.getCurrencyType(), price);
+        if (!enoughTickets) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "Not enough tickets.");
+        }
     }
 }
