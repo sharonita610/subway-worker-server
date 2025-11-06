@@ -2,19 +2,18 @@ package com.game.subwayworkerserver.controller.response;
 
 
 import com.game.subwayworkerserver.domain.skill.SkillCard;
-import com.game.subwayworkerserver.domain.skill.SkillCardType;
 import com.game.subwayworkerserver.entity.SkillCardEntity;
 
 import java.util.List;
 
 public record SkillByUserResponse(
-        String type,
-        List<SkillCard> skillCardList
+        List<SkillCard> activeSkillCardList,
+        List<SkillCard> passiveSkillCardList
 ) {
-    public static SkillByUserResponse of(final SkillCardType skillCardType, final List<SkillCardEntity> skillList) {
+    public static SkillByUserResponse of(List<SkillCardEntity> activeSkillCards, List<SkillCardEntity> passiveSkillCards) {
         return new SkillByUserResponse(
-                skillCardType.name(),
-                SkillCard.of(skillList)
+                SkillCard.of(activeSkillCards),
+                SkillCard.of(passiveSkillCards)
         );
     }
 }
