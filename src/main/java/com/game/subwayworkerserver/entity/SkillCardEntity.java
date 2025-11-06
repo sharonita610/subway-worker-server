@@ -37,10 +37,10 @@ public class SkillCardEntity extends BaseTimeEntity {
     private int currentLevel = 1;
 
     @Column(nullable = false)
-    private int requiredCard = 2;
+    private int requiredCount;
 
     @Column(nullable = false)
-    private int quantity = 1;
+    private int count = 1;
 
     @Column(nullable = false)
     private int skillCardEnumId;

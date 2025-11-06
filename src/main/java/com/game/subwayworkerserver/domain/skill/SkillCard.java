@@ -15,8 +15,8 @@ public record SkillCard(
         String korName,
         String description,
         int level,
-        int requiredQuantity,
-        int quantity,
+        int requiredCount,
+        int actualCount,
         boolean inUse,
         boolean thisCoworkerUsing,
         boolean otherCoworkerUsing,
@@ -30,7 +30,7 @@ public record SkillCard(
     public SkillCard {
     }
 
-    public static List<SkillCard> of(List<SkillCardEntity> skillCardEntityList) {
+    public static List<SkillCard> of(final List<SkillCardEntity> skillCardEntityList) {
 
         return skillCardEntityList.stream()
                 .map(card -> {
@@ -43,8 +43,8 @@ public record SkillCard(
                             .korName(card.getKorName())
                             .description(description)
                             .level(card.getCurrentLevel())
-                            .requiredQuantity(card.getRequiredCard())
-                            .quantity(card.getQuantity())
+                            .requiredCount(card.getRequiredCount())
+                            .actualCount(card.getCount())
                             .inUse(card.isInUse())
                             .onSale(card.isOnSale())
                             .coworkerId(card.getCoworkerId())
@@ -71,8 +71,8 @@ public record SkillCard(
                             .korName(card.getKorName())
                             .description(description)
                             .level(card.getCurrentLevel())
-                            .requiredQuantity(card.getRequiredCard())
-                            .quantity(card.getQuantity())
+                            .requiredCount(card.getRequiredCount())
+                            .actualCount(card.getCount())
                             .inUse(isUsing)
                             .onSale(card.isOnSale())
                             .otherCoworkerUsing(otherCoworker)
