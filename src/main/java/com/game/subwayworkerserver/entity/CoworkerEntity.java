@@ -160,12 +160,18 @@ public class CoworkerEntity extends BaseTimeEntity {
         List<PassiveSkillCard> randomPassiveSkills = getRandomPassiveSkills(2);
         List<ActiveSkillCard> randomActiveSkills = getRandomActiveSkills(2);
 
-        CoworkerLevel coworkerLevel1 = CoworkerLevel.of(coworkerLevel - 1);
+        int cumulativeExp = 0;
+
+        if (coworkerLevel != ONE) {
+            CoworkerLevel coworkerLevel1 = CoworkerLevel.of(coworkerLevel - 1);
+            cumulativeExp = coworkerLevel1.getCumulativeExp() + 1;
+        }
         return CoworkerEntity.builder()
                 .name(coworkerName)
                 .level(CoworkerLevel.of(coworkerLevel))
                 .currentExp(DEFAULT)
-                .totalExp(coworkerLevel1.getCumulativeExp() + 1)
+                .totalExp(cumulativeExp)
+                .totalExp(1)
                 .userId(userId)
                 .coworkerType(coworkerType)
                 .hp(stats.hp())
@@ -211,12 +217,18 @@ public class CoworkerEntity extends BaseTimeEntity {
     }
 
     public static CoworkerEntity of(final long userId, final CoworkerType coworkerType, final CoworkerLevel level) {
-        CoworkerLevel coworkerLevel = CoworkerLevel.of(level.getLevel() - 1);
+        int cumulativeExp = 0;
+
+        if (level.getLevel() != ONE) {
+            CoworkerLevel coworkerLevel1 = CoworkerLevel.of(level.getLevel() - 1);
+            cumulativeExp = coworkerLevel1.getCumulativeExp() + 1;
+        }
+
         return CoworkerEntity.builder()
                 .name(coworkerType.getKoreanName())
                 .level(level)
                 .currentExp(DEFAULT)
-                .totalExp(coworkerLevel.getCumulativeExp() + 1)
+                .totalExp(cumulativeExp)
                 .userId(userId)
                 .coworkerType(coworkerType)
                 .hp(DEFAULT)

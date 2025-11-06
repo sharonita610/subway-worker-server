@@ -118,7 +118,8 @@ public class UserService {
         UserEntity user = findUserBy(uuid);
         List<CoworkerEntity> coworkerEntityList = coworkerRepository.findByUserIdAndOnSaleFalseAndAvailableTrue(user.getId());
         List<CoworkerEntity> sortedCoworkerList = coworkerListFilter.sort(coworkerEntityList);
-        return CoworkerListResponse.of(sortedCoworkerList);
+        List<UserGachaEntity> treasureList = gachaRepository.findAllByUserId(user.getId());
+        return CoworkerListResponse.of(sortedCoworkerList, treasureList);
     }
 
     public List<String> getAllUserUuids() {
