@@ -3,10 +3,8 @@ package com.game.subwayworkerserver.controller;
 import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.CaptureItemListResponse;
 import com.game.subwayworkerserver.controller.request.UserCreateRequest;
-import com.game.subwayworkerserver.controller.response.CoworkerListResponse;
-import com.game.subwayworkerserver.controller.response.SkillListResponse;
-import com.game.subwayworkerserver.controller.response.TrapItemListResponse;
-import com.game.subwayworkerserver.controller.response.UserResponse;
+import com.game.subwayworkerserver.controller.response.*;
+import com.game.subwayworkerserver.service.SkillCardService;
 import com.game.subwayworkerserver.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final SkillCardService skillCardService;
 
     @Operation(
             summary = "사용자 이름 중복 체크 [완]",
@@ -116,5 +115,18 @@ public class UserController {
         String uuid = SecurityUtils.getCurrentUserUuid();
         userService.deleteUser(uuid);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "유저가 가지고 있는 스킬 카드 전체 조회 [완]",
+            description = "동료 리스트를 조회",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "동료 리스트")
+            }
+    )
+    @GetMapping("/user/skillCards")
+    public ResponseEntity<SkillByUserResponse> getUserSkillCards(@RequestParam("type") String type) {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        return ResponseEntity.ok(skillCardService.getUserSkillCards(uuid, type));
     }
 }
