@@ -26,7 +26,7 @@ public class SkillCardService {
     private final CoworkerRepository coworkerId;
     private final SkillCardRepository skillCardRepository;
 
-    public SkillByCoworkerResponse getSkillListByUser(String uuid, SkillByUserRequest request) {
+    public SkillByCoworkerResponse getSkillListByUserAndCoworker(String uuid, SkillByUserRequest request) {
         UserEntity user = getUserEntityByUuid(uuid);
 
         CoworkerEntity coworkerEntity = coworkerId.findById(request.coworkerId()).orElseThrow(
@@ -47,7 +47,7 @@ public class SkillCardService {
 
         List<SkillCardEntity> skillCardEntityList =
                 skillCardRepository.findAllUserIdAndAvailableTrueAndSkillCardEnumIdIn(user.getId(), requestedSkill);
-        return SkillByCoworkerResponse.of(skillCardType, requestedSkill, skillCardEntityList);
+        return SkillByCoworkerResponse.of(skillCardEntityList, coworkerEntity.getId());
     }
 
     private UserEntity getUserEntityByUuid(final String uuid) {
