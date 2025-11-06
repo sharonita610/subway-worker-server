@@ -8,17 +8,17 @@ import com.game.subwayworkerserver.entity.SkillCardEntity;
 
 import java.util.List;
 
-public record SkillByUserResponse(
+public record SkillByCoworkerResponse(
         SkillCardType skillCardType,
         List<SkillCardNameInfo> enabledSkills,
         List<SkillCard> skillCardList
 ) {
-    public static SkillByUserResponse of(
+    public static SkillByCoworkerResponse of(
             SkillCardType skillCardType,
             List<Integer> requestedSkill,
             final List<SkillCardEntity> skillCardEntityList
     ) {
-        return new SkillByUserResponse(
+        return new SkillByCoworkerResponse(
                 skillCardType,
                 SkillCardNameInfo.of(skillCardType, requestedSkill),
                 SkillCard.of(skillCardEntityList)
