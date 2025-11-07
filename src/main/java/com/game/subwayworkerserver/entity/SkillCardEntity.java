@@ -3,8 +3,12 @@ package com.game.subwayworkerserver.entity;
 import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import com.game.subwayworkerserver.domain.skill.SkillCardType;
+import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.Map;
 
 @Getter
 @Entity
@@ -12,6 +16,16 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SkillCardEntity extends BaseTimeEntity {
+
+    private static final int SKILL_MAX_LEVEL = 5;
+
+    // Level 1에서 Level 4까지의 요구 갯수를 정의 (Level 5로 가기 위한 요구 갯수는 4)
+    private static final Map<Integer, Integer> LEVEL_UP_REQUIREMENTS_MAP = Map.of(
+            1, 1,
+            2, 2,
+            3, 3,
+            4, 4
+    );
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -115,5 +129,25 @@ public class SkillCardEntity extends BaseTimeEntity {
     public void deactivateCoworkerId() {
         this.coworkerId = 0L;
         this.inUse = false;
+    }
+
+    public void isMaxLevel() {
+        if (this.currentLevel >= SKILL_MAX_LEVEL) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "Skill card is already at max level.");
+        }
+    }
+
+    public void updateFinalState(int newLevel, int finalCount) {
+        this.currentLevel = newLevel;
+        this.count = finalCount;
+
+        // 다음 레벨로 가기 위해 필요한 카드 갯수를 엔티티의 requiredCount 필드에 업데이트
+        if (newLevel < SKILL_MAX_LEVEL) {
+            // 다음 레벨이 되기 위해 필요한 갯수 (예: newLevel이 3이면 다음 Lv4로 가기 위해 3장이 필요)
+            this.requiredCount = LEVEL_UP_REQUIREMENTS_MAP.getOrDefault(newLevel, 0);
+        } else {
+            // 만렙 도달 시
+            this.requiredCount = 0;
+        }
     }
 }
