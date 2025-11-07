@@ -16,10 +16,16 @@ public record SkillCardOnSale(
         String description,
         boolean inUse,
         boolean onSale,
+        boolean available,
+        int currentLevel,
+        int requiredCount,
+        int count,
+        int skillCardEnumId,
         int price,
         long sellerId,
         boolean isPaid,
-        boolean isSold
+        boolean isSold,
+        String cardType
 
 
 ) {
@@ -59,14 +65,20 @@ public record SkillCardOnSale(
                             .sellerId(market.getSellerId())
                             .isPaid(market.isPaid())
                             .isSold(market.isSold())
+                            .available(market.isAvailable())
 
                             // SkillCardEntity (상세 스킬 정보)
                             // SkillCardEntity의 name 필드가 영어 이름이라고 가정
                             .engName(card.getEngName())
                             .korName(card.getKorName())
                             .description("d")
+                            .currentLevel(card.getCurrentLevel())
+                            .requiredCount(card.getRequiredCount())
+                            .skillCardEnumId(card.getSkillCardEnumId())
+                            .count(card.getCount())
                             .inUse(card.isInUse())
                             .onSale(card.isOnSale())
+                            .cardType(card.getType().name())
                             .build();
                 })
                 .filter(java.util.Objects::nonNull)
