@@ -7,7 +7,7 @@ import com.game.subwayworkerserver.entity.UserGachaEntity;
 import java.util.List;
 
 public record CoworkerListResponse(
-        List<CoworkerBaseInfo> cowokerList
+        List<CoworkerBaseInfo> coworkerList
 ) {
     public static CoworkerListResponse of(
             final List<CoworkerEntity> coworkerEntityList,
