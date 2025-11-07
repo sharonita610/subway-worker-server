@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.stream.Stream;
 
 @Component
 public class SkillCardListFilter {
@@ -23,15 +24,50 @@ public class SkillCardListFilter {
 
     private Comparator<SkillCardEntity> createDefaultEntityComparator() {
         return Comparator
-                // 1순위: 현재 레벨 높은 순 (내림차순)
                 .comparing(SkillCardEntity::getCurrentLevel, Comparator.reverseOrder())
-                // 2순위: 같은 레벨이라면 현재 보유 수량(quantity) 많은 순 (내림차순)
                 .thenComparing(SkillCardEntity::getCount, Comparator.reverseOrder())
-                // 3순위: 같은 수량이라면 한글 이름 가나다 순 (오름차순)
                 .thenComparing(SkillCardEntity::getKorName);
     }
 
-    public List<SkillCardOnSale> filter(List<SkillCardOnSale> coworkerOnSalesDomainList, SkillCardFilterRequest request) {
-        return null;
+    public List<SkillCardOnSale> filter(List<SkillCardOnSale> cards, SkillCardFilterRequest request) {
+        Stream<SkillCardOnSale> stream = cards.stream();
+
+        if (request.levels() != null && !request.levels().isEmpty()) {
+            stream = stream.filter(card -> request.levels().contains(card.currentLevel()));
+        }
+
+        List<String> combinedSkills = getCombinedSkills(request);
+        if (!combinedSkills.isEmpty()) {
+            stream = stream.filter(card -> combinedSkills.contains(card.korName()));
+        }
+
+        stream = stream.sorted(getComparator(request.sortType()));
+
+        return stream.toList();
+    }
+
+    private Comparator<SkillCardOnSale> getComparator(String sortType) {
+        if (sortType == null) {
+            return Comparator.comparing(SkillCardOnSale::currentLevel).reversed();
+        }
+
+        SkillSortType type = SkillSortType.fromKoreanName(sortType);
+
+        return switch (type) {
+            case PRICE_ASC -> Comparator.comparing(SkillCardOnSale::price);
+            case LEVEL_DESC -> Comparator.comparing(SkillCardOnSale::currentLevel).reversed();
+            case PRICE_DESC, DEFAULT -> Comparator.comparing(SkillCardOnSale::price).reversed();
+        };
+    }
+
+    private List<String> getCombinedSkills(SkillCardFilterRequest request) {
+        List<String> combined = new java.util.ArrayList<>();
+        if (request.passiveSkills() != null) {
+            combined.addAll(request.passiveSkills());
+        }
+        if (request.activeSkills() != null) {
+            combined.addAll(request.activeSkills());
+        }
+        return combined;
     }
 }
