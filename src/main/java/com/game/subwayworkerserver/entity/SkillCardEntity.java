@@ -19,14 +19,6 @@ public class SkillCardEntity extends BaseTimeEntity {
 
     private static final int SKILL_MAX_LEVEL = 5;
 
-    // Level 1에서 Level 4까지의 요구 갯수를 정의 (Level 5로 가기 위한 요구 갯수는 4)
-    private static final Map<Integer, Integer> LEVEL_UP_REQUIREMENTS_MAP = Map.of(
-            1, 1,
-            2, 2,
-            3, 3,
-            4, 4
-    );
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
