@@ -1,11 +1,12 @@
 package com.game.subwayworkerserver.service;
 
-import com.game.subwayworkerserver.controller.request.OpenLuckyGachaRequest;
 import com.game.subwayworkerserver.controller.request.OpenSkillCardRequest;
 import com.game.subwayworkerserver.controller.request.SkillByUserRequest;
 import com.game.subwayworkerserver.controller.request.SkillCardConfigureRequest;
+import com.game.subwayworkerserver.controller.request.UpgradeRequest;
 import com.game.subwayworkerserver.controller.response.EarnedSkillCardResponse;
 import com.game.subwayworkerserver.controller.response.SkillByCoworkerResponse;
+import com.game.subwayworkerserver.controller.response.SkillListBySkillIdResponse;
 import com.game.subwayworkerserver.controller.response.SkillByUserResponse;
 import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
@@ -165,5 +166,22 @@ public class SkillCardService {
         if (!enoughTickets) {
             throw new BaseException(ErrorCode.BAD_REQUEST, "Not enough tickets.");
         }
+    }
+
+    public SkillListBySkillIdResponse getSkillsAvailableToUpgrade(final String uuid, final long skillCardId) {
+        UserEntity user = getUserEntityByUuid(uuid);
+        SkillCardEntity skillCard = skillCardRepository.findById(skillCardId).orElseThrow(
+                () -> new BaseException(ErrorCode.NOT_FOUND, "Skill card not found.")
+        );
+        int skillCardEnumId = skillCard.getSkillCardEnumId();
+        List<SkillCardEntity> skillCardList =
+                skillCardRepository.findAllByUserIdAndSkillCardEnumIdAndAvailableTrueAndOnSaleFalse(user.getId(), skillCardEnumId);
+
+        return SkillListBySkillIdResponse.of(skillCardList);
+
+    }
+
+    public SkillListBySkillIdResponse upgradeCard(String uuid, UpgradeRequest request) {
+        return null;
     }
 }
