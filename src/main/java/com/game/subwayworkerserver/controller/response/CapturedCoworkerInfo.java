@@ -10,13 +10,13 @@ public record CapturedCoworkerInfo(
         String coworkerName,
         String position,
         String baseHpRange,
-        String baseManaRange,
+        String baseInitManaRange,
         String baseMaxManaRange,
         String baseAttackRange,
         String baseDefenseRange,
         String baseManaRecoveryRange,
         long hp,
-        long mana,
+        long initMana,
         long maxMana,
         long attack,
         long defense,
@@ -37,13 +37,13 @@ public record CapturedCoworkerInfo(
                 .coworkerName(coworker.getName())
                 .position(position)
                 .baseHpRange(type.getHpRange().min() + "~"  + type.getHpRange().max())
-                .baseManaRange(type.getMpNowRange().min() + "~"  + type.getMpNowRange().max())
+                .baseInitManaRange(type.getMpNowRange().min() + "~"  + type.getMpNowRange().max())
                 .baseMaxManaRange(type.getMpMaxRange().min() + "~"  + type.getMpMaxRange().max())
                 .baseAttackRange(type.getAttackRange().min() + "~" + type.getAttackRange().max())
                 .baseDefenseRange(type.getDefenseRange().min() + "~" + type.getDefenseRange().max())
                 .baseManaRecoveryRange(String.valueOf(type.getManaRecovery()))
                 .hp(coworker.getHp())
-                .mana(coworker.getMana())
+                .initMana(coworker.getInitMana())
                 .maxMana(coworker.getMaxMana())
                 .attack(coworker.getAttack())
                 .defense(coworker.getDefense())

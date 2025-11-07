@@ -151,7 +151,7 @@ public record CoworkerBaseInfo(
 
 
             StatBaseInfo hpInfo = StatBaseInfo.of(coworker.getHp(), hpBonus);
-            StatBaseInfo manaInfo = StatBaseInfo.of(coworker.getMana(), 0L);
+            StatBaseInfo manaInfo = StatBaseInfo.of(coworker.getInitMana(), 0L);
             StatBaseInfo maxManaInfo = StatBaseInfo.of(coworker.getMaxMana(), 0L);
             StatBaseInfo attackInfo = StatBaseInfo.of(coworker.getAttack(), attackBonus);
             StatBaseInfo defenseInfo = StatBaseInfo.of(coworker.getDefense(), defenseBonus);
@@ -164,7 +164,7 @@ public record CoworkerBaseInfo(
 
             return new StatsInfos(
                     StatBaseInfo.of(coworkerOnSale.hp(), 0L),
-                    StatBaseInfo.of(coworkerOnSale.mana(), 0L),
+                    StatBaseInfo.of(coworkerOnSale.initMana(), 0L),
                     StatBaseInfo.of(coworkerOnSale.maxMana(), 0L),
                     StatBaseInfo.of(coworkerOnSale.attack(), 0L),
                     StatBaseInfo.of(coworkerOnSale.defense(), 0L),

@@ -21,7 +21,7 @@ public record CoworkerTotal(
         long hp,
         long attack,
         long defense,
-        long mana,
+        long initMana,
         long maxMana,
         long manaRecovery,
         long treasureHp,

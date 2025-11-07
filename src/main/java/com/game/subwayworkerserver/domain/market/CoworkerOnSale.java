@@ -26,7 +26,7 @@ public record CoworkerOnSale(
         long hp,
         long attack,
         long defense,
-        long mana,
+        long initMana,
         long maxMana,
         long manaRecovery,
         int activeSkillId1,
@@ -79,7 +79,7 @@ public record CoworkerOnSale(
                             .hp(coworker.getHp())
                             .attack(coworker.getAttack())
                             .defense(coworker.getDefense())
-                            .mana(coworker.getMana())
+                            .initMana(coworker.getInitMana())
                             .maxMana(coworker.getMaxMana())
                             .manaRecovery(coworker.getManaRecovery())
                             .activeSkillId1(coworker.getActiveSkill1())

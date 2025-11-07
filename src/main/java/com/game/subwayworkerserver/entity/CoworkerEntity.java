@@ -53,7 +53,7 @@ public class CoworkerEntity extends BaseTimeEntity {
     private long hp;
 
     @Column(nullable = false)
-    private long mana;
+    private long initMana;
 
     @Column(nullable = false)
     private long maxMana;
@@ -97,7 +97,7 @@ public class CoworkerEntity extends BaseTimeEntity {
 
     @Builder
     public CoworkerEntity(String name, CoworkerLevel level, int currentExp, long userId, CoworkerType coworkerType, long hp,
-                          long mana, long maxMana, long manaRecovery, long attack, long defense, boolean inUse,
+                          long initMana, long maxMana, long manaRecovery, long attack, long defense, boolean inUse,
                           boolean onSale, int activeSkill1, int activeSkill2, int passiveSkill1, int passiveSkill2,
                           CoworkerElement coworkerElement, boolean available, boolean isMaterial, int totalExp
     ) {
@@ -107,7 +107,7 @@ public class CoworkerEntity extends BaseTimeEntity {
         this.userId = userId;
         this.coworkerType = coworkerType;
         this.hp = hp;
-        this.mana = mana;
+        this.initMana = initMana;
         this.maxMana = maxMana;
         this.manaRecovery = manaRecovery;
         this.attack = attack;
@@ -137,7 +137,7 @@ public class CoworkerEntity extends BaseTimeEntity {
                 .userId(userId)
                 .coworkerType(coworkerType)
                 .hp(stats.hp())
-                .mana(stats.mpNow())
+                .initMana(stats.mpNow())
                 .maxMana(stats.mpMax())
                 .manaRecovery(stats.manaRecovery())
                 .attack(stats.attack())
@@ -175,7 +175,7 @@ public class CoworkerEntity extends BaseTimeEntity {
                 .userId(userId)
                 .coworkerType(coworkerType)
                 .hp(stats.hp())
-                .mana(stats.mpNow())
+                .initMana(stats.mpNow())
                 .maxMana(stats.mpMax())
                 .manaRecovery(stats.manaRecovery())
                 .attack(stats.attack())
@@ -200,7 +200,7 @@ public class CoworkerEntity extends BaseTimeEntity {
                 .userId(coworkerEntity.getUserId())
                 .coworkerType(coworkerEntity.getCoworkerType())
                 .hp(coworkerEntity.getHp())
-                .mana(coworkerEntity.getMana())
+                .initMana(coworkerEntity.getInitMana())
                 .maxMana(coworkerEntity.getMaxMana())
                 .manaRecovery(coworkerEntity.getManaRecovery())
                 .attack(coworkerEntity.getAttack())
@@ -232,7 +232,7 @@ public class CoworkerEntity extends BaseTimeEntity {
                 .userId(userId)
                 .coworkerType(coworkerType)
                 .hp(DEFAULT)
-                .mana(DEFAULT)
+                .initMana(DEFAULT)
                 .maxMana(DEFAULT)
                 .manaRecovery(DEFAULT)
                 .attack(DEFAULT)
