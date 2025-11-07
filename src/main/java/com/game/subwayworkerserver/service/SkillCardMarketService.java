@@ -101,4 +101,15 @@ public class SkillCardMarketService {
             throw new BaseException(BAD_REQUEST, "Not enough coin");
         }
     }
+
+    @Transactional
+    public void cancelSellingMySkillCard(final String uuid, final long marketId) {
+        UserEntity user = findUserByUuid(uuid);
+        SkillCardMarketEntity skillCardMarket = skillCardMarketRepository.findByIdAndAvailableTrueAndSoldFalse(marketId).orElseThrow(
+                () -> new BaseException(NOT_FOUND, "SkillCard already sold.")
+        );
+        SkillCardEntity skillCard = getSkillCardRepositoryByUserIdAndId(user.getId(), skillCardMarket.getSkillCardId());
+        skillCard.cancelSelling();
+        skillCardMarketRepository.delete(skillCardMarket);
+    }
 }
