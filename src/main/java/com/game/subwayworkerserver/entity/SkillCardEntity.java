@@ -141,12 +141,9 @@ public class SkillCardEntity extends BaseTimeEntity {
         this.currentLevel = newLevel;
         this.count = finalCount;
 
-        // 다음 레벨로 가기 위해 필요한 카드 갯수를 엔티티의 requiredCount 필드에 업데이트
         if (newLevel < SKILL_MAX_LEVEL) {
-            // 다음 레벨이 되기 위해 필요한 갯수 (예: newLevel이 3이면 다음 Lv4로 가기 위해 3장이 필요)
-            this.requiredCount = LEVEL_UP_REQUIREMENTS_MAP.getOrDefault(newLevel, 0);
+            this.requiredCount = newLevel + 1;
         } else {
-            // 만렙 도달 시
             this.requiredCount = 0;
         }
     }
