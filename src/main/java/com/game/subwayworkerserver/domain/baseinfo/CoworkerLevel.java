@@ -88,9 +88,9 @@ public enum CoworkerLevel {
     public int getBaseXpForMaterial() {
         return switch (this) {
             case INTERN -> 200;
-            case WORKER -> 300; // 2Lv = 300
-            case SENIOR -> 600; // 3Lv = 600
-            case ASSISTANT_MANAGER -> 800;
+            case WORKER -> 300;
+            case SENIOR -> 500;
+            case ASSISTANT_MANAGER -> 700;
             case MANAGER -> 1000;
             case TEAM_LEADER -> 1500;
             case CHIEF -> 0;
