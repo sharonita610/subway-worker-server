@@ -113,6 +113,23 @@ public class SkillCardEntity extends BaseTimeEntity {
                 .build();
     }
 
+    public static SkillCardEntity copyEntityForRegistration(SkillCardEntity soldCard) {
+        return SkillCardEntity.builder()
+                .userId(soldCard.getUserId())
+                .engName(soldCard.getEngName())
+                .korName(soldCard.getKorName())
+                .type(soldCard.getType())
+                .currentLevel(soldCard.getCurrentLevel())
+                .requiredCount(soldCard.getRequiredCount())
+                .count(soldCard.getCount())
+                .skillCardEnumId(soldCard.getSkillCardEnumId())
+                .inUse(false)
+                .onSale(false)
+                .available(false)
+                .coworkerId(soldCard.getCoworkerId())
+                .build();
+    }
+
     public void activateCoworkerId(final long coworkerId) {
         this.coworkerId = coworkerId;
         this.inUse = true;
@@ -146,5 +163,11 @@ public class SkillCardEntity extends BaseTimeEntity {
 
     public void paidDone() {
         this.onSale = false;
+    }
+
+    public void registerNewUser(final long buyerId) {
+        this.userId = buyerId;
+        this.onSale = false;
+        this.available = true;
     }
 }
