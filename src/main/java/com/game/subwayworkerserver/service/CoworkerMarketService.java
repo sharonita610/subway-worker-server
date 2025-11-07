@@ -72,14 +72,14 @@ public class CoworkerMarketService {
         Long userId = user.getId();
         checkUserCoin(request.registrationFee(), user);
 
-        CoworkerEntity coworkerEntity = coworkerRepository.findByUserIdAndId(userId, request.coworkerId()).orElseThrow(
+        CoworkerEntity coworkerEntity = coworkerRepository.findByUserIdAndId(userId, request.targetId()).orElseThrow(
                 () -> new BaseException(NOT_FOUND, "CoworkerId not found.")
         );
 
         if (coworkerEntity.isInUse()) {
             throw new BaseException(BAD_REQUEST, "CoworkerId is already in use.");
         }
-        boolean coworkerOnMarket = coworkerMarketRepository.existsByCoworkerIdAndSellerId(request.coworkerId(), userId);
+        boolean coworkerOnMarket = coworkerMarketRepository.existsByCoworkerIdAndSellerId(request.targetId(), userId);
         if (coworkerOnMarket) {
             throw new BaseException(BAD_REQUEST, "동료는 이미 판매중입니다.");
         }

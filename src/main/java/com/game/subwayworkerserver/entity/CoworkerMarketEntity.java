@@ -68,7 +68,7 @@ public class CoworkerMarketEntity extends BaseTimeEntity {
                 request.sellingPrice(),
                 request.sellingCommission(),
                 CurrencyType.VACATION_TICKET,
-                request.coworkerId(),
+                request.targetId(),
                 true
         );
     }
