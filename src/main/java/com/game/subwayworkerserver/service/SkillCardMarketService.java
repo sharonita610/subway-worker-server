@@ -3,11 +3,10 @@ package com.game.subwayworkerserver.service;
 import com.game.subwayworkerserver.controller.request.SellingRequest;
 import com.game.subwayworkerserver.controller.request.SkillCardFilterRequest;
 import com.game.subwayworkerserver.controller.response.GlobalSkillCardResponse;
+import com.game.subwayworkerserver.controller.response.PaymentSuccessResponse;
 import com.game.subwayworkerserver.controller.response.SkillOnSaleResponse;
 import com.game.subwayworkerserver.domain.market.SkillCardOnSale;
-import com.game.subwayworkerserver.entity.SkillCardEntity;
-import com.game.subwayworkerserver.entity.SkillCardMarketEntity;
-import com.game.subwayworkerserver.entity.UserEntity;
+import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.repository.SkillCardMarketRepository;
 import com.game.subwayworkerserver.repository.SkillCardRepository;
@@ -111,5 +110,28 @@ public class SkillCardMarketService {
         SkillCardEntity skillCard = getSkillCardRepositoryByUserIdAndId(user.getId(), skillCardMarket.getSkillCardId());
         skillCard.cancelSelling();
         skillCardMarketRepository.delete(skillCardMarket);
+    }
+
+    @Transactional
+    public PaymentSuccessResponse getSkillCardSoldPayment(final String uuid, final long marketId) {
+        UserEntity user = findUserByUuid(uuid);
+        SkillCardMarketEntity skillCardMarketEntity =
+                skillCardMarketRepository.findByIdAndSellerIdAndSoldTrueAndIsPaidFalseAndAvailableFalse(marketId, user.getId())
+                        .orElseThrow(
+                                () -> new BaseException(NOT_FOUND, "Coworker not found on market.")
+                        );
+
+        int skillCardRealPrice = skillCardMarketEntity.getPrice() - skillCardMarketEntity.getCommission();
+        user.increaseVacationTicket(skillCardRealPrice);
+        skillCardMarketEntity.paidDone();
+
+        skillCardRepository.findByIdAndOnSaleTrue(skillCardMarketEntity.getSkillCardId())
+                .ifPresent(SkillCardEntity::paidDone);
+
+        return PaymentSuccessResponse.of(
+                skillCardMarketEntity.getPrice(),
+                skillCardMarketEntity.getCommission(),
+                skillCardRealPrice
+        );
     }
 }
