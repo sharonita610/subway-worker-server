@@ -73,4 +73,15 @@ public class SkillCardMarketEntity extends BaseTimeEntity {
     public void paidDone() {
         this.isPaid = true;
     }
+
+    public void purchase(final long buyerId) {
+        this.buyerId = buyerId;
+        this.soldTime = LocalDateTime.now();
+        this.sold = true;
+        this.available = false;
+    }
+
+    public void changeSkillCardId(final long newSkillCardId) {
+        this.skillCardId = newSkillCardId;
+    }
 }
