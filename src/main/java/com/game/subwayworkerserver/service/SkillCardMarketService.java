@@ -2,6 +2,7 @@ package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.SkillCardFilterRequest;
 import com.game.subwayworkerserver.controller.response.GlobalSkillCardResponse;
+import com.game.subwayworkerserver.controller.response.SkillOnSaleResponse;
 import com.game.subwayworkerserver.domain.market.SkillCardOnSale;
 import com.game.subwayworkerserver.entity.SkillCardEntity;
 import com.game.subwayworkerserver.entity.SkillCardMarketEntity;
@@ -51,5 +52,14 @@ public class SkillCardMarketService {
         return marketSkillCardLists.stream()
                 .map(SkillCardMarketEntity::getSkillCardId)
                 .toList();
+    }
+
+    public SkillOnSaleResponse getMySkillCardOnSale(final String uuid) {
+        UserEntity user = findUserByUuid(uuid);
+        List<SkillCardMarketEntity> skillCardOnSale = skillCardMarketRepository.findAllBySellerId(user.getId());
+        List<Long> skillCardIds = getSkillCardIds(skillCardOnSale);
+        List<SkillCardEntity> skillCardEntityList = skillCardRepository.findAllByIdInAndOnSaleTrue(skillCardIds);
+        List<SkillCardOnSale> coworkerOnSalesDomainList = SkillCardOnSale.toDomain(skillCardOnSale, skillCardEntityList);
+        return SkillOnSaleResponse.of(coworkerOnSalesDomainList);
     }
 }
