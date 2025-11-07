@@ -114,7 +114,7 @@ public class MarketController {
             description = "장터에 올라온 스킬카드를 구매하기"
     )
     @PostMapping("/market/global/buy-skill")
-    public ResponseEntity<Void> buySkillCard(@RequestParam("id") long skillId){
+    public ResponseEntity<Void> buySkillCard(@RequestParam("id") long marketId){
         String uuid = SecurityUtils.getCurrentUserUuid();
 
         return ResponseEntity.ok().build();
@@ -143,13 +143,12 @@ public class MarketController {
     }
 
     @Operation(
-            summary = "판매 완료된 스킬카드 정산",
+            summary = "판매 완료된 스킬카드 정산 [test]",
             description = "장터에 내놓았던 스킬카드가 판매되어 정산 요청"
     )
     @GetMapping("/market/skill/get-paid")
-    public ResponseEntity<PaymentSuccessResponse> getSillPaid(@RequestParam("id") long skillId){
+    public ResponseEntity<PaymentSuccessResponse> getSillPaid(@RequestParam("id") long marketId){
         String uuid = SecurityUtils.getCurrentUserUuid();
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(skillCardMarketService.getSkillCardSoldPayment(uuid, marketId));
     }
 }
