@@ -90,7 +90,7 @@ public class CoworkerController {
     }
 
     @Operation(
-            summary = "유저 강화하기 [개발 중] ",
+            summary = "유저 강화하기 [완] ",
             description = "유저를 강화하기 위한 요청을 한다."
     )
     @PostMapping("/coworker/upgrade")
