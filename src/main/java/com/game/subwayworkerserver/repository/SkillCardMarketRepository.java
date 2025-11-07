@@ -8,4 +8,6 @@ import java.util.List;
 public interface SkillCardMarketRepository extends JpaRepository<SkillCardMarketEntity, Long> {
 
     List<SkillCardMarketEntity> findAllByAvailableTrueAndSoldFalseAndSellerIdNot(final long sellerId);
+
+    List<SkillCardMarketEntity> findAllBySellerId(final long sellerId);
 }
