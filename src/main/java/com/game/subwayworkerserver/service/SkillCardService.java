@@ -198,7 +198,7 @@ public class SkillCardService {
         final int totalCost = getTotalCost(materialCount, request.price());
         user.checkAndPurchase(totalCost);
 
-        UpgradeResult result = upgradeExecutor.executeUpgradeLogic(targetCard, materialCount);
+        UpgradeResult result = upgradeExecutor.executeSkillCardLogic(targetCard, materialCount);
 
         targetCard.updateFinalState(result.finalLevel(), result.finalCount());
         skillCardRepository.deleteAll(materialCards);
