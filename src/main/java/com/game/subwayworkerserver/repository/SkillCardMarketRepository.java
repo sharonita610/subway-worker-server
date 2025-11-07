@@ -10,4 +10,6 @@ public interface SkillCardMarketRepository extends JpaRepository<SkillCardMarket
     List<SkillCardMarketEntity> findAllByAvailableTrueAndSoldFalseAndSellerIdNot(final long sellerId);
 
     List<SkillCardMarketEntity> findAllBySellerId(final long sellerId);
+
+    boolean existsBySkillCardIdAndSellerId(final long skillCardId, long sellerId);
 }
