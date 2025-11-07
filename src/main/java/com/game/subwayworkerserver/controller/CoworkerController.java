@@ -5,10 +5,7 @@ import com.game.subwayworkerserver.controller.request.PartnerConfigureRequest;
 import com.game.subwayworkerserver.controller.request.SkillByUserRequest;
 import com.game.subwayworkerserver.controller.request.SkillCardConfigureRequest;
 import com.game.subwayworkerserver.controller.request.UpgradeRequest;
-import com.game.subwayworkerserver.controller.response.CoworkerTypesResponse;
-import com.game.subwayworkerserver.controller.response.SkillByCoworkerResponse;
-import com.game.subwayworkerserver.controller.response.SkillListBySkillIdResponse;
-import com.game.subwayworkerserver.controller.response.UserUpgradeResponse;
+import com.game.subwayworkerserver.controller.response.*;
 import com.game.subwayworkerserver.service.CoworkerService;
 import com.game.subwayworkerserver.service.SkillCardService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -71,17 +68,15 @@ public class CoworkerController {
         return ResponseEntity.ok(skillCardService.getSkillsAvailableToUpgrade(uuid, skillCardId));
     }
 
-
     @Operation(
-            summary = "카드 강화하기",
+            summary = "카드 강화하기 [개발 중] ",
             description = "강화가 가능한 동일한 카드만 조회하는 기능"
     )
     @PostMapping("/skills/upgrade")
-    public ResponseEntity<SkillListBySkillIdResponse> upgradeCard(@RequestBody UpgradeRequest request) {
+    public ResponseEntity<UpgradedSkillCardResponse> upgradeCard(@RequestBody UpgradeRequest request) {
         String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok(skillCardService.upgradeCard(uuid, request));
     }
-
 
     @Operation(
             summary = "스킬카드를 파트너에게 장착 또는 제거하기 [완]",
