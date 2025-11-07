@@ -7,10 +7,7 @@ import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
-import com.game.subwayworkerserver.repository.CoworkerRepository;
-import com.game.subwayworkerserver.repository.UserGachaRepository;
-import com.game.subwayworkerserver.repository.UserItemMapRepository;
-import com.game.subwayworkerserver.repository.UserRepository;
+import com.game.subwayworkerserver.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +24,7 @@ public class UserService {
     private final UserItemMapRepository userItemMapRepository;
     private final CoworkerListFilter coworkerListFilter;
     private final UserGachaRepository gachaRepository;
+    private final SkillCardRepository skillCardRepository;
 
 
     public Boolean verifyUserName(final String name) {
@@ -118,7 +116,9 @@ public class UserService {
         UserEntity user = findUserBy(uuid);
         List<CoworkerEntity> coworkerEntityList = coworkerRepository.findByUserIdAndOnSaleFalseAndAvailableTrue(user.getId());
         List<CoworkerEntity> sortedCoworkerList = coworkerListFilter.sort(coworkerEntityList);
-        return CoworkerListResponse.of(sortedCoworkerList);
+        List<UserGachaEntity> treasureList = gachaRepository.findAllByUserId(user.getId());
+        List<SkillCardEntity> skillCardList = skillCardRepository.findAllByUserIdAndInUseTrueAndAvailableTrue(user.getId());
+        return CoworkerListResponse.of(sortedCoworkerList, treasureList, skillCardList);
     }
 
     public List<String> getAllUserUuids() {

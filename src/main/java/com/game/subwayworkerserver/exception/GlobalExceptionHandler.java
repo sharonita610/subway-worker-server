@@ -3,6 +3,7 @@ package com.game.subwayworkerserver.exception;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -94,5 +95,32 @@ public class GlobalExceptionHandler {
                 .path(((ServletWebRequest) request).getRequest().getRequestURI())
                 .build();
 
-        return new ResponseEntity<>(response, errorCode.getStatus());    }
+        return new ResponseEntity<>(response, errorCode.getStatus());
+    }
+
+    /**
+     * 지원하지 않는 HTTP Method로 요청 시 발생하는 예외 처리 (HTTP 405 Method Not Allowed)
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    protected ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(
+            HttpRequestMethodNotSupportedException e, WebRequest request) {
+
+        // 405 Method Not Allowed 상태 사용
+        HttpStatus status = HttpStatus.METHOD_NOT_ALLOWED;
+        String detailMessage = e.getMessage() != null ?
+                e.getMessage() :
+                "지원하지 않는 HTTP 요청 방식입니다.";
+
+        // Note: ErrorCode에 405가 명시적으로 정의되어 있다면 그것을 사용해도 됩니다.
+        // 여기서는 HttpStatus를 직접 사용하여 처리합니다.
+
+        ErrorResponse response = ErrorResponse.builder()
+                .status(status.value())
+                .error(status.getReasonPhrase())
+                .message(detailMessage)
+                .path(((ServletWebRequest) request).getRequest().getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(response, status);
+    }
 }

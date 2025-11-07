@@ -5,6 +5,11 @@ import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
 @Getter
 public enum ActiveSkillCard {
 
@@ -69,6 +74,17 @@ public enum ActiveSkillCard {
         throw new BaseException(ErrorCode.NOT_VALID_ID, "유효하지 않은 Active Skill ID입니다: " + id);
     }
 
+    public static List<ActiveSkillCard> getRandomCard(final int count) {
+        ActiveSkillCard[] allCardsArray = ActiveSkillCard.values();
+        List<ActiveSkillCard> allCards = new ArrayList<>(List.of(allCardsArray));
+        if (count <= 0) {
+            return Collections.emptyList(); // 0개 또는 음수를 요청하면 빈 리스트 반환
+        }
+
+        Collections.shuffle(allCards, ThreadLocalRandom.current());
+        int subListSize = Math.min(count, allCards.size());
+        return allCards.subList(0, subListSize);
+    }
     /**
      * 특정 레벨에서의 최종 효과 수치를 계산합니다.
      *

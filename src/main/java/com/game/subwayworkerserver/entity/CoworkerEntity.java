@@ -1,6 +1,8 @@
 package com.game.subwayworkerserver.entity;
 
 import com.game.subwayworkerserver.domain.baseinfo.*;
+import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.util.CharacterGenerator;
 import jakarta.persistence.*;
 import lombok.*;
@@ -36,6 +38,9 @@ public class CoworkerEntity extends BaseTimeEntity {
 
     @Column(nullable = false)
     private int currentExp;
+
+    @Column(nullable = false)
+    private int totalExp;
 
     @Column(nullable = false)
     private long userId;
@@ -94,7 +99,7 @@ public class CoworkerEntity extends BaseTimeEntity {
     public CoworkerEntity(String name, CoworkerLevel level, int currentExp, long userId, CoworkerType coworkerType, long hp,
                           long mana, long maxMana, long manaRecovery, long attack, long defense, boolean inUse,
                           boolean onSale, int activeSkill1, int activeSkill2, int passiveSkill1, int passiveSkill2,
-                          CoworkerElement coworkerElement, boolean available, boolean isMaterial
+                          CoworkerElement coworkerElement, boolean available, boolean isMaterial, int totalExp
     ) {
         this.name = name;
         this.level = level;
@@ -116,6 +121,7 @@ public class CoworkerEntity extends BaseTimeEntity {
         this.coworkerElement = coworkerElement;
         this.available = available;
         this.isMaterial = isMaterial;
+        this.totalExp = totalExp;
     }
 
     public static CoworkerEntity of(final long userId, final CoworkerType coworkerType) {
@@ -127,6 +133,7 @@ public class CoworkerEntity extends BaseTimeEntity {
                 .name(coworkerType.getKoreanName())
                 .level(CoworkerLevel.of(ONE))
                 .currentExp(DEFAULT)
+                .totalExp(DEFAULT)
                 .userId(userId)
                 .coworkerType(coworkerType)
                 .hp(stats.hp())
@@ -153,10 +160,18 @@ public class CoworkerEntity extends BaseTimeEntity {
         List<PassiveSkillCard> randomPassiveSkills = getRandomPassiveSkills(2);
         List<ActiveSkillCard> randomActiveSkills = getRandomActiveSkills(2);
 
+        int cumulativeExp = 0;
+
+        if (coworkerLevel != ONE) {
+            CoworkerLevel coworkerLevel1 = CoworkerLevel.of(coworkerLevel - 1);
+            cumulativeExp = coworkerLevel1.getCumulativeExp() + 1;
+        }
         return CoworkerEntity.builder()
                 .name(coworkerName)
                 .level(CoworkerLevel.of(coworkerLevel))
                 .currentExp(DEFAULT)
+                .totalExp(cumulativeExp)
+                .totalExp(1)
                 .userId(userId)
                 .coworkerType(coworkerType)
                 .hp(stats.hp())
@@ -181,6 +196,7 @@ public class CoworkerEntity extends BaseTimeEntity {
                 .name(coworkerEntity.getName())
                 .level(coworkerEntity.getLevel())
                 .currentExp(coworkerEntity.getCurrentExp())
+                .totalExp(coworkerEntity.getTotalExp())
                 .userId(coworkerEntity.getUserId())
                 .coworkerType(coworkerEntity.getCoworkerType())
                 .hp(coworkerEntity.getHp())
@@ -201,10 +217,18 @@ public class CoworkerEntity extends BaseTimeEntity {
     }
 
     public static CoworkerEntity of(final long userId, final CoworkerType coworkerType, final CoworkerLevel level) {
+        int cumulativeExp = 0;
+
+        if (level.getLevel() != ONE) {
+            CoworkerLevel coworkerLevel1 = CoworkerLevel.of(level.getLevel() - 1);
+            cumulativeExp = coworkerLevel1.getCumulativeExp() + 1;
+        }
+
         return CoworkerEntity.builder()
                 .name(coworkerType.getKoreanName())
                 .level(level)
                 .currentExp(DEFAULT)
+                .totalExp(cumulativeExp)
                 .userId(userId)
                 .coworkerType(coworkerType)
                 .hp(DEFAULT)
@@ -263,5 +287,56 @@ public class CoworkerEntity extends BaseTimeEntity {
 
     public void setInUseTrue() {
         this.inUse = true;
+    }
+
+    public void checkUser(final long userId) {
+        if (this.userId != userId) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "Coworker does not belong to this user");
+        }
+    }
+
+    public void checkSkillAvailability(final int skillCardEnumId) {
+        List<Integer> equippedSkills = List.of(
+                this.getActiveSkill1(),
+                this.getActiveSkill2(),
+                this.getPassiveSkill1(),
+                this.getPassiveSkill2()
+        );
+
+        if (!equippedSkills.contains(skillCardEnumId)) {
+            throw new BaseException(
+                    ErrorCode.BAD_REQUEST, "해당 스킬 카드(ID: " + skillCardEnumId + ")는 장착 불가능합니다.");
+        }
+    }
+
+    public void accumulateExp(final long totalGainedExp) {
+
+        // 1. 경험치 업데이트
+        this.totalExp += totalGainedExp;
+        this.currentExp += totalGainedExp;
+
+        // 2. 만렙이 아니고, 다음 레벨 필요 경험치를 충족했을 때 (단순 IF 조건)
+        if (this.level.getRequiredExpToNextLevel() > 0 &&
+                this.currentExp >= this.level.getRequiredExpToNextLevel()) {
+
+            // 현재 레벨업에 필요한 경험치를 초과분(남은 경험치) 계산
+            long requiredExp = this.level.getRequiredExpToNextLevel();
+            this.currentExp -= requiredExp;
+
+            // 다음 레벨 객체 획득
+            int nextLevelValue = this.level.getLevel() + 1;
+
+            try {
+                // 다음 레벨로 갱신
+                this.level = CoworkerLevel.of(nextLevelValue);
+
+                // TODO: 레벨업 시 스탯 증가 로직 호출 (updateStatsForLevelUp();)
+
+            } catch (IllegalArgumentException e) {
+                // 만렙 도달 (예외 발생 시 CHIEF로 설정)
+                this.level = CoworkerLevel.CHIEF;
+                this.currentExp = 0;
+            }
+        }
     }
 }

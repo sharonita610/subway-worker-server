@@ -19,6 +19,8 @@ public record CoworkerOnSale(
         boolean inUse,
         boolean onSale,
         int level,
+        int exp,
+        int totalExp,
         String position,
         String element,
         long hp,
@@ -68,6 +70,8 @@ public record CoworkerOnSale(
                             .engName(coworker.getCoworkerType().name())
                             .korName(coworker.getName())
                             .level(coworker.getLevel().getLevel())
+                            .exp(coworker.getCurrentExp())
+                            .totalExp(coworker.getTotalExp())
                             .position(coworker.getLevel().getTitle())
                             .inUse(coworker.isInUse())
                             .onSale(coworker.isOnSale())

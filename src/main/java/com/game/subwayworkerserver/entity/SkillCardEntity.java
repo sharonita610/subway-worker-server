@@ -1,11 +1,14 @@
 package com.game.subwayworkerserver.entity;
 
+import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
+import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import com.game.subwayworkerserver.domain.skill.SkillCardType;
+import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.Map;
 
 @Getter
 @Entity
@@ -14,12 +17,25 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SkillCardEntity extends BaseTimeEntity {
 
+    private static final int SKILL_MAX_LEVEL = 5;
+
+    // Level 1에서 Level 4까지의 요구 갯수를 정의 (Level 5로 가기 위한 요구 갯수는 4)
+    private static final Map<Integer, Integer> LEVEL_UP_REQUIREMENTS_MAP = Map.of(
+            1, 1,
+            2, 2,
+            3, 3,
+            4, 4
+    );
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
     private Long coworkerId;
+
+    @Column(nullable = false)
+    private Long userId;
 
     @Column(nullable = false)
     private String engName;
@@ -35,10 +51,10 @@ public class SkillCardEntity extends BaseTimeEntity {
     private int currentLevel = 1;
 
     @Column(nullable = false)
-    private int maxLevel = 5;
+    private int requiredCount;
 
     @Column(nullable = false)
-    private int quantity = 1;
+    private int count = 1;
 
     @Column(nullable = false)
     private int skillCardEnumId;
@@ -51,4 +67,87 @@ public class SkillCardEntity extends BaseTimeEntity {
 
     @Column(nullable = false)
     private boolean available = true;
+
+    @Builder
+    public SkillCardEntity(Long userId, String engName, String korName, SkillCardType type,
+                           int currentLevel, int requiredCount, int count, int skillCardEnumId, boolean inUse,
+                           boolean onSale, boolean available, Long coworkerId
+    ) {
+        this.userId = userId;
+        this.engName = engName;
+        this.korName = korName;
+        this.type = type;
+        this.currentLevel = currentLevel;
+        this.requiredCount = requiredCount;
+        this.count = count;
+        this.skillCardEnumId = skillCardEnumId;
+        this.inUse = inUse;
+        this.onSale = onSale;
+        this.available = available;
+        this.coworkerId = coworkerId;
+    }
+
+    public static SkillCardEntity of(final long userId, final ActiveSkillCard randomCard) {
+        return SkillCardEntity.builder()
+                .userId(userId)
+                .engName(randomCard.name())
+                .korName(randomCard.getKoreanName())
+                .type(SkillCardType.ACTIVE)
+                .currentLevel(1)
+                .requiredCount(2)
+                .count(1)
+                .skillCardEnumId(randomCard.getId())
+                .inUse(false)
+                .onSale(false)
+                .available(true)
+                .coworkerId(0L)
+                .build();
+    }
+
+    public static SkillCardEntity of(final long userId, PassiveSkillCard randomCard) {
+        return SkillCardEntity.builder()
+                .userId(userId)
+                .engName(randomCard.name())
+                .korName(randomCard.getKoreanName())
+                .type(SkillCardType.PASSIVE)
+                .currentLevel(1)
+                .requiredCount(2)
+                .count(1)
+                .skillCardEnumId(randomCard.getId())
+                .inUse(false)
+                .onSale(false)
+                .available(true)
+                .coworkerId(0L)
+                .build();
+    }
+
+    public void activateCoworkerId(final long coworkerId) {
+        this.coworkerId = coworkerId;
+        this.inUse = true;
+    }
+
+    public void deactivateCoworkerId() {
+        this.coworkerId = 0L;
+        this.inUse = false;
+    }
+
+    public void isMaxLevel() {
+        if (this.currentLevel >= SKILL_MAX_LEVEL) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "Skill card is already at max level.");
+        }
+    }
+
+    public void updateFinalState(int newLevel, int finalCount) {
+        this.currentLevel = newLevel;
+        this.count = finalCount;
+
+        // 다음 레벨로 가기 위해 필요한 카드 갯수를 엔티티의 requiredCount 필드에 업데이트
+        if (newLevel < SKILL_MAX_LEVEL) {
+            // 다음 레벨이 되기 위해 필요한 갯수 (예: newLevel이 3이면 다음 Lv4로 가기 위해 3장이 필요)
+            this.requiredCount = LEVEL_UP_REQUIREMENTS_MAP.getOrDefault(newLevel, 0);
+        } else {
+            // 만렙 도달 시
+            this.requiredCount = 0;
+        }
+    }
 }

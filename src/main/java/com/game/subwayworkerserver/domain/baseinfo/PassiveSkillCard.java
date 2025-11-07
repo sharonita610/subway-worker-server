@@ -5,6 +5,11 @@ import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
 @Getter
 public enum PassiveSkillCard {
 
@@ -60,6 +65,17 @@ public enum PassiveSkillCard {
         throw new BaseException(ErrorCode.NOT_VALID_ID, "유효하지 않은 Passive Skill ID입니다: " + id);
     }
 
+    public static List<PassiveSkillCard> getRandomCard(final int count) {
+        PassiveSkillCard[] allCardsArray = PassiveSkillCard.values();
+        List<PassiveSkillCard> allCards = new ArrayList<>(List.of(allCardsArray));
+        if (count <= 0) {
+            return Collections.emptyList();
+        }
+
+        Collections.shuffle(allCards, ThreadLocalRandom.current());
+        int subListSize = Math.min(count, allCards.size());
+        return allCards.subList(0, subListSize);
+    }
     /**
      * 특정 레벨에서의 최종 효과 수치를 계산합니다.
      *
