@@ -170,4 +170,8 @@ public class SkillCardEntity extends BaseTimeEntity {
         this.onSale = false;
         this.available = true;
     }
+
+    public void sellOnMarket() {
+        this.onSale = true;
+    }
 }
