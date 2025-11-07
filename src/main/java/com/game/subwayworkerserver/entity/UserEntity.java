@@ -140,9 +140,9 @@ public class UserEntity extends BaseTimeEntity {
     }
 
     public void checkAndPurchase(final int totalCost) {
-        if (this.coin >= totalCost) {
-            this.coin -=  totalCost;
+        if (this.coin < totalCost) {
+            throw new BaseException(BAD_REQUEST, "코인이 부족해요!");
         }
-        throw new BaseException(BAD_REQUEST, "코인이 부족해요!");
+        this.coin -= totalCost;
     }
 }
