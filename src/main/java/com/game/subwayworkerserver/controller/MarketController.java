@@ -116,7 +116,7 @@ public class MarketController {
     @PostMapping("/market/global/buy-skill")
     public ResponseEntity<Void> buySkillCard(@RequestParam("id") long marketId){
         String uuid = SecurityUtils.getCurrentUserUuid();
-
+        skillCardMarketService.purchaseSkillCard(uuid, marketId);
         return ResponseEntity.ok().build();
     }
 
