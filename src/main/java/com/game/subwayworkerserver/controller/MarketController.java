@@ -132,13 +132,13 @@ public class MarketController {
     }
 
     @Operation(
-            summary = "장터에 내놓은 스킬카드 판매 철회",
+            summary = "장터에 내놓은 스킬카드 판매 철회 [test]",
             description = "장터에 내놓았던 스킬카드를 철회하는 기능"
     )
     @PostMapping("/market/skill/cancel")
-    public ResponseEntity<Void> cancelSellingSkill(@RequestParam("id") long skillId){
+    public ResponseEntity<HttpStatus> cancelSellingSkill(@RequestParam("id") long marketId){
         String uuid = SecurityUtils.getCurrentUserUuid();
-
+        skillCardMarketService.cancelSellingMySkillCard(uuid, marketId);
         return ResponseEntity.ok().build();
     }
 
