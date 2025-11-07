@@ -69,7 +69,7 @@ public class CoworkerController {
     }
 
     @Operation(
-            summary = "카드 강화하기 [개발 중] ",
+            summary = "카드 강화하기 [완] ",
             description = "강화가 가능한 동일한 카드만 조회하는 기능"
     )
     @PostMapping("/skills/upgrade")
