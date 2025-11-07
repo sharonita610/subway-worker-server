@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.game.subwayworkerserver.exception.ErrorCode.BAD_REQUEST;
+
 @Service
 @RequiredArgsConstructor
 public class CoworkerService {
@@ -59,66 +61,76 @@ public class CoworkerService {
     public UserUpgradeResponse upgradeCoworker(final String uuid, final UpgradeRequest request) {
 
         UserEntity user = getUserByUuid(uuid);
+        checkUserCoin(user, request.price());
 
-        // 1. 대상 동료와 재료 동료 불러오기 및 유효성 검사
         CoworkerEntity target = coworkerRepository.findById(request.targetId())
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND, "대상이 존재하지 않습니다."));
 
-        List<CoworkerEntity> materials = coworkerRepository.findAllById(request.materialIds());
+        List<CoworkerEntity> materials = getMaterialEntityList(request.materialIds(), user.getId());
 
-        if (materials.size() != request.materialIds().size()) {
+        long totalGainedExp = calculateGainedExperience(target, materials);
+
+        target.accumulateExp(totalGainedExp);
+        coworkerRepository.deleteAll(materials);
+        CoworkerEntity upgraded = coworkerRepository.save(target);
+        user.purchaseWithCoin(request.price());
+        return UserUpgradeResponse.of(upgraded);
+    }
+
+    private static void checkUserCoin(final UserEntity user, final int price) {
+        boolean ableToBuy = user.hasCoinMoreThanItemPrice(price);
+        if (!ableToBuy) {
+            throw new BaseException(BAD_REQUEST, "코인이 부족해요!");
+        }
+    }
+
+    private List<CoworkerEntity> getMaterialEntityList(List<Long> materialIds, long userId) {
+        List<CoworkerEntity> materials = coworkerRepository.findAllById(materialIds);
+
+        if (materials.size() != materialIds.size()) {
             throw new BaseException(ErrorCode.BAD_REQUEST, "제공된 재료 동료 ID 중 유효하지 않은 항목이 있습니다.");
         }
 
-        // 권한 검사 (모든 동료가 userId에 속하는지 확인)
         materials.stream()
-                .filter(coworker -> coworker.getUserId() != user.getId())
+                .filter(coworker -> coworker.getUserId() != userId)
                 .findAny()
                 .ifPresent(m -> {
                     throw new BaseException(ErrorCode.BAD_REQUEST, "사용자 소유가 아닌 재료 동료가 포함되어 있습니다.");
                 });
-
-        // 2. 경험치 계산
-        long totalGainedExp = calculateGainedExperience(target, materials);
-
-        // 3. 경험치 적용 및 레벨업 처리 (핵심 비즈니스 로직)
-        target.accumulateExp(totalGainedExp);
-
-        // 4. 재료 동료 제거
-        coworkerRepository.deleteAll(materials);
-
-        // 5. 대상 동료 저장 및 반환
-        CoworkerEntity upgraded = coworkerRepository.save(target);
-
-        return UserUpgradeResponse.of(upgraded);
+        return materials;
     }
 
 
     private long calculateGainedExperience(CoworkerEntity target, List<CoworkerEntity> materials) {
-        long totalBaseXP = 0;
-        boolean hasSameCoworker = false;
 
+        long totalBaseXP = 0;
+
+        // 2-1. 재료 동료의 Base XP 합산 및 ENERZ/동일 캐릭터 보너스 적용
         for (CoworkerEntity material : materials) {
 
-            // 1. 재료 동료의 기본 경험치 획득 (CoworkerType 또는 Level에서 가져옴)
-            // *가정: CoworkerEntity 내부에 현재 레벨에 따른 기본 XP를 반환하는 메서드가 존재합니다.
-            long baseXP = material.getTotalExp();
+            // a) 레벨에 따른 고정 XP 획득 (CoworkerLevel의 getBaseXpForMaterial() 사용 가정)
+            long materialLevelXP = material.getLevel().getBaseXpForMaterial();
+
+            // b) 재료 동료가 현재 레벨에서 모은 XP (예시의 200/300 중 200)
+            long materialCurrentXP = material.getCurrentExp();
+
+            // c) 총 기본 XP = 레벨 고정 XP + 현재 획득 XP
+            long baseXP = materialLevelXP + materialCurrentXP;
 
             double multiplier = 1.0;
 
-            // 2. ENERZ 또는 동일 캐릭터 부스트 적용
-            if (material.getCoworkerType().name().equals("ENERZ")) {
-                multiplier = EnhanceConstants.ENERZ_XP_MULTIPLIER;
-            } else if (material.getCoworkerType().equals(target.getCoworkerType())) {
-                multiplier = EnhanceConstants.ENERZ_XP_MULTIPLIER;
+            if (material.getCoworkerType().name().equals("ENERZ") ||
+                    material.getCoworkerType().equals(target.getCoworkerType())) {
+
+                multiplier = EnhanceConstants.ENERZ_XP_MULTIPLIER; // 1.2배
             }
 
             totalBaseXP += (long) (baseXP * multiplier);
         }
 
+        // 4. 확률 보너스 계산 및 최종 경험치 합산
         double critMultiplier = EnhanceConstants.getCriticalMultiplier();
         long critXP = (long) (EnhanceConstants.CRIT_STANDARD_XP * critMultiplier);
-
         return totalBaseXP + critXP;
     }
 
