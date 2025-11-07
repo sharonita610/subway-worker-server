@@ -88,7 +88,7 @@ public class MarketController {
     }
 
     @Operation(
-            summary = "구매 가능한 스킬카드 리스트 조회 [test 필요]",
+            summary = "구매 가능한 스킬카드 리스트 조회 [test]",
             description = "장터에 올라온 모든 스킬 카드의 리스트를 필터링 기능을 포함하여 조회"
     )
     @PostMapping("/market/global/skill")
@@ -100,7 +100,7 @@ public class MarketController {
     }
 
     @Operation(
-            summary = "내가 판매 중인 스킬카드 리스트 조회 [test 필요]",
+            summary = "내가 판매 중인 스킬카드 리스트 조회 [test]",
             description = "내가 판매 중인 스킬카드 리스트를 조회"
     )
     @PostMapping("/market/skill/selling-list")
@@ -121,14 +121,14 @@ public class MarketController {
     }
 
     @Operation(
-            summary = "나의 스킬카드 장터에 내놓기",
+            summary = "나의 스킬카드 장터에 내놓기 [test]",
             description = "나의 스킬카드 장터에 내놓기 위한 기능"
     )
     @PostMapping("/market/skill/sell")
-    public ResponseEntity<Void> sellSkill(@RequestBody SellingRequest request){
+    public ResponseEntity<HttpStatus> sellSkillCard(@RequestBody SellingRequest request){
         String uuid = SecurityUtils.getCurrentUserUuid();
-
-        return ResponseEntity.ok().build();
+        skillCardMarketService.registerCardOnMarket(uuid, request);
+        return ResponseEntity.ok(HttpStatus.NO_CONTENT);
     }
 
     @Operation(
