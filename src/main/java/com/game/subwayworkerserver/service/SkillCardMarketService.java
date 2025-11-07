@@ -37,7 +37,7 @@ public class SkillCardMarketService {
         return GlobalSkillCardResponse.of(filteredCoworkers);
     }
 
-    private UserEntity findUserByUuid(String uuid) {
+    private UserEntity findUserByUuid(final String uuid) {
         return userRepository.findByUuid(uuid).orElseThrow(
                 () -> new BaseException(USER_NOT_FOUND)
         );
