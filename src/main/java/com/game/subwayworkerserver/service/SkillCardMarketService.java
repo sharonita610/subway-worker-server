@@ -134,4 +134,31 @@ public class SkillCardMarketService {
                 skillCardRealPrice
         );
     }
+
+    @Transactional
+    public void purchaseSkillCard(final String uuid, final long marketId) {
+        UserEntity user = findUserByUuid(uuid);
+        SkillCardMarketEntity skillCardMarketEntity = skillCardMarketRepository.findByIdAndAvailableTrueAndSoldFalse(marketId).orElseThrow(
+                () -> new BaseException(NOT_FOUND, "방금 판매된 스킬카드예요.")
+        );
+        checkUserVacationTicket(user, skillCardMarketEntity.getPrice());
+        skillCardMarketEntity.purchase(user.getId());
+        skillCardRepository.findByIdAndOnSaleTrue(skillCardMarketEntity.getSkillCardId())
+                .ifPresent(soldCard -> {
+                    SkillCardEntity newOwner = SkillCardEntity.copyEntityForRegistration(soldCard);
+                    SkillCardEntity saved = skillCardRepository.save(newOwner);
+                    soldCard.registerNewUser(user.getId());
+                    skillCardMarketEntity.changeSkillCardId(saved.getId());
+                });
+
+        int skillCardRealPrice = skillCardMarketEntity.getPrice() - skillCardMarketEntity.getCommission();
+        user.purchaseWithVacationTickets(skillCardRealPrice);
+    }
+
+    private static void checkUserVacationTicket(final UserEntity user, final int price) {
+        boolean ableToBuy = user.hasEnoughVacationTickets(price);
+        if (!ableToBuy) {
+            throw new BaseException(BAD_REQUEST, "휴가티켓이 부족해요!");
+        }
+    }
 }
