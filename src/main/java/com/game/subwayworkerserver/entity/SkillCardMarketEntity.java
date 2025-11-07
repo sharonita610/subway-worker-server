@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.entity;
 
+import com.game.subwayworkerserver.controller.request.SellingRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -46,4 +47,26 @@ public class SkillCardMarketEntity extends BaseTimeEntity {
     private boolean isPaid = false;
 
     private LocalDateTime soldTime;
+
+    public SkillCardMarketEntity(
+            long sellerId, int price, int commission, CurrencyType currency, long skillCardId, boolean available
+    ) {
+        this.sellerId = sellerId;
+        this.price = price;
+        this.commission = commission;
+        this.currency = currency;
+        this.skillCardId = skillCardId;
+        this.available = available;
+    }
+
+    public static SkillCardMarketEntity of(final long userId, final SellingRequest request) {
+        return new SkillCardMarketEntity(
+                userId,
+                request.sellingPrice(),
+                request.sellingCommission(),
+                CurrencyType.VACATION_TICKET,
+                request.targetId(),
+                true
+        );
+    }
 }
