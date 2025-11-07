@@ -119,10 +119,7 @@ public class UserController {
 
     @Operation(
             summary = "유저가 가지고 있는 스킬 카드 전체 조회 [완]",
-            description = "동료 리스트를 조회",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "동료 리스트")
-            }
+            description = "유저의 모든 스킬 리스트를 조회"
     )
     @GetMapping("/user/skillCards")
     public ResponseEntity<SkillByUserResponse> getUserSkillCards() {
