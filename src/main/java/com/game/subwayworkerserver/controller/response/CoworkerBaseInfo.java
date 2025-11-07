@@ -130,7 +130,7 @@ public record CoworkerBaseInfo(
 
     private record StatsInfos(
             StatBaseInfo hp,
-            StatBaseInfo mana,
+            StatBaseInfo initMana,
             StatBaseInfo maxMana,
             StatBaseInfo attack,
             StatBaseInfo defense,
