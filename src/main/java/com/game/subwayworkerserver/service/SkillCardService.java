@@ -18,18 +18,17 @@ import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.SkillCardRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
+import com.game.subwayworkerserver.service.UpgradeExecutor.UpgradeResult;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import static com.game.subwayworkerserver.domain.skill.SkillCardType.ACTIVE;
 import static com.game.subwayworkerserver.domain.skill.SkillCardType.PASSIVE;
-import static com.game.subwayworkerserver.exception.ErrorCode.BAD_REQUEST;
 
 @Service
 @RequiredArgsConstructor
@@ -39,9 +38,9 @@ public class SkillCardService {
     private final CoworkerRepository coworkerRepository;
     private final SkillCardRepository skillCardRepository;
     private final SkillCardListFilter skillCardListFilter;
+    private final UpgradeExecutor upgradeExecutor;
 
     private static final int COST_PER_CARD = 10000;
-    private static final int MAX_LEVEL = 5;
 
     public SkillByCoworkerResponse getSkillListByUserAndCoworker(String uuid, SkillByUserRequest request) {
         UserEntity user = getUserEntityByUuid(uuid);
@@ -188,87 +187,53 @@ public class SkillCardService {
 
         UserEntity user = getUserByUuid(uuid);
 
-        // 1. 대상 카드 조회
-        SkillCardEntity targetCard = skillCardRepository.findById(request.targetId()).orElseThrow(
-                () -> new BaseException(ErrorCode.NOT_FOUND, "Target card not found.")
-        );
+        SkillCardEntity targetCard = getSkillCardEntity(request.targetId());
         targetCard.isMaxLevel();
 
-        // 2. 재료 카드 유효성 검사 및 리스트 획득
-        List<SkillCardEntity> materialCards = checkMaterialCardIds(request, user, targetCard);
+        List<SkillCardEntity> materialCards = checkMaterialCardIds(
+                request.materialIds(), user.getId(), targetCard.getSkillCardEnumId()
+        );
+        int materialCount = materialCards.size();
 
-        final int addCardCount = materialCards.size();
-        final long totalCost = (long) addCardCount * COST_PER_CARD; // long으로 캐스팅하여 오버플로우 방지
+        final int totalCost = getTotalCost(materialCount, request.price());
+        user.checkAndPurchase(totalCost);
 
-        // 3. 코인 검사 및 차감
-        // request.price() 대신 totalCost를 사용해야 합니다. (request.price()가 totalCost와 동일해야 함)
-        checkUserCoin(user, (int)totalCost); // 코인 보유량 확인
-        user.purchaseWithCoin((int)totalCost); // 코인 차감
+        UpgradeResult result = upgradeExecutor.executeUpgradeLogic(targetCard, materialCount);
 
-        // 4. 레벨업 계산 (executeUpgradeLogic에서 최종 레벨/카운트를 계산)
-        UpgradeResult result = executeUpgradeLogic(targetCard, addCardCount);
-
-        // 5. 대상 카드 최종 상태 업데이트 (DB에 반영될 내용)
         targetCard.updateFinalState(result.finalLevel(), result.finalCount());
-
-        // 6. 재료 카드 제거
         skillCardRepository.deleteAll(materialCards);
-
-        // 7. 결과 반환을 위해 대상 카드 저장 (updateFinalState가 @Transactional 내에서 변경을 추적하지만, 명시적 저장이 필요할 수 있음)
-        skillCardRepository.save(targetCard);
-
-        // SkillListBySkillIdResponse DTO로 변환하여 반환한다고 가정
-        return UpgradedSkillCardResponse.of(targetCard);
+        SkillCardEntity saved = skillCardRepository.save(targetCard);
+        return UpgradedSkillCardResponse.of(saved);
     }
 
-    private UpgradeResult executeUpgradeLogic(SkillCardEntity targetCard, int addCardCount) {
-
-        int currentLevel = targetCard.getCurrentLevel();
-        int totalNewCount = targetCard.getCount() + addCardCount;
-        while (currentLevel < MAX_LEVEL) {
-
-            int requiredCards = LEVEL_UP_REQUIREMENTS.getOrDefault(currentLevel, MAX_LEVEL + 1);
-
-            if (totalNewCount >= requiredCards) {
-                totalNewCount -= requiredCards;
-                currentLevel++;
-
-                if (currentLevel >= MAX_LEVEL) {
-                    break;
-                }
-
-            } else {
-                break;
-            }
+    private static int getTotalCost(final int addCardCount, final int requestPrice) {
+        final int totalCost = addCardCount * COST_PER_CARD;
+        if (totalCost == requestPrice) {
+            return totalCost;
         }
-
-        return new UpgradeResult(currentLevel, totalNewCount);
+        throw new BaseException(ErrorCode.BAD_REQUEST, "Total cost is wrong.");
     }
 
+    private List<SkillCardEntity> checkMaterialCardIds(
+            final List<Long> materialIds, final long userId, final int targetSkillCardId
+    ) {
 
-    private static final Map<Integer, Integer> LEVEL_UP_REQUIREMENTS = Map.of(
-            1, 1, // Lv1 -> Lv2에 필요한 추가 카드 수: 1장
-            2, 2, // Lv2 -> Lv3에 필요한 추가 카드 수: 2장
-            3, 3, // Lv3 -> Lv4에 필요한 추가 카드 수: 3장
-            4, 4  // Lv4 -> Lv5에 필요한 추가 카드 수: 4장
-    );
-
-    private List<SkillCardEntity>  checkMaterialCardIds(UpgradeRequest request, UserEntity user, SkillCardEntity targetCard) {
-        List<SkillCardEntity> materialCards = skillCardRepository.findAllByIdIn(request.materialIds());
-        if (materialCards.size() != request.materialIds().size()) {
+        List<SkillCardEntity> materialCards = skillCardRepository.findAllByIdIn(materialIds);
+        if (materialCards.size() != materialIds.size()) {
             throw new BaseException(ErrorCode.NOT_FOUND, "One or more material cards not found.");
         }
 
         materialCards.stream()
-                .filter(c -> !Objects.equals(c.getUserId(), user.getId()) || !c.isAvailable() || c.isInUse())
+                .filter(card ->
+                        !Objects.equals(card.getUserId(), userId) || !card.isAvailable() || card.isInUse()
+                )
                 .findAny()
-                .ifPresent(c -> {
+                .ifPresent(card -> {
                     throw new BaseException(ErrorCode.BAD_REQUEST, "Invalid material card status or ownership.");
                 });
 
-        // 2-2. 동일 카드 강화 확인 (가장 중요)
         materialCards.stream()
-                .filter(c -> c.getSkillCardEnumId() != targetCard.getSkillCardEnumId())
+                .filter(card -> card.getSkillCardEnumId() != targetSkillCardId)
                 .findAny()
                 .ifPresent(c -> {
                     throw new BaseException(ErrorCode.BAD_REQUEST, "Skill cards can only be upgraded with the same card type.");
@@ -277,19 +242,11 @@ public class SkillCardService {
         return materialCards;
     }
 
-    private static void checkUserCoin(final UserEntity user, final int price) {
-        boolean ableToBuy = user.hasCoinMoreThanItemPrice(price);
-        if (!ableToBuy) {
-            throw new BaseException(BAD_REQUEST, "코인이 부족해요!");
-        }
-    }
-
     private UserEntity getUserByUuid(String uuid) {
         return userRepository.findByUuid(uuid).orElseThrow(
                 () -> new BaseException(ErrorCode.USER_NOT_FOUND)
         );
     }
 
-    private record UpgradeResult(int finalLevel, int finalCount) {}
 
 }
