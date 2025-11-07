@@ -139,4 +139,8 @@ public class SkillCardEntity extends BaseTimeEntity {
             this.requiredCount = 0;
         }
     }
+
+    public void cancelSelling() {
+        this.onSale = false;
+    }
 }
