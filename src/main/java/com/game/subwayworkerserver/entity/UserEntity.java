@@ -1,10 +1,13 @@
 package com.game.subwayworkerserver.entity;
 
+import com.game.subwayworkerserver.exception.BaseException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import static com.game.subwayworkerserver.exception.ErrorCode.BAD_REQUEST;
 
 @Getter
 @Entity
@@ -136,4 +139,10 @@ public class UserEntity extends BaseTimeEntity {
         this.coin += quantity;
     }
 
+    public void checkAndPurchase(final int totalCost) {
+        if (this.coin >= totalCost) {
+            this.coin -=  totalCost;
+        }
+        throw new BaseException(BAD_REQUEST, "코인이 부족해요!");
+    }
 }
