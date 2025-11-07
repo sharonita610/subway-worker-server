@@ -12,7 +12,6 @@ import com.game.subwayworkerserver.entity.CoworkerEntity;
 import com.game.subwayworkerserver.entity.SkillCardEntity;
 import com.game.subwayworkerserver.entity.UserGachaEntity;
 import lombok.Builder;
-import org.aspectj.weaver.ast.Literal;
 
 import java.util.List;
 import java.util.Map;
