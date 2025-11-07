@@ -35,6 +35,9 @@ public class SkillCardMarketService {
 
         List<SkillCardEntity> skillCardOnSaleByCardIds = findSkillCardOnSaleByCardIds(skillCardIds);
         List<SkillCardOnSale> coworkerOnSalesDomainList = SkillCardOnSale.toDomain(marketSkillCardLists, skillCardOnSaleByCardIds);
+        if(request == null) {
+            return GlobalSkillCardResponse.of(coworkerOnSalesDomainList);
+        }
         List<SkillCardOnSale> filteredCoworkers = skillCardListFilter.filter(coworkerOnSalesDomainList, request);
         return GlobalSkillCardResponse.of(filteredCoworkers);
     }
@@ -59,7 +62,7 @@ public class SkillCardMarketService {
         UserEntity user = findUserByUuid(uuid);
         List<SkillCardMarketEntity> skillCardOnSale = skillCardMarketRepository.findAllBySellerId(user.getId());
         List<Long> skillCardIds = getSkillCardIds(skillCardOnSale);
-        List<SkillCardEntity> skillCardEntityList = skillCardRepository.findAllByIdInAndOnSaleTrue(skillCardIds);
+        List<SkillCardEntity> skillCardEntityList = skillCardRepository.findAllByIdIn(skillCardIds);
         List<SkillCardOnSale> coworkerOnSalesDomainList = SkillCardOnSale.toDomain(skillCardOnSale, skillCardEntityList);
         return SkillOnSaleResponse.of(coworkerOnSalesDomainList);
     }
@@ -73,7 +76,8 @@ public class SkillCardMarketService {
         long cardId = request.targetId();
 
         SkillCardEntity skillCard = getSkillCardRepositoryByUserIdAndId(userId, cardId);
-        verifySkillCardExistenceOnMarket(skillCard.getId(), cardId);
+        skillCard.sellOnMarket();
+        verifySkillCardExistenceOnMarket(skillCard.getId(), userId);
 
         SkillCardMarketEntity skillCardMarketEntity = SkillCardMarketEntity.of(userId, request);
         skillCardMarketRepository.save(skillCardMarketEntity);
@@ -81,8 +85,8 @@ public class SkillCardMarketService {
         user.purchaseWithCoin(request.registrationFee());
     }
 
-    private void verifySkillCardExistenceOnMarket(final long skillCardId, long cardId) {
-        boolean exists = skillCardMarketRepository.existsBySkillCardIdAndSellerId(skillCardId, cardId);
+    private void verifySkillCardExistenceOnMarket(final long skillCardId, long userId) {
+        boolean exists = skillCardMarketRepository.existsBySkillCardIdAndSellerId(skillCardId, userId);
         if (exists) {
             throw new BaseException(BAD_REQUEST, "Skill card already on market");
         }
@@ -118,7 +122,7 @@ public class SkillCardMarketService {
         SkillCardMarketEntity skillCardMarketEntity =
                 skillCardMarketRepository.findByIdAndSellerIdAndSoldTrueAndIsPaidFalseAndAvailableFalse(marketId, user.getId())
                         .orElseThrow(
-                                () -> new BaseException(NOT_FOUND, "Coworker not found on market.")
+                                () -> new BaseException(NOT_FOUND, "Skillcard not found on market.")
                         );
 
         int skillCardRealPrice = skillCardMarketEntity.getPrice() - skillCardMarketEntity.getCommission();
@@ -143,6 +147,7 @@ public class SkillCardMarketService {
         );
         checkUserVacationTicket(user, skillCardMarketEntity.getPrice());
         skillCardMarketEntity.purchase(user.getId());
+
         skillCardRepository.findByIdAndOnSaleTrue(skillCardMarketEntity.getSkillCardId())
                 .ifPresent(soldCard -> {
                     SkillCardEntity newOwner = SkillCardEntity.copyEntityForRegistration(soldCard);
