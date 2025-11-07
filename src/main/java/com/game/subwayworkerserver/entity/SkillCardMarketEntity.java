@@ -69,4 +69,8 @@ public class SkillCardMarketEntity extends BaseTimeEntity {
                 true
         );
     }
+
+    public void paidDone() {
+        this.isPaid = true;
+    }
 }
