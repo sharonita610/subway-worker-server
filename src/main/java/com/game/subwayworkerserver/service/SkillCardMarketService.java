@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.service;
 
+import com.game.subwayworkerserver.controller.request.SellingRequest;
 import com.game.subwayworkerserver.controller.request.SkillCardFilterRequest;
 import com.game.subwayworkerserver.controller.response.GlobalSkillCardResponse;
 import com.game.subwayworkerserver.controller.response.SkillOnSaleResponse;
@@ -11,12 +12,13 @@ import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.repository.SkillCardMarketRepository;
 import com.game.subwayworkerserver.repository.SkillCardRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.game.subwayworkerserver.exception.ErrorCode.USER_NOT_FOUND;
+import static com.game.subwayworkerserver.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -61,5 +63,42 @@ public class SkillCardMarketService {
         List<SkillCardEntity> skillCardEntityList = skillCardRepository.findAllByIdInAndOnSaleTrue(skillCardIds);
         List<SkillCardOnSale> coworkerOnSalesDomainList = SkillCardOnSale.toDomain(skillCardOnSale, skillCardEntityList);
         return SkillOnSaleResponse.of(coworkerOnSalesDomainList);
+    }
+
+    @Transactional
+    public void registerCardOnMarket(final String uuid, final SellingRequest request) {
+        UserEntity user = findUserByUuid(uuid);
+        checkUserCoin(request.registrationFee(), user);
+
+        long userId = user.getId();
+        long cardId = request.targetId();
+
+        SkillCardEntity skillCard = getSkillCardRepositoryByUserIdAndId(userId, cardId);
+        verifySkillCardExistenceOnMarket(skillCard.getId(), cardId);
+
+        SkillCardMarketEntity skillCardMarketEntity = SkillCardMarketEntity.of(userId, request);
+        skillCardMarketRepository.save(skillCardMarketEntity);
+
+        user.purchaseWithCoin(request.registrationFee());
+    }
+
+    private void verifySkillCardExistenceOnMarket(final long skillCardId, long cardId) {
+        boolean exists = skillCardMarketRepository.existsBySkillCardIdAndSellerId(skillCardId, cardId);
+        if (exists) {
+            throw new BaseException(BAD_REQUEST, "Skill card already on market");
+        }
+    }
+
+    private SkillCardEntity getSkillCardRepositoryByUserIdAndId(final long userId, final long skillCardId) {
+        return skillCardRepository.findByUserIdAndIdAndInUseFalse(userId, skillCardId).orElseThrow(
+                () -> new BaseException(NOT_FOUND, "Skill card not found or is already in use")
+        );
+    }
+
+    private static void checkUserCoin(final int registrationFee, final UserEntity user) {
+        boolean ableToBuy = user.hasCoinMoreThanItemPrice(registrationFee);
+        if (!ableToBuy) {
+            throw new BaseException(BAD_REQUEST, "Not enough coin");
+        }
     }
 }
