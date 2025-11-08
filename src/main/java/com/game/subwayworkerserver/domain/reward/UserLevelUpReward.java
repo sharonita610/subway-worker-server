@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.domain.reward;
 
 public record UserLevelUpReward(
-        long coin,
+        int coin,
         int vacationTicket,
         int gachaTicket
 ) {
