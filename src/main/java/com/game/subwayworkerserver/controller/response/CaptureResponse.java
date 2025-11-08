@@ -11,12 +11,14 @@ public record CaptureResponse(
         boolean run
 ) {
 
-    public static CaptureResponse of(final int captureAttemptCount, final CoworkerEntity coworkerEntity, String position) {
+    public static CaptureResponse of(
+         final BaseReward baseReward,   final int extraExpReward, final CoworkerEntity coworkerEntity, String position
+    ) {
         return new CaptureResponse(
-            true,
-            BaseReward.getCaptureReward(),
-            captureAttemptCount == 0 ? 50 : 0,
-            CapturedCoworkerInfo.of(coworkerEntity, position),
+                true,
+                baseReward,
+                extraExpReward,
+                CapturedCoworkerInfo.of(coworkerEntity, position),
                 false
         );
     }
