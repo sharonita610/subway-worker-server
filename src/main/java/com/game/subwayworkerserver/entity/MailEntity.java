@@ -1,6 +1,7 @@
 package com.game.subwayworkerserver.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -35,6 +36,17 @@ public class MailEntity extends BaseTimeEntity {
     private LocalDateTime sentAt = LocalDateTime.now();
 
     private LocalDateTime expiresAt;
+
+    @Builder
+    public MailEntity(Long userId, String sender, String title, String content, boolean isRead, boolean isClaimed, LocalDateTime sentAt) {
+        this.userId = userId;
+        this.sender = sender;
+        this.title = title;
+        this.content = content;
+        this.isRead = isRead;
+        this.isClaimed = isClaimed;
+        this.sentAt = sentAt;
+    }
 
     public void markAsRead() {
         if (!this.isRead) {
