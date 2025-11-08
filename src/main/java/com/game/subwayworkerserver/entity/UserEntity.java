@@ -148,4 +148,19 @@ public class UserEntity extends BaseTimeEntity {
         }
         this.coin -= totalCost;
     }
+
+    public void grantReward(int exp, int extraExp, int coin) {
+        this.exp += exp + extraExp;
+        this.totalExp += exp + extraExp;
+        this.coin += coin;
+    }
+
+    public void updateLevelAndExp(int currentLevel, int currentExp) {
+        this.level += currentLevel;
+        this.exp += currentExp;
+    }
+
+    public void hasReward() {
+        hasPendingReward = true;
+    }
 }
