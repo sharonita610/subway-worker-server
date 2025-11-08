@@ -53,9 +53,11 @@ public class CoworkerController {
             description = "스킬 리스트 조회 현재 선택 된 동료 id 가 포함 된 리스트"
     )
     @GetMapping("/coworker/skills")
-    public ResponseEntity<SkillByCoworkerResponse> getSkillListByUserAndCoworker(@RequestBody SkillByUserRequest request) {
+    public ResponseEntity<SkillByCoworkerResponse> getSkillListByUserAndCoworker(
+            @RequestParam("id") long coworkerId, @RequestParam("type")  String type
+    ) {
         String uuid = SecurityUtils.getCurrentUserUuid();
-        return ResponseEntity.ok(skillCardService.getSkillListByUserAndCoworker(uuid, request));
+        return ResponseEntity.ok(skillCardService.getSkillListByUserAndCoworker(uuid, coworkerId, type));
     }
 
     @Operation(
