@@ -91,16 +91,21 @@ public class SystemService {
 
     private void processRewardList(List<RewardEntity> rewardList, long userId, UserEntity user) {
         rewardList.forEach(reward -> {
-            if(reward.getType().equals(RewardType.ENERZ)) {
-                processMaterialFriend(userId);
+            if (reward.getType().equals(RewardType.ENERZ)) {
+                processMaterialFriend(userId, reward.getExtraInfo());
+
+            } else if (reward.getType().equals(RewardType.NO_ADS)) {
+                int days = Integer.parseInt(reward.getExtraInfo());
+                user.extendAdFreeBenefit(days);
             }
+
             user.giveReward(reward.getType(), reward.getQuantity());
             reward.claimRewardDone();
         });
     }
 
-    private void processMaterialFriend(final long userId) {
-        CoworkerEntity coworkerEntity = CoworkerEntity.of(userId, CoworkerType.ENERZ, CoworkerLevel.getSpecialCoworkerLevel());
+    private void processMaterialFriend(final long userId, final String extraInfo) {
+        CoworkerEntity coworkerEntity = CoworkerEntity.of(userId, CoworkerType.ENERZ, CoworkerLevel.of(Integer.parseInt(extraInfo)));
         coworkerRepository.save(coworkerEntity);
     }
 
@@ -117,6 +122,7 @@ public class SystemService {
         List<Long> mailIdList = getMailIdList(mailList);
         List<RewardEntity> rewardList = getAllRewardsByMailIds(mailIdList);
         processRewardList(rewardList, user.getId(), user);
+        mailList.forEach(MailEntity::claimDone);
         user.claimMailDone();
     }
 
