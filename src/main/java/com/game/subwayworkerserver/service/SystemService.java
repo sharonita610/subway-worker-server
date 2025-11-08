@@ -28,7 +28,7 @@ public class SystemService {
     private final MailRepository mailRepository;
     private final RewardRepository rewardRepository;
     private final CoworkerRepository coworkerRepository;
-    private final AttendanceChecker attendanceChecker;
+    private final AttendanceRewardProcessor rewardProcessor;
 
     public UserMailBoxResponse getMailBox(final String uuid) {
         UserEntity user = getUserByUuid(uuid);
@@ -85,7 +85,7 @@ public class SystemService {
         MailEntity mail = getMailById(mailId);
         List<RewardEntity> rewardList = rewardRepository.findAllByMailIdAndUserIdAndIsClaimedFalse(mail.getId(), userId);
         processRewardList(rewardList, userId, user);
-
+        mail.claimDone();
         user.claimMailDone();
     }
 
@@ -128,4 +128,36 @@ public class SystemService {
         return CheckInListResponse.of(userCheckInRewards);
     }
 
+    @Transactional
+    public void claimCheckInReward(final String uuid) {
+        UserEntity user = getUserByUuid(uuid);
+        int consecutiveAttendanceDays = user.getConsecutiveAttendanceDays();
+        int claimedRewardDayUpTo = user.getClaimedRewardDayUpTo();
+
+        validateClaimDates(consecutiveAttendanceDays, claimedRewardDayUpTo);
+
+        int currentDayToProcess = claimedRewardDayUpTo + 1;
+        int finalDayClaimed = claimedRewardDayUpTo;
+
+        while (currentDayToProcess <= consecutiveAttendanceDays) {
+
+            CheckInReward reward = CheckInReward.getRewardByDay(currentDayToProcess);
+            rewardProcessor.process(user, reward, currentDayToProcess);
+
+            finalDayClaimed = currentDayToProcess;
+            currentDayToProcess++;
+        }
+
+        user.updateClaimDailyRewardDone(finalDayClaimed);
+    }
+
+    private static void validateClaimDates(int consecutiveAttendanceDays, int claimedRewardDayUpTo) {
+        if (consecutiveAttendanceDays == 0) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "현재 수령 가능한 출석 보상이 없습니다.");
+        }
+
+        if (claimedRewardDayUpTo >= consecutiveAttendanceDays) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "현재 출석 일차까지 모든 보상을 이미 수령했습니다.");
+        }
+    }
 }
