@@ -167,7 +167,9 @@ public class SkillCardService {
         );
         int skillCardEnumId = skillCard.getSkillCardEnumId();
         List<SkillCardEntity> skillCardList =
-                skillCardRepository.findAllByUserIdAndSkillCardEnumIdAndAvailableTrueAndOnSaleFalse(user.getId(), skillCardEnumId);
+                skillCardRepository.findAllByUserIdAndSkillCardEnumIdAndAvailableTrueAndOnSaleFalseAndIdNot(
+                        user.getId(), skillCardEnumId, skillCardId
+                );
 
         return SkillListBySkillIdResponse.of(skillCardList);
 
