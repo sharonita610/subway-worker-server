@@ -29,8 +29,8 @@ public enum PassiveSkillCard {
     SECOND_CHANCE(105, "두번째 기회", "죽으면 HP의 20%로 살아납니다. 일정 HP로 부활.",
             SkillCardType.PASSIVE, 0.20, 0.05, "상대 턴 공격 + 내가 죽을 때 resurrection"), // 20% -> 0.20, 5p 증가 -> 0.05
 
-    DOPPELGANGER(106, "도플갱어", "대전에서 같은 캐릭터를 공격할 때 공격력이 1.2배 증가합니다.",
-            SkillCardType.PASSIVE, 1.2, 0.10, "내 턴 공격"),
+//    DOPPELGANGER(106, "도플갱어", "대전에서 같은 캐릭터를 공격할 때 공격력이 1.2배 증가합니다.",
+//            SkillCardType.PASSIVE, 1.2, 0.10, "내 턴 공격"),
 
     AUX_BATTERY(107, "보조배터리", "최대 HP가 3% 증가하며 턴 당 HP 충전이 1p 증가합니다.",
             SkillCardType.PASSIVE, 0.03, 0.01, "시작 시점."); // 3% HP 증가 -> 0.03, 1p 증가 -> 0.01 (두 가지 효과 중 하나만 baseEffectValue에 매핑)
