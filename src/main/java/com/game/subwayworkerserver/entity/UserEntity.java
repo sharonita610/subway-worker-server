@@ -1,6 +1,7 @@
 package com.game.subwayworkerserver.entity;
 
 import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -174,13 +175,23 @@ public class UserEntity extends BaseTimeEntity {
         hasPendingReward = false;
     }
 
-    public void giveLevelUpReward(final RewardType type, final int quantity) {
-        if(type.equals(RewardType.COIN)){
-            this.coin += quantity;
-        } else if (type.equals(RewardType.VACATION_TICKET)){
-            this.vacationTicket += quantity;
-        } else if (type.equals(RewardType.GACHA_TICKET)){
-            this.gachaTicket += quantity;
+    public void giveReward(final RewardType type, final int quantity) {
+        if (quantity <= 0) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "지급 수량은 1 이상이어야 합니다.");
+        }
+
+        switch (type) {
+            case COIN:
+                this.coin += quantity;
+                break;
+            case VACATION_TICKET:
+                this.vacationTicket += quantity;
+                break;
+            case GACHA_TICKET:
+                this.gachaTicket += quantity;
+                break;
+            default:
+                throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR, "알 수 없는 보상 타입입니다: " + type);
         }
     }
 }
