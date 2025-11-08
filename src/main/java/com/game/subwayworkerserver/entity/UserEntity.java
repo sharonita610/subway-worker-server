@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 import static com.game.subwayworkerserver.exception.ErrorCode.BAD_REQUEST;
 
 @Getter
@@ -63,6 +65,11 @@ public class UserEntity extends BaseTimeEntity {
 
     @Column(nullable = false)
     private boolean hasDailyCheckInReward = false;
+
+    @Column(nullable = false)
+    private int consecutiveAttendanceDays = 0;
+
+    private LocalDate lastAttendanceDate;
 
     public UserEntity(String name, String uuid, int exp, int level, int totalExp, int coin, int vacationTicket,
                       int gachaTicket, int stage, Gender gender) {
@@ -193,5 +200,21 @@ public class UserEntity extends BaseTimeEntity {
             default:
                 throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR, "알 수 없는 보상 타입입니다: " + type);
         }
+    }
+
+    public void claimMailDone() {
+        this.hasPendingMail = false;
+    }
+
+    public void dailyAttendanceCheck() {
+        this.lastAttendanceDate = LocalDate.now();
+        this.hasDailyCheckInReward = true;
+        this.consecutiveAttendanceDays += 1;
+    }
+
+    public void resetDailyAttendance() {
+        this.lastAttendanceDate = LocalDate.now();
+        this.hasDailyCheckInReward = true;
+        this.consecutiveAttendanceDays = 1;
     }
 }
