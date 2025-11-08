@@ -15,7 +15,7 @@ public class RewardEntity extends BaseTimeEntity{
     private Long id;
 
     @Column(nullable = false)
-    private Long mailId;
+    private long mailId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
