@@ -128,7 +128,8 @@ public class SkillCardService {
 
         SkillCardPaymentOption skillCardPaymentOption =
                 SkillCardPaymentOption.confirmCountAndPriceAndCardType(currencyType, request.price(), skillCardType);
-        checkUserHasEnoughTicketsToPay(request.price(), user, currencyType);
+
+        user.purchaseWithVacationTickets(skillCardPaymentOption.getPrice());
 
         int count = skillCardPaymentOption.getCount();
         List<SkillCardEntity> skillCardEntityList = List.of();
@@ -157,16 +158,6 @@ public class SkillCardService {
         return passiveSkillCards.stream()
                 .map(passiveSkillCard -> SkillCardEntity.of(userId, passiveSkillCard))
                 .toList();
-    }
-
-
-    private void checkUserHasEnoughTicketsToPay(
-            final int price, final UserEntity user, final CurrencyType currencyType
-    ) {
-        boolean enoughTickets = user.hasEnoughTickets(currencyType.getCurrencyType(), price);
-        if (!enoughTickets) {
-            throw new BaseException(ErrorCode.BAD_REQUEST, "Not enough tickets.");
-        }
     }
 
     public SkillListBySkillIdResponse getSkillsAvailableToUpgrade(final String uuid, final long skillCardId) {

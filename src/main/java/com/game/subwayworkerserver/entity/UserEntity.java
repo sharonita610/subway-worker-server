@@ -115,8 +115,11 @@ public class UserEntity extends BaseTimeEntity {
         this.vacationTicket += acquiredTickets;
     }
 
-    public void purchaseWithVacationTickets(final int coworkerRealPrice) {
-        this.vacationTicket -= coworkerRealPrice;
+    public void purchaseWithVacationTickets(final int price) {
+        if (this.vacationTicket < price) {
+            throw new BaseException(BAD_REQUEST, "휴가 티켓이 부족하여 구매할 수 없습니다.");
+        }
+        this.vacationTicket -= price;
     }
 
     public boolean hasEnoughTickets(final String currencyType, final int itemPrice) {
