@@ -223,16 +223,13 @@ public class UserEntity extends BaseTimeEntity {
         this.consecutiveAttendanceDays = 1;
     }
 
-    public void extendAdFreeBenefit(int daysToExtend) {
+    public void extendAdFreeBenefit(final int daysToExtend) {
         LocalDate today = LocalDate.now();
 
-        // 1. 기존 만료일 확인 (혜택이 이미 적용 중인 경우)
         LocalDate currentExpiration = this.adFreeExpirationDate;
         if (currentExpiration == null || currentExpiration.isBefore(today)) {
-            // 혜택이 없거나 이미 만료된 경우: 오늘부터 시작
             this.adFreeExpirationDate = today.plusDays(daysToExtend);
         } else {
-            // 혜택이 유효한 경우: 기존 만료일에 이어서 기간 연장
             this.adFreeExpirationDate = currentExpiration.plusDays(daysToExtend);
         }
     }
