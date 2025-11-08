@@ -11,4 +11,6 @@ public interface RewardRepository extends CrudRepository<RewardEntity, Long> {
     List<RewardEntity> findAllByMailIdInAndIsClaimedFalse(List<Long> mailIds);
 
     List<RewardEntity> findAllByUserIdAndIsClaimedFalseAndSource(final long userId, final RewardSource source);
+
+    List<RewardEntity> findAllByMailIdAndUserIdAndIsClaimedFalse(final long mailId, final long userId);
 }
