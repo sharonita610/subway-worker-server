@@ -8,7 +8,9 @@ public record CoworkerInUseInfo(
     String engName,
     String korName,
     String position,
-    int level
+    int level,
+    String engElement,
+    String korElement
 ) {
     public static List<CoworkerInUseInfo> of(final List<CoworkerEntity> coworkerInUse) {
         return  coworkerInUse.stream()
@@ -17,7 +19,9 @@ public record CoworkerInUseInfo(
                                 coworker.getCoworkerType().name(),
                                 coworker.getName(),
                                 coworker.getLevel().getTitle(),
-                                coworker.getLevel().getLevel()
+                                coworker.getLevel().getLevel(),
+                                coworker.getCoworkerElement().name(),
+                                coworker.getCoworkerElement().getKoreanName()
                         )
                 ).toList();
     }
