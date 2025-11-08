@@ -5,28 +5,29 @@ import com.game.subwayworkerserver.exception.ErrorCode;
 import lombok.Getter;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
 public enum CheckInReward {
 
-    DAY_1(1, 30000L, 0L, 0L, 0, 0),
-    DAY_2(2, 0L, 50L, 0L, 0, 0),
-    DAY_3(3, 50000L, 0L, 0L, 0, 0),
-    DAY_4(4, 0L, 100L, 0L, 0, 0),
-    DAY_5(5, 50000L, 0L, 0L, 1, 0),
-    DAY_6(6, 100000L, 0L, 2L, 0, 0),
-    DAY_7(7, 0L, 100L, 0L, 1, 3);
+    DAY_1(1, 30000L, 0L, 0L, null, null),
+    DAY_2(2, 0L, 50L, 0L, null, null),
+    DAY_3(3, 50000L, 0L, 0L, null, null),
+    DAY_4(4, 0L, 100L, 0L, null, null),
+    DAY_5(5, 50000L, 0L, 0L, MaterialFriend.ENERZ_LV2, null),
+    DAY_6(6, 100000L, 0L, 2L, null, null),
+    DAY_7(7, 0L, 100L, 0L, MaterialFriend.ENERZ_LV4, NoAds.NO_ADS_3DAYS);
 
     private final int day;
     private final long coin;
     private final long vacationTicket;
     private final long gachaTicket;
-    private final int materialFriend;
-    private final int noAds;
+    private final MaterialFriend materialFriend;
+    private final NoAds noAds;
 
-    CheckInReward(int day, long coin, long vacationTicket, long gachaTicket, int materialFriend, int noAds) {
+    CheckInReward(int day, long coin, long vacationTicket, long gachaTicket, MaterialFriend materialFriend, NoAds noAds) {
         this.day = day;
         this.coin = coin;
         this.vacationTicket = vacationTicket;
@@ -55,5 +56,18 @@ public enum CheckInReward {
             throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR, "출석 보상 정의에 오류가 있습니다: " + actualDay);
         }
         return reward;
+    }
+
+    public static List<CheckInReward> getAllRewards() {
+        return Arrays.asList(CheckInReward.values());
+    }
+
+    public enum MaterialFriend {
+        ENERZ_LV2, ENERZ_LV3, ENERZ_LV4, ENERZ_LV5;
+
+    }
+
+    public enum NoAds {
+        NO_ADS_1DAY, NO_ADS_3DAYS, NO_ADS_15DAYS, NO_ADS_30DAYS;
     }
 }
