@@ -42,4 +42,8 @@ public class RewardEntity extends BaseTimeEntity{
         this.quantity = quantity;
         this.isClaimed = isClaimed;
     }
+
+    public void claimRewardDone() {
+        this.isClaimed = true;
+    }
 }
