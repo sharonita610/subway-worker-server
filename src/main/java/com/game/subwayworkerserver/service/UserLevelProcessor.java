@@ -70,6 +70,7 @@ public class UserLevelProcessor {
                     .source(RewardSource.LEVEL_UP)
                     .quantity(reward.coin())
                     .isClaimed(false)
+                    .mailId(0L)
                     .build());
         }
 
@@ -80,6 +81,7 @@ public class UserLevelProcessor {
                     .source(RewardSource.LEVEL_UP)
                     .quantity(reward.vacationTicket())
                     .isClaimed(false)
+                    .mailId(0L)
                     .build());
         }
 
@@ -90,6 +92,7 @@ public class UserLevelProcessor {
                     .source(RewardSource.LEVEL_UP)
                     .quantity(reward.vacationTicket())
                     .isClaimed(false)
+                    .mailId(0L)
                     .build());
         }
 
