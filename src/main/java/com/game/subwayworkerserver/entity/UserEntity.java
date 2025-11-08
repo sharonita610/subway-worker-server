@@ -69,6 +69,11 @@ public class UserEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private int consecutiveAttendanceDays = 0;
 
+    @Column(nullable = false)
+    private int claimedRewardDayUpTo = 0;
+
+    private LocalDate adFreeExpirationDate;
+
     private LocalDate lastAttendanceDate;
 
     public UserEntity(String name, String uuid, int exp, int level, int totalExp, int coin, int vacationTicket,
@@ -216,5 +221,27 @@ public class UserEntity extends BaseTimeEntity {
         this.lastAttendanceDate = LocalDate.now();
         this.hasDailyCheckInReward = true;
         this.consecutiveAttendanceDays = 1;
+    }
+
+    public void extendAdFreeBenefit(int daysToExtend) {
+        LocalDate today = LocalDate.now();
+
+        // 1. 기존 만료일 확인 (혜택이 이미 적용 중인 경우)
+        LocalDate currentExpiration = this.adFreeExpirationDate;
+        if (currentExpiration == null || currentExpiration.isBefore(today)) {
+            // 혜택이 없거나 이미 만료된 경우: 오늘부터 시작
+            this.adFreeExpirationDate = today.plusDays(daysToExtend);
+        } else {
+            // 혜택이 유효한 경우: 기존 만료일에 이어서 기간 연장
+            this.adFreeExpirationDate = currentExpiration.plusDays(daysToExtend);
+        }
+    }
+
+    public boolean isAdFreeActive() {
+        if (this.adFreeExpirationDate == null) {
+            return false;
+        }
+        // 만료일이 오늘보다 미래이면 유효함 (오늘 날짜까지는 포함되어야 하므로 isBefore를 사용)
+        return this.adFreeExpirationDate.isAfter(LocalDate.now());
     }
 }
