@@ -11,7 +11,11 @@ public record UserBaseInfo(
         int vacationTicket,
         int gachaTicket,
         boolean hasPendingReward,
-        boolean hasTrappedSomething
+        boolean hasTrappedSomething,
+        boolean hasDailyCheckInReward,
+        boolean hasPendingMail,
+        int consecutiveAttendanceDays
+
 
 ) {
     public static UserBaseInfo of(UserEntity user) {
@@ -24,7 +28,10 @@ public record UserBaseInfo(
                 user.getVacationTicket(),
                 user.getGachaTicket(),
                 user.isHasPendingReward(),
-                user.isTrapSuccess()
+                user.isTrapSuccess(),
+                user.isHasDailyCheckInReward(),
+                user.isHasPendingMail(),
+                user.getConsecutiveAttendanceDays()
         );
     }
 }
