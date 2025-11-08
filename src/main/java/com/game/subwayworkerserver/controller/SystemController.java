@@ -6,6 +6,7 @@ import com.game.subwayworkerserver.controller.response.UserMailBoxResponse;
 import com.game.subwayworkerserver.service.SystemService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +20,7 @@ public class SystemController {
     private final SystemService systemService;
 
     @Operation(
-            summary = "우편함 조회 [test]",
+            summary = "우편함 조회 [완]",
             description = "동료 리스트를 조회"
     )
     @GetMapping("/mail-box")
@@ -33,7 +34,7 @@ public class SystemController {
             description = "mailId 로 단일 보상을 받는 기능"
     )
     @PostMapping("/mail-box")
-    public String claimRewardById(@RequestParam("id") long mailId) {
+    public ResponseEntity<HttpStatus> claimRewardById(@RequestParam("id") long mailId) {
         String uuid = SecurityUtils.getCurrentUserUuid();
 
         return null;
@@ -45,14 +46,14 @@ public class SystemController {
             description = "우편함에 있는 모든 보상 받기"
     )
     @PostMapping("/mail-box/all")
-    public String claimAllRewards() {
+    public ResponseEntity<HttpStatus> claimAllRewards() {
         String uuid = SecurityUtils.getCurrentUserUuid();
 
         return null;
     }
 
     @Operation(
-            summary = "레벨 업 보상 받기 [test]",
+            summary = "레벨 업 보상 받기 [완]",
             description = "사용자의 레벨 상승 보상받기"
     )
     @GetMapping("/level-up-reward")
