@@ -1,8 +1,11 @@
 package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.SecurityUtils;
+import com.game.subwayworkerserver.controller.response.UserMailBoxResponse;
+import com.game.subwayworkerserver.service.SystemService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -10,18 +13,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class UserSystemController {
+public class SystemController {
 
+    private final SystemService systemService;
 
     @Operation(
             summary = "우편함 조회",
             description = "동료 리스트를 조회"
     )
     @GetMapping("/mail-box")
-    public String mailBox() {
+    public ResponseEntity<UserMailBoxResponse> mailBox() {
         String uuid = SecurityUtils.getCurrentUserUuid();
-
-        return null;
+        return ResponseEntity.ok(systemService.getMailBox(uuid));
     }
 
     @Operation(
