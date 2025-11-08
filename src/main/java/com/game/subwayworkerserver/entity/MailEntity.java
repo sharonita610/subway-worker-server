@@ -18,9 +18,9 @@ public class MailEntity extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
-    private Long userId;
+    private long userId;
 
-    private String sender = "system";
+    private String sender;
 
     @Column(nullable = false)
     private String title;
@@ -33,19 +33,19 @@ public class MailEntity extends BaseTimeEntity {
     private boolean isClaimed = false;
 
     @Column(nullable = false)
-    private LocalDateTime sentAt = LocalDateTime.now();
+    private LocalDateTime sentAt;
 
     private LocalDateTime expiresAt;
 
     @Builder
     public MailEntity(Long userId, String sender, String title, String content, boolean isRead, boolean isClaimed, LocalDateTime sentAt) {
         this.userId = userId;
-        this.sender = sender;
+        this.sender = "system";
         this.title = title;
         this.content = content;
         this.isRead = isRead;
         this.isClaimed = isClaimed;
-        this.sentAt = sentAt;
+        this.sentAt = LocalDateTime.now();
     }
 
     public void markAsRead() {
@@ -54,7 +54,7 @@ public class MailEntity extends BaseTimeEntity {
         }
     }
 
-    public void markAsClaimed() {
+    public void claimDone() {
         if (this.isClaimed) {
             throw new IllegalStateException("이미 수령된 보상입니다.");
         }
