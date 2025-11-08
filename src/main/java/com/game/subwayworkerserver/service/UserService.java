@@ -25,7 +25,7 @@ public class UserService {
     private final CoworkerListFilter coworkerListFilter;
     private final UserGachaRepository gachaRepository;
     private final SkillCardRepository skillCardRepository;
-
+    private final AttendanceChecker attendanceChecker;
 
     public Boolean verifyUserName(final String name) {
         if (name == null) {
@@ -55,9 +55,12 @@ public class UserService {
         return savedUser.getUuid();
     }
 
+    @Transactional
     public UserResponse getUserInfos(final String uuid) {
 
         UserEntity user = findUserBy(uuid);
+        attendanceChecker.checkDailyAttendance(user);
+
         List<CoworkerEntity> coworkerInUse = coworkerRepository.findByUserIdAndInUseTrue(user.getId());
 
         return new UserResponse(
