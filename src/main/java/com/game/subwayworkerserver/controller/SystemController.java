@@ -31,7 +31,7 @@ public class SystemController {
     }
 
     @Operation(
-            summary = "단일 보상 받기 [test]",
+            summary = "단일 보상 받기 [완]",
             description = "mailId 로 단일 보상을 받는 기능"
     )
     @PostMapping("/mail-box")
@@ -42,7 +42,7 @@ public class SystemController {
     }
 
     @Operation(
-            summary = "전체 단일 보상 받기 [test]",
+            summary = "전체 보상 받기 [완]",
             description = "우편함에 있는 모든 보상 받기"
     )
     @PostMapping("/mail-box/all")
