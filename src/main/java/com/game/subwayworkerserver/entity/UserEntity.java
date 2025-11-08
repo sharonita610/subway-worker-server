@@ -57,6 +57,12 @@ public class UserEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private boolean hasPendingReward = false;
 
+    @Column(nullable = false)
+    private boolean hasPendingMail = false;
+
+    @Column(nullable = false)
+    private boolean hasDailyCheckInReward = false;
+
     public UserEntity(String name, String uuid, int exp, int level, int totalExp, int coin, int vacationTicket,
                       int gachaTicket, int stage, Gender gender) {
         this.name = name;
