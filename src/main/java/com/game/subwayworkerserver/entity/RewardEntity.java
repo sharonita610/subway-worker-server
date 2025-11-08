@@ -1,4 +1,5 @@
 package com.game.subwayworkerserver.entity;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,7 @@ import lombok.Builder;
 @Entity
 @Table(name = "reward")
 @NoArgsConstructor
-public class RewardEntity extends BaseTimeEntity{
+public class RewardEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,19 +29,25 @@ public class RewardEntity extends BaseTimeEntity{
     private RewardSource source;
 
     @Column(nullable = false)
-    private int quantity;
+    private long quantity;
 
     @Column(nullable = false)
     private boolean isClaimed = false;
 
+    private String extraInfo;
+
     @Builder
-    public RewardEntity(Long userId, long mailId, RewardType type, RewardSource source, int quantity, boolean isClaimed) {
+    public RewardEntity(
+            Long userId, long mailId, RewardType type, RewardSource source, long quantity, boolean isClaimed,
+            String extraInfo
+    ) {
         this.userId = userId;
         this.mailId = mailId;
         this.type = type;
         this.source = source;
         this.quantity = quantity;
         this.isClaimed = isClaimed;
+        this.extraInfo = extraInfo;
     }
 
     public void claimRewardDone() {
