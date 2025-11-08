@@ -46,7 +46,7 @@ public record MailReward(
             int quantity
     ) {
         public static RewardBaseInfo of(final RewardEntity rewardEntity) {
-            return new RewardBaseInfo(rewardEntity.getType().name(), rewardEntity.getQuantity());
+            return new RewardBaseInfo(rewardEntity.getType().name(), (int) rewardEntity.getQuantity());
         }
     }
 }
