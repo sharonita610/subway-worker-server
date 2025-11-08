@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.service;
 
+import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import lombok.Getter;
@@ -57,12 +58,33 @@ public enum CheckInReward {
         return Arrays.asList(CheckInReward.values());
     }
 
+    @Getter
     public enum MaterialFriend {
-        ENERZ_LV2, ENERZ_LV3, ENERZ_LV4, ENERZ_LV5;
+        ENERZ_LV2(CoworkerType.ENERZ, 2),
+        ENERZ_LV3(CoworkerType.ENERZ, 3),
+        ENERZ_LV4(CoworkerType.ENERZ, 4),
+        ENERZ_LV5(CoworkerType.ENERZ, 5);
 
+        private final CoworkerType type;
+        private final int level;
+
+        MaterialFriend(CoworkerType type, int level) {
+            this.type = type;
+            this.level = level;
+        }
     }
 
+    @Getter
     public enum NoAds {
-        NO_ADS_1DAY, NO_ADS_3DAYS, NO_ADS_15DAYS, NO_ADS_30DAYS;
+        NO_ADS_1DAY(1),
+        NO_ADS_3DAYS(3),
+        NO_ADS_15DAYS(15),
+        NO_ADS_30DAYS(30);
+
+        private final int days;
+
+        NoAds(int days) {
+            this.days = days;
+        }
     }
 }
