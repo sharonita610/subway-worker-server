@@ -63,7 +63,7 @@ public class SystemController {
     }
 
     @Operation(
-            summary = "출근부 조회 [test]",
+            summary = "출근부 조회 [완]",
             description = "사용자의 레벨 상승 보상받기"
     )
     @GetMapping("/check-in-list")
