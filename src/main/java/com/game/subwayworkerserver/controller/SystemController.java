@@ -1,6 +1,7 @@
 package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.SecurityUtils;
+import com.game.subwayworkerserver.controller.response.LevelUpRewardResponse;
 import com.game.subwayworkerserver.controller.response.UserMailBoxResponse;
 import com.game.subwayworkerserver.service.SystemService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +19,7 @@ public class SystemController {
     private final SystemService systemService;
 
     @Operation(
-            summary = "우편함 조회",
+            summary = "우편함 조회 [test]",
             description = "동료 리스트를 조회"
     )
     @GetMapping("/mail-box")
@@ -48,6 +49,16 @@ public class SystemController {
         String uuid = SecurityUtils.getCurrentUserUuid();
 
         return null;
+    }
+
+    @Operation(
+            summary = "레벨 업 보상 받기 [test]",
+            description = "사용자의 레벨 상승 보상받기"
+    )
+    @GetMapping("/level-up-reward")
+    public ResponseEntity<LevelUpRewardResponse> getLevelUpReward() {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        return ResponseEntity.ok(systemService.getLevelUpReward(uuid));
     }
 
 }
