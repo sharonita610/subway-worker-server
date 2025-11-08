@@ -1,15 +1,18 @@
 package com.game.subwayworkerserver.service;
 
+import com.game.subwayworkerserver.controller.response.LevelUpRewardResponse;
 import com.game.subwayworkerserver.controller.response.UserMailBoxResponse;
 import com.game.subwayworkerserver.domain.user.MailReward;
 import com.game.subwayworkerserver.entity.MailEntity;
 import com.game.subwayworkerserver.entity.RewardEntity;
+import com.game.subwayworkerserver.entity.RewardSource;
 import com.game.subwayworkerserver.entity.UserEntity;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.MailRepository;
 import com.game.subwayworkerserver.repository.RewardRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +30,7 @@ public class SystemService {
         UserEntity user = getUserByUuid(uuid);
         List<MailEntity> mailList = mailRepository.findByUserIdAndIsReadFalseAndIsClaimedFalse(user.getId());
         List<Long> mailIdList = getMailIdList(mailList);
-        List<RewardEntity> allByMailIdIn = rewardRepository.findAllByMailIdIn(mailIdList);
+        List<RewardEntity> allByMailIdIn = rewardRepository.findAllByMailIdInAndIsClaimedFalse(mailIdList);
         List<MailReward> domainList = MailReward.toDomain(mailList, allByMailIdIn);
         return UserMailBoxResponse.of(domainList);
     }
@@ -42,5 +45,20 @@ public class SystemService {
         return userRepository.findByUuid(uuid).orElseThrow(
                 () -> new BaseException(ErrorCode.USER_NOT_FOUND)
         );
+    }
+
+    @Transactional
+    public LevelUpRewardResponse getLevelUpReward(final String uuid) {
+        UserEntity user = getUserByUuid(uuid);
+        List<RewardEntity> levelUpReward = rewardRepository.findAllByUserIdAndIsClaimedFalseAndSource(
+                user.getId(), RewardSource.LEVEL_UP
+        );
+        if (levelUpReward.isEmpty()) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "현재기준 레벨업 보상이 없습니다.");
+        }
+        levelUpReward.forEach(reward -> user.giveLevelUpReward(reward.getType(), reward.getQuantity()));
+
+        user.changeStatus();
+        return LevelUpRewardResponse.of(levelUpReward);
     }
 }
