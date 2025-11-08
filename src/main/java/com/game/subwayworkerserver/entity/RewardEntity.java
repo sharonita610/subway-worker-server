@@ -22,10 +22,10 @@ public class RewardEntity extends BaseTimeEntity{
     private RewardType type;
 
     @Column(nullable = false)
-    private int quantity;
+    private long quantity;
 
     @Builder
-    public RewardEntity(long mailId, RewardType type, int quantity) {
+    public RewardEntity(long mailId, RewardType type, long quantity) {
         this.mailId = mailId;
         this.type = type;
         this.quantity = quantity;
