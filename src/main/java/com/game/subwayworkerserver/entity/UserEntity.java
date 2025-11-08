@@ -187,7 +187,7 @@ public class UserEntity extends BaseTimeEntity {
         hasPendingReward = false;
     }
 
-    public void giveReward(final RewardType type, final int quantity) {
+    public void giveReward(final RewardType type, final long quantity) {
         if (quantity <= 0) {
             throw new BaseException(ErrorCode.BAD_REQUEST, "지급 수량은 1 이상이어야 합니다.");
         }
@@ -243,5 +243,10 @@ public class UserEntity extends BaseTimeEntity {
         }
         // 만료일이 오늘보다 미래이면 유효함 (오늘 날짜까지는 포함되어야 하므로 isBefore를 사용)
         return this.adFreeExpirationDate.isAfter(LocalDate.now());
+    }
+
+    public void updateClaimDailyRewardDone(final int dayClaimed) {
+        this.claimedRewardDayUpTo = dayClaimed;
+        this.hasDailyCheckInReward = false;
     }
 }
