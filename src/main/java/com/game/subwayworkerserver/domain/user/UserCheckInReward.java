@@ -3,6 +3,7 @@ package com.game.subwayworkerserver.domain.user;
 import com.game.subwayworkerserver.entity.RewardType;
 import com.game.subwayworkerserver.service.CheckInReward;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public record UserCheckInReward(
@@ -31,7 +32,7 @@ public record UserCheckInReward(
 
     private static List<DailyRewardInfo> createRewardList(CheckInReward reward) {
 
-        List<DailyRewardInfo> list = new java.util.ArrayList<>();
+        List<DailyRewardInfo> list = new ArrayList<>();
 
         if (reward.getCoin() > 0) {
             list.add(new DailyRewardInfo(RewardType.COIN.name(), (int) reward.getCoin()));
