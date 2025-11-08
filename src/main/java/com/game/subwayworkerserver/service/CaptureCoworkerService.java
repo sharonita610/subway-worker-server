@@ -2,6 +2,7 @@ package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.CaptureCoworkerRequest;
 import com.game.subwayworkerserver.controller.response.CaptureResponse;
+import com.game.subwayworkerserver.domain.reward.BaseReward;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
@@ -27,6 +28,7 @@ public class CaptureCoworkerService {
     private final CaptureRecordRepository captureRecordRepository;
     private final UserItemMapRepository  userItemMapRepository;
     private final CoworkerRepository coworkerRepository;
+    private final UserLevelProcessor userLevelProcessor;
 
     private static final String COWORKER_LOCATIONS_KEY = "coworker:locations";
     private static final String USER_ACQUIRED_PREFIX = "user:acquired:";
@@ -52,9 +54,10 @@ public class CaptureCoworkerService {
         }
 
         // user 정보 조회
-        long userId = userRepository.findByUuid(uuid).orElseThrow(
+        UserEntity user = userRepository.findByUuid(uuid).orElseThrow(
                 () -> new BaseException(ErrorCode.USER_NOT_FOUND)
-        ).getId();
+        );
+        long userId = user.getId();
 
         // user item map 에서 도구 조회
         ItemName itemName = ItemName.fromConstantName(request.captureItemName());
@@ -92,7 +95,11 @@ public class CaptureCoworkerService {
             hideCoworkerFromUser(request.coworkerId(), acquiredKey);
             captureRecord.increaseSuccessCount();
 
-            return CaptureResponse.of(captureAttemptCount, coworkerEntity, position);
+            BaseReward captureReward = BaseReward.getCaptureReward();
+            int extraExp = captureAttemptCount == 0 ? 50 : 0;
+            userLevelProcessor.processExpGainAndLevelUp(user, captureReward, extraExp);
+
+            return CaptureResponse.of(captureReward, extraExp, coworkerEntity, position);
         }
 
         // 3. 포획 실패 (Failure)
