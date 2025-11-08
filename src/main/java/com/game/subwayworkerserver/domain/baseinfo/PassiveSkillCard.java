@@ -67,15 +67,21 @@ public enum PassiveSkillCard {
 
     public static List<PassiveSkillCard> getRandomCard(final int count) {
         PassiveSkillCard[] allCardsArray = PassiveSkillCard.values();
-        List<PassiveSkillCard> allCards = new ArrayList<>(List.of(allCardsArray));
+        int totalAvailable = allCardsArray.length;
+        List<PassiveSkillCard> resultCards = new ArrayList<>(count);
+
         if (count <= 0) {
             return Collections.emptyList();
         }
 
-        Collections.shuffle(allCards, ThreadLocalRandom.current());
-        int subListSize = Math.min(count, allCards.size());
-        return allCards.subList(0, subListSize);
+        for (int i = 0; i < count; i++) {
+            int randomIndex = ThreadLocalRandom.current().nextInt(totalAvailable);
+            resultCards.add(allCardsArray[randomIndex]);
+        }
+        return resultCards;
     }
+
+
     /**
      * 특정 레벨에서의 최종 효과 수치를 계산합니다.
      *
