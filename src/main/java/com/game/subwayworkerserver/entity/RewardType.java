@@ -6,5 +6,6 @@ public enum RewardType {
     VACATION_TICKET,
     GACHA_TICKET,
     ENERZ,
+    NO_ADS
 
 }
