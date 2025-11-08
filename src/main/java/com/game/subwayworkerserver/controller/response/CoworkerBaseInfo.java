@@ -76,29 +76,25 @@ public record CoworkerBaseInfo(
                 .build();
     }
 
-    private static List<SkillCard> getSelectedSkill(final long userId, List<SkillCardEntity> skillCardEntityList) {
+    private static List<SkillCard> getSelectedSkill(final long coworkerId, List<SkillCardEntity> skillCardEntityList) {
         return skillCardEntityList.stream()
-                .map(card -> {
-
-                    if (!Objects.equals(userId, card.getCoworkerId())) {
-                        return null;
-                    }
-                    return SkillCard.builder()
-                            .id(card.getId())
-                            .engName(card.getEngName())
-                            .korName(card.getKorName())
-                            .description(getDescription(card))
-                            .level(card.getCurrentLevel())
-                            .requiredCount(card.getRequiredCount())
-                            .actualCount(card.getCount())
-                            .inUse(card.isInUse())
-                            .thisCoworkerUsing(true)
-                            .otherCoworkerUsing(false)
-                            .onSale(card.isOnSale())
-                            .coworkerId(card.getCoworkerId() != null ? card.getCoworkerId() : 0L)
-                            .cardType(card.getType().name())
-                            .build();
-                })
+                .filter(card -> Objects.equals(coworkerId, card.getCoworkerId()))
+                .filter(SkillCardEntity::isInUse)
+                .map(card -> SkillCard.builder()
+                        .id(card.getId())
+                        .engName(card.getEngName())
+                        .korName(card.getKorName())
+                        .description(getDescription(card))
+                        .level(card.getCurrentLevel())
+                        .requiredCount(card.getRequiredCount())
+                        .actualCount(card.getCount())
+                        .inUse(card.isInUse())
+                        .thisCoworkerUsing(true)
+                        .otherCoworkerUsing(false)
+                        .onSale(card.isOnSale())
+                        .coworkerId(card.getCoworkerId() != null ? card.getCoworkerId() : 0L)
+                        .cardType(card.getType().name())
+                        .build())
                 .toList();
     }
 
