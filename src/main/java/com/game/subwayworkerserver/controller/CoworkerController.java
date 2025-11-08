@@ -65,7 +65,7 @@ public class CoworkerController {
             description = "강화가 가능한 동일한 카드만 조회하는 기능"
     )
     @GetMapping("/skills/upgrade")
-    public ResponseEntity<SkillListBySkillIdResponse> getSkillsAvailableToUpgrade(@RequestParam long skillCardId) {
+    public ResponseEntity<SkillListBySkillIdResponse> getSkillsAvailableToUpgrade(@RequestParam("id") long skillCardId) {
         String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok(skillCardService.getSkillsAvailableToUpgrade(uuid, skillCardId));
     }
