@@ -1,0 +1,50 @@
+package com.game.subwayworkerserver.controller;
+
+import com.game.subwayworkerserver.config.SecurityUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+public class UserSystemController {
+
+
+    @Operation(
+            summary = "우편함 조회",
+            description = "동료 리스트를 조회"
+    )
+    @GetMapping("/mail-box")
+    public String mailBox() {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+
+        return null;
+    }
+
+    @Operation(
+            summary = "단일 보상 받기",
+            description = "mailId 로 단일 보상을 받는 기능"
+    )
+    @PostMapping("/mail-box")
+    public String claimRewardById(@RequestParam("id") long mailId) {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+
+        return null;
+    }
+
+
+    @Operation(
+            summary = "전체 단일 보상 받기",
+            description = "우편함에 있는 모든 보상 받기"
+    )
+    @PostMapping("/mail-box/all")
+    public String claimAllRewards() {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+
+        return null;
+    }
+
+}
