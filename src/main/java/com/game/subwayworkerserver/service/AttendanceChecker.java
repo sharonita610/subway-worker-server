@@ -26,5 +26,6 @@ public class AttendanceChecker {
 
             user.dailyAttendanceCheck();
         }
+        user.resetDailyAttendance();
     }
 }
