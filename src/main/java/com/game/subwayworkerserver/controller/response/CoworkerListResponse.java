@@ -26,7 +26,7 @@ public record CoworkerListResponse(
 
     public static CoworkerListResponse of(List<CoworkerEntity> coworkerEntityList) {
         List<CoworkerBaseInfo> coworkerBaseInfos = coworkerEntityList.stream()
-                .map((CoworkerEntity coworker) -> CoworkerBaseInfo.fromEntity(coworker))
+                .map(CoworkerBaseInfo::fromEntity)
                 .toList();
         return new CoworkerListResponse(coworkerBaseInfos);
     }
