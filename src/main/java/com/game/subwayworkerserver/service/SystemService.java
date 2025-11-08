@@ -2,13 +2,13 @@ package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.response.LevelUpRewardResponse;
 import com.game.subwayworkerserver.controller.response.UserMailBoxResponse;
+import com.game.subwayworkerserver.domain.baseinfo.CoworkerLevel;
+import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.domain.user.MailReward;
-import com.game.subwayworkerserver.entity.MailEntity;
-import com.game.subwayworkerserver.entity.RewardEntity;
-import com.game.subwayworkerserver.entity.RewardSource;
-import com.game.subwayworkerserver.entity.UserEntity;
+import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
+import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.MailRepository;
 import com.game.subwayworkerserver.repository.RewardRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
@@ -25,6 +25,7 @@ public class SystemService {
     private final UserRepository userRepository;
     private final MailRepository mailRepository;
     private final RewardRepository rewardRepository;
+    private final CoworkerRepository coworkerRepository;
 
     public UserMailBoxResponse getMailBox(final String uuid) {
         UserEntity user = getUserByUuid(uuid);
@@ -57,11 +58,44 @@ public class SystemService {
             throw new BaseException(ErrorCode.BAD_REQUEST, "현재기준 레벨업 보상이 없습니다.");
         }
         levelUpReward.forEach(reward -> {
-            user.giveLevelUpReward(reward.getType(), reward.getQuantity());
+            user.giveReward(reward.getType(), reward.getQuantity());
             reward.claimRewardDone();
         });
 
         user.claimRewardDone();
         return LevelUpRewardResponse.of(levelUpReward);
+    }
+
+    @Transactional
+    public void claimRewardById(final String uuid, final long mailId) {
+        UserEntity user = getUserByUuid(uuid);
+        long userId = user.getId();
+
+        MailEntity mail = getMail(mailId);
+        List<RewardEntity> rewardList = rewardRepository.findAllByMailIdAndUserIdAndIsClaimedFalse(mail.getId(), userId);
+        rewardList.forEach(reward -> {
+            if(reward.getType().equals(RewardType.ENERZ)) {
+                processMaterialFriend(userId);
+            }
+            user.giveReward(reward.getType(), reward.getQuantity());
+            reward.claimRewardDone();
+        });
+
+        user.claimRewardDone();
+    }
+
+    private void processMaterialFriend(long userId) {
+        CoworkerEntity coworkerEntity = CoworkerEntity.of(userId, CoworkerType.ENERZ, CoworkerLevel.getSpecialCoworkerLevel());
+        coworkerRepository.save(coworkerEntity);
+    }
+
+    private MailEntity getMail(long mailId) {
+        return mailRepository.findById(mailId).orElseThrow(
+                () -> new BaseException(ErrorCode.NOT_FOUND, "Mail id not found.")
+        );
+    }
+
+    public void claimAllRewards(final String uuid) {
+
     }
 }
