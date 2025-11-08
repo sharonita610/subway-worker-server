@@ -170,7 +170,7 @@ public class UserEntity extends BaseTimeEntity {
         hasPendingReward = true;
     }
 
-    public void changeStatus() {
+    public void claimRewardDone() {
         hasPendingReward = false;
     }
 

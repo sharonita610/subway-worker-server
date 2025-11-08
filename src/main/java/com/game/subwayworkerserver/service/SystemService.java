@@ -56,9 +56,12 @@ public class SystemService {
         if (levelUpReward.isEmpty()) {
             throw new BaseException(ErrorCode.BAD_REQUEST, "현재기준 레벨업 보상이 없습니다.");
         }
-        levelUpReward.forEach(reward -> user.giveLevelUpReward(reward.getType(), reward.getQuantity()));
+        levelUpReward.forEach(reward -> {
+            user.giveLevelUpReward(reward.getType(), reward.getQuantity());
+            reward.claimRewardDone();
+        });
 
-        user.changeStatus();
+        user.claimRewardDone();
         return LevelUpRewardResponse.of(levelUpReward);
     }
 }
