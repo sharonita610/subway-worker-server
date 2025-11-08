@@ -41,12 +41,12 @@ public class AttendanceRewardProcessor {
         }
         if (reward.getMaterialFriend() != null) {
             rewardsToSave.add(
-                    getBuildWithExtraInfo(userId, RewardType.ENERZ, mailId, reward.getMaterialFriend().name())
+                    getBuildWithExtraInfo(userId, RewardType.ENERZ, mailId, String.valueOf(reward.getMaterialFriend().getLevel()))
             );
         }
         if (reward.getNoAds() != null) {
             rewardsToSave.add(
-                    getBuildWithExtraInfo(userId, RewardType.NO_ADS, mailId, reward.getNoAds().name())
+                    getBuildWithExtraInfo(userId, RewardType.NO_ADS, mailId, String.valueOf(reward.getNoAds().getDays()))
             );
         }
 
