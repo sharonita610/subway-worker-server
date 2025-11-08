@@ -6,8 +6,8 @@ import com.game.subwayworkerserver.entity.CoworkerEntity;
 import java.util.List;
 
 public record EnabledSkills(
-        List<SkillBaseInfo> passiveSkills,
-        List<SkillBaseInfo> activeSkills
+        List<SkillBaseInfo> activeSkills,
+        List<SkillBaseInfo> passiveSkills
 ) {
     public static EnabledSkills of(CoworkerEntity coworker) {
         return new EnabledSkills(
