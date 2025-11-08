@@ -10,7 +10,7 @@ public record LevelUpRewardResponse(
     public static LevelUpRewardResponse of(final List<RewardEntity> levelUpReward) {
         return new LevelUpRewardResponse(
                 levelUpReward.stream()
-                        .map(reward-> RewardInfo.of(reward.getType().name(), reward.getQuantity()))
+                        .map(reward-> RewardInfo.of(reward.getType().name(), (int) reward.getQuantity()))
                 .toList()
         ) ;
     }
