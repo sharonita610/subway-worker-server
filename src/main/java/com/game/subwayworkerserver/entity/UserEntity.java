@@ -169,4 +169,18 @@ public class UserEntity extends BaseTimeEntity {
     public void hasReward() {
         hasPendingReward = true;
     }
+
+    public void changeStatus() {
+        hasPendingReward = false;
+    }
+
+    public void giveLevelUpReward(final RewardType type, final int quantity) {
+        if(type.equals(RewardType.COIN)){
+            this.coin += quantity;
+        } else if (type.equals(RewardType.VACATION_TICKET)){
+            this.vacationTicket += quantity;
+        } else if (type.equals(RewardType.GACHA_TICKET)){
+            this.gachaTicket += quantity;
+        }
+    }
 }
