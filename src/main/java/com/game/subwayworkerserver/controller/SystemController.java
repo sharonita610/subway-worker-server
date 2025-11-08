@@ -30,16 +30,15 @@ public class SystemController {
     }
 
     @Operation(
-            summary = "단일 보상 받기",
+            summary = "단일 보상 받기 [test]",
             description = "mailId 로 단일 보상을 받는 기능"
     )
     @PostMapping("/mail-box")
     public ResponseEntity<HttpStatus> claimRewardById(@RequestParam("id") long mailId) {
         String uuid = SecurityUtils.getCurrentUserUuid();
-
-        return null;
+        systemService.claimRewardById(uuid, mailId);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
-
 
     @Operation(
             summary = "전체 단일 보상 받기",
@@ -48,8 +47,8 @@ public class SystemController {
     @PostMapping("/mail-box/all")
     public ResponseEntity<HttpStatus> claimAllRewards() {
         String uuid = SecurityUtils.getCurrentUserUuid();
-
-        return null;
+        systemService.claimAllRewards(uuid);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @Operation(
