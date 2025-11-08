@@ -1,7 +1,6 @@
 package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.OpenSkillCardRequest;
-import com.game.subwayworkerserver.controller.request.SkillByUserRequest;
 import com.game.subwayworkerserver.controller.request.SkillCardConfigureRequest;
 import com.game.subwayworkerserver.controller.request.UpgradeRequest;
 import com.game.subwayworkerserver.controller.response.*;
@@ -42,12 +41,13 @@ public class SkillCardService {
 
     private static final int COST_PER_CARD = 10000;
 
-    public SkillByCoworkerResponse getSkillListByUserAndCoworker(String uuid, SkillByUserRequest request) {
+    public SkillByCoworkerResponse getSkillListByUserAndCoworker(
+            final String uuid, final long coworkerId, final String cardType) {
         UserEntity user = getUserEntityByUuid(uuid);
 
-        CoworkerEntity coworkerEntity = getCoworkerEntity(request.coworkerId());
+        CoworkerEntity coworkerEntity = getCoworkerEntity(coworkerId);
 
-        SkillCardType skillCardType = SkillCardType.valueOf(request.cardType().toUpperCase());
+        SkillCardType skillCardType = SkillCardType.valueOf(cardType.toUpperCase());
 
         List<Integer> requestedSkill = new ArrayList<>();
 
