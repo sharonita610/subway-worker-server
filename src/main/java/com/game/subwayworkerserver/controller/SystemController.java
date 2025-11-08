@@ -64,11 +64,22 @@ public class SystemController {
 
     @Operation(
             summary = "출근부 조회 [완]",
-            description = "사용자의 레벨 상승 보상받기"
+            description = "연속 출석부 조회 및 현재까지 받은 보상조회"
     )
     @GetMapping("/check-in-list")
     public ResponseEntity<CheckInListResponse> getCheckInRewardList() {
         String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok(systemService.getCheckInRewardList(uuid));
+    }
+
+    @Operation(
+            summary = "출석 보상 받기 [완]",
+            description = "아직 받지 못한 축석 보상 받기"
+    )
+    @PostMapping("/check-in")
+    public ResponseEntity<HttpStatus> claimCheckInReward() {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        systemService.claimCheckInReward(uuid);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 }
