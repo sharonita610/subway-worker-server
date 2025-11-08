@@ -6,6 +6,7 @@ import com.game.subwayworkerserver.controller.response.UserMailBoxResponse;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerLevel;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.domain.user.MailReward;
+import com.game.subwayworkerserver.domain.user.UserCheckInReward;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
@@ -17,7 +18,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -121,47 +121,11 @@ public class SystemService {
     }
 
     public CheckInListResponse getCheckInRewardList(final String uuid) {
-
-        return null;
+        UserEntity user = getUserByUuid(uuid);
+        int claimedRewardDayUpTo = user.getClaimedRewardDayUpTo();
+        List<CheckInReward> allRewards = CheckInReward.getAllRewards();
+        List<UserCheckInReward> userCheckInRewards = UserCheckInReward.toDomain(claimedRewardDayUpTo, allRewards);
+        return CheckInListResponse.of(userCheckInRewards);
     }
-    @Transactional
-    public void checkAndClaimDailyAttendance(Long userId) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
-        LocalDate today = LocalDate.now();
-        LocalDate lastDate = user.getLastAttendanceDate();
-        int currentDays = user.getConsecutiveAttendanceDays();
-
-        // 1. ⭐️ 마지막 출석일 확인 및 연속성 검사
-        if (lastDate != null) {
-
-            // A) 오늘 이미 출석했는지 확인 (하루 기준 00:00:00)
-            if (lastDate.isEqual(today)) {
-                throw new BaseException(ErrorCode.BAD_REQUEST, "오늘은 이미 출석 보상을 수령했습니다.");
-            }
-
-            // B) 어제가 아닌지 확인 (연속 출석 실패 = 리셋 조건)
-            LocalDate yesterday = today.minusDays(1);
-            if (lastDate.isBefore(yesterday)) {
-                // 1일차부터 다시 시작해야 함
-                currentDays = 0;
-            }
-        }
-
-        // 2. 연속 일수 업데이트
-        // (실패했거나 처음 출석 시 currentDays=0, 연속 성공 시 currentDays=1~6)
-        currentDays++;
-
-        // 3. 7일차를 초과했는지 확인 (7일 주기가 완료되었으므로 다시 1일차로 시작)
-        if (currentDays > 7) {
-            currentDays = 1;
-        }
-
-        // 4. 보상 지급
-        CheckInReward reward = CheckInReward.getRewardByDay(currentDays);
-        // rewardService.grantRewardToUser(userId, reward);
-
-        // 5. 유저 상태 업데이트
-    }
 }
