@@ -26,7 +26,7 @@ public class SkillCardListFilter {
         return Comparator
                 .comparing(SkillCardEntity::getCurrentLevel, Comparator.reverseOrder())
                 .thenComparing(SkillCardEntity::getCount, Comparator.reverseOrder())
-                .thenComparing(SkillCardEntity::getKorName);
+                .thenComparing(SkillCardEntity::getKorName, Comparator.naturalOrder());
     }
 
     public List<SkillCardOnSale> filter(List<SkillCardOnSale> cards, SkillCardFilterRequest request) {

@@ -61,7 +61,8 @@ public class SkillCardService {
 
         List<SkillCardEntity> skillCardEntityList =
                 skillCardRepository.findAllByUserIdAndAvailableTrueAndSkillCardEnumIdInAndOnSaleFalse(user.getId(), requestedSkill);
-        return SkillByCoworkerResponse.of(skillCardEntityList, coworkerEntity.getId());
+        List<SkillCardEntity> filteredSkills = skillCardListFilter.defaultFilter(skillCardEntityList);
+        return SkillByCoworkerResponse.of(filteredSkills, coworkerEntity.getId());
     }
 
     private CoworkerEntity getCoworkerEntity(final long coworkerId) {
