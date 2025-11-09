@@ -6,10 +6,12 @@ import com.game.subwayworkerserver.controller.response.CoworkerTypesResponse;
 import com.game.subwayworkerserver.controller.response.UserUpgradeResponse;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
+import com.game.subwayworkerserver.entity.SkillCardEntity;
 import com.game.subwayworkerserver.entity.UserEntity;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
+import com.game.subwayworkerserver.repository.SkillCardRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class CoworkerService {
 
     private final CoworkerRepository coworkerRepository;
     private final UserRepository userRepository;
+    private final SkillCardRepository skillCardRepository;
 
     private static final String ENERZ = "ENERZ";
 
@@ -73,7 +76,9 @@ public class CoworkerService {
         coworkerRepository.deleteAll(materials);
         target.accumulateExp(totalGainedExp);
         CoworkerEntity upgraded = coworkerRepository.save(target);
-        return UserUpgradeResponse.of(upgraded);
+        List<SkillCardEntity> coworkerSkills = skillCardRepository.findAllByCoworkerIdAndInUseTrue(upgraded.getId());
+
+        return UserUpgradeResponse.of(upgraded, coworkerSkills);
     }
 
     private List<CoworkerEntity> getMaterialEntityList(List<Long> materialIds, long userId) {
