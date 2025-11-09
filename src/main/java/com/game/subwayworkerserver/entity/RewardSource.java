@@ -12,5 +12,7 @@ public enum RewardSource {
 
     SYSTEM_REWARD,
 
-    DUNGEON
+    DUNGEON,
+
+    SUBSCRIPTION
 }
