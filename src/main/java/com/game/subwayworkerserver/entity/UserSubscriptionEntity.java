@@ -39,6 +39,11 @@ public class UserSubscriptionEntity extends BaseTimeEntity {
         this.expirationDate = expirationDate;
     }
 
+    public static UserSubscriptionEntity of(final long userId, final SubscriptionItem subscriptionItem) {
+        LocalDate expirationDate = LocalDate.now().plusDays(30);
+        return new UserSubscriptionEntity(userId, subscriptionItem, expirationDate);
+    }
+
     public void extendSubscription(int daysToExtend) {
         LocalDate today = LocalDate.now();
 
