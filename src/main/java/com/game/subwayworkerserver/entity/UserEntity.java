@@ -1,5 +1,7 @@
 package com.game.subwayworkerserver.entity;
 
+import com.game.subwayworkerserver.domain.level.UserLevel;
+import com.game.subwayworkerserver.domain.level.UserLevelConfig;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import jakarta.persistence.*;
@@ -167,9 +169,13 @@ public class UserEntity extends BaseTimeEntity {
         this.coin += coin;
     }
 
-    public void updateLevelAndExp(int currentLevel, int currentExp) {
-        this.level += currentLevel;
-        this.exp += currentExp;
+    public void updateLevelAndExp(int currentLevel, int finalRemainingExp) {
+        int maxLevel = UserLevelConfig.LEVEL_RANGE_31_40.getMaxLevel();
+        if (maxLevel < currentLevel) {
+            throw new BaseException(BAD_REQUEST, "User max level is : " + maxLevel);
+        }
+        this.level = currentLevel;
+        this.exp = finalRemainingExp;
     }
 
     public void hasReward() {
@@ -246,7 +252,7 @@ public class UserEntity extends BaseTimeEntity {
     }
 
     public void grantExperience(int totalExperience) {
-       this.exp += totalExperience;
+        this.exp += totalExperience;
         this.totalExp += totalExperience;
     }
 }
