@@ -48,20 +48,21 @@ public class UserLevelProcessor {
                 break;
             }
 
-            long requiredExp = UserLevelConfig.getRequiredExpForLevel(currentLevel + 1);
+            long requiredExp = UserLevelConfig.getRequiredExpForLevel(currentLevel);
 
             if (currentExp >= requiredExp) {
                 currentExp -= (int) requiredExp;
                 currentLevel++;
+
                 grantLevelUpReward(user.getId(), config.getBaseReward());
+                user.updateLevelAndExp(currentLevel, currentExp);
+                user.hasReward();
 
             } else {
                 break;
             }
         }
 
-        user.updateLevelAndExp(currentLevel, currentExp);
-        user.hasReward();
     }
 
     private void grantLevelUpReward(long userId, UserLevelUpReward reward) {
