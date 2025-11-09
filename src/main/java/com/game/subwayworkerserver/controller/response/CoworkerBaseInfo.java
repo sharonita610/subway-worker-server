@@ -115,6 +115,24 @@ public record CoworkerBaseInfo(
                 .build();
     }
 
+    public static CoworkerBaseInfo of(CoworkerEntity coworker, List<SkillCardEntity> coworkerSkills) {
+        return CoworkerBaseInfo.builder()
+                .id(coworker.getId())
+                .engName(String.valueOf(coworker.getCoworkerType()))
+                .korName(coworker.getName())
+                .position(coworker.getLevel().getTitle())
+                .engElement(coworker.getCoworkerElement().name())
+                .korElement(coworker.getCoworkerElement().getKoreanName())
+                .isPartner(coworker.isInUse())
+                .onSale(coworker.isOnSale())
+                .exp(ExpInfo.of(coworker))
+                .statList(StatsInfos.of(coworker, List.of()))
+                .enabledSkills(EnabledSkills.of(coworker))
+                .selectedSkills(getSelectedSkill(coworker.getId(), coworkerSkills))
+                .build();
+
+    }
+
     private record StatBaseInfo(
             long defaultPower, long treasure, long total
     ) {
