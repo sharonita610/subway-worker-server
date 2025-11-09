@@ -32,6 +32,7 @@ public class GiftBoxService {
 
     private final UserRepository userRepository;
     private final UserItemMapRepository userItemMapRepository;
+    private final UserLevelProcessor userLevelProcessor;
 
     private static final String RANDOM_GIFT_BOX_KEY = "giftbox:locations";
     private static final String USER_ACQUIRED_PREFIX = "user:acquired:";
@@ -100,9 +101,8 @@ public class GiftBoxService {
         }
 
         // 3. 유저 잔고 업데이트
-        user.updateRewards(totalCoins, totalTickets, totalExperience);
-        // userRepository.save(user); // @Transactional 덕분에 자동 반영됨
-
+        user.increaseVacationTicket(totalTickets);
+        userLevelProcessor.processExpGainAndLevelUp(user, totalExperience);
         // 4. 추가 아이템 인벤토리 업데이트 (재료, 도구 등)
         for (ExtraGift item : bonusGifts) {
 
