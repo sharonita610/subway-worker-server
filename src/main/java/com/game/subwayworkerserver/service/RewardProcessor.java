@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.service;
 
+import com.game.subwayworkerserver.domain.baseinfo.SubscriptionItem;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.repository.MailRepository;
 import com.game.subwayworkerserver.repository.RewardRepository;
@@ -11,6 +12,9 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.game.subwayworkerserver.entity.RewardSource.SUBSCRIPTION;
+import static com.game.subwayworkerserver.entity.RewardType.VACATION_TICKET;
+
 @Component
 @RequiredArgsConstructor
 public class RewardProcessor {
@@ -21,7 +25,7 @@ public class RewardProcessor {
 
     private static final String REWARD_CONTENT = "보상이 지급되었어요. 받아가세요!";
 
-    public void process(final UserEntity user, final CheckInReward reward, final long rewardDay) {
+    public void processAttendanceReward(final UserEntity user, final CheckInReward reward, final long rewardDay) {
         long userId = user.getId();
         long mailId = createMail(userId, String.format("%d일차 보상 지급", rewardDay));
 
@@ -34,7 +38,7 @@ public class RewardProcessor {
         }
         if (reward.getVacationTicket() > 0) {
             rewardsToSave.add(
-                    getBuild(userId, RewardType.VACATION_TICKET, RewardSource.ATTENDANCE, reward.getVacationTicket(), mailId)
+                    getBuild(userId, VACATION_TICKET, RewardSource.ATTENDANCE, reward.getVacationTicket(), mailId)
             );
         }
         if (reward.getGachaTicket() > 0) {
@@ -96,7 +100,27 @@ public class RewardProcessor {
     public void sendDailySubscriptionReward(long userId, String mailTitle, int dailyTicket) {
         userRepository.findById(userId).ifPresent(UserEntity::hasMailToCheck);
         long mailId = createMail(userId, mailTitle);
-        RewardEntity build = getBuild(userId, RewardType.VACATION_TICKET, RewardSource.SUBSCRIPTION, dailyTicket, mailId);
+        RewardEntity build = getBuild(userId, VACATION_TICKET, SUBSCRIPTION, dailyTicket, mailId);
         rewardRepository.save(build);
+    }
+
+    public void processSubscriptionReward(final UserEntity user, final SubscriptionItem subscriptionItem) {
+        long userId = user.getId();
+
+        long mailId = createMail(user.getId(), "Vip 뱃지 구매");
+        List<RewardEntity> rewardsToSave = new ArrayList<>();
+
+        if (subscriptionItem.getDailyTicket() > 0) {
+            rewardsToSave.add(
+                    getBuild(userId, VACATION_TICKET, SUBSCRIPTION, subscriptionItem.getDailyTicket(), mailId)
+            );
+        }
+        if (subscriptionItem.getInstanceTicket() > 0) {
+            rewardsToSave.add(
+                    getBuild(userId, VACATION_TICKET, SUBSCRIPTION, subscriptionItem.getInstanceTicket(), mailId)
+            );
+        }
+        rewardRepository.saveAll(rewardsToSave);
+        user.hasMailToCheck();
     }
 }
