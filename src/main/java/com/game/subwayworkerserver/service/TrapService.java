@@ -3,6 +3,7 @@ package com.game.subwayworkerserver.service;
 import com.game.subwayworkerserver.controller.request.GpsAddTrapRequest;
 import com.game.subwayworkerserver.controller.response.CoworkerListResponse;
 import com.game.subwayworkerserver.controller.response.UserTrapListResponse;
+import com.game.subwayworkerserver.domain.reward.BaseReward;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
@@ -30,6 +31,7 @@ public class TrapService {
     private final UserItemMapRepository userItemMapRepository;
     private final UserTrapMapRepository userTrapMapRepository;
     private final CoworkerRepository coworkerRepository;
+    private final UserLevelProcessor userLevelProcessor;
 
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -106,7 +108,22 @@ public class TrapService {
         List<UserTrapMapEntity> userTrapMapList = userTrapMapRepository.findByUserIdAndIsTrappedTrue(user.getId());
         List<CoworkerEntity> coworkerEntityList = saveUserTrapIfSuccess(userTrapMapList);
         user.updateTrapDone();
-        return coworkerEntityList.isEmpty() ? CoworkerListResponse.empty() : CoworkerListResponse.of(coworkerEntityList);
+
+        if (coworkerEntityList.isEmpty()) {
+            return CoworkerListResponse.empty();
+        }
+        int size = coworkerEntityList.size();
+        BaseReward trapReward = BaseReward.getTrapReward();
+
+        int totalCoin = trapReward.coin() * size;
+        int totalExp = trapReward.exp() * size;
+        user.increaseCoin(totalCoin);
+
+        userLevelProcessor.processExpGainAndLevelUp(user, totalExp);
+
+        return CoworkerListResponse.of(totalCoin, totalExp, coworkerEntityList);
+
+
     }
 
     private List<CoworkerEntity> saveUserTrapIfSuccess(final List<UserTrapMapEntity> userTrapMapList) {
