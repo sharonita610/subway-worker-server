@@ -1,5 +1,7 @@
 package com.game.subwayworkerserver.domain.baseinfo;
 
+import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -35,4 +37,12 @@ public enum SubscriptionItem {
         return Arrays.asList(SubscriptionItem.values());
     }
 
+    public static SubscriptionItem getById(final long subscribeId) {
+        for (SubscriptionItem item : values()) {
+            if (item.id == subscribeId) {
+                return item;
+            }
+        }
+        throw new BaseException(ErrorCode.BAD_REQUEST, "유효하지 않은 구독 상품 ID입니다: " + subscribeId);
+    }
 }
