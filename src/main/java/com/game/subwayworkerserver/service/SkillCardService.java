@@ -45,7 +45,7 @@ public class SkillCardService {
             final String uuid, final long coworkerId, final String cardType) {
         UserEntity user = getUserEntityByUuid(uuid);
 
-        CoworkerEntity coworkerEntity = getCoworkerEntity(coworkerId);
+        CoworkerEntity coworkerEntity = getCoworkerEntity(coworkerId, user.getId());
 
         SkillCardType skillCardType = SkillCardType.valueOf(cardType.toUpperCase());
 
@@ -65,8 +65,8 @@ public class SkillCardService {
         return SkillByCoworkerResponse.of(filteredSkills, coworkerEntity.getId());
     }
 
-    private CoworkerEntity getCoworkerEntity(final long coworkerId) {
-        return coworkerRepository.findById(coworkerId).orElseThrow(
+    private CoworkerEntity getCoworkerEntity(final long coworkerId, final long userId) {
+        return coworkerRepository.findByIdAndUserId(coworkerId, userId).orElseThrow(
                 () -> new BaseException(ErrorCode.NOT_FOUND, "Coworker not found.")
         );
     }
@@ -93,7 +93,7 @@ public class SkillCardService {
     public void addSkillCardToCoworker(final String uuid, final SkillCardConfigureRequest request) {
         UserEntity user = getUserEntityByUuid(uuid);
         SkillCardType skillCardType = SkillCardType.valueOf(request.skillCardType().toUpperCase());
-        CoworkerEntity coworker = getCoworkerEntity(request.coworkerId());
+        CoworkerEntity coworker = getCoworkerEntity(request.coworkerId(), user.getId());
         coworker.checkUser(user.getId());
 
         if (request.skillCardId() == 0) {

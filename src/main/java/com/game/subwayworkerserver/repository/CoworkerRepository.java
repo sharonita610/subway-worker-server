@@ -21,4 +21,6 @@ public interface CoworkerRepository extends JpaRepository<CoworkerEntity, Long> 
     Optional<CoworkerEntity> findByUserIdAndId(final long userId, final long coworkerId);
 
     Optional<CoworkerEntity> findByIdAndOnSaleTrue(long coworkerId);
+
+    Optional<CoworkerEntity> findByIdAndUserId(final long coworkerId, final long userId);
 }
