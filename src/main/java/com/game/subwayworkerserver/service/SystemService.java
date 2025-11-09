@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -150,7 +151,7 @@ public class SystemService {
         while (currentDayToProcess <= consecutiveAttendanceDays) {
 
             CheckInReward reward = CheckInReward.getRewardByDay(currentDayToProcess);
-            rewardProcessor.process(user, reward, currentDayToProcess);
+            rewardProcessor.processAttendanceReward(user, reward, currentDayToProcess);
 
             finalDayClaimed = currentDayToProcess;
             currentDayToProcess++;
@@ -180,8 +181,27 @@ public class SystemService {
         return SubscribeListResponse.of(domain);
     }
 
-    public void subscribe(String uuid, long subscribeId) {
+    @Transactional
+    public void subscribe(final String uuid, final long subscribeId) {
         UserEntity user = getUserByUuid(uuid);
+        SubscriptionItem subscriptionItem = SubscriptionItem.getById(subscribeId);
+        Optional<UserSubscriptionEntity> existingSubscription =
+                subscriptionRepository.findByUserIdAndTypeAndExpirationDateGreaterThanEqual(
+                        user.getId(), subscriptionItem, LocalDate.now()
+                );
 
+        if (existingSubscription.isPresent()) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "이미 구독중인 상품입니다.");
+        }
+
+        // 결제 기능
+
+
+        UserSubscriptionEntity userSubscriptionEntity = UserSubscriptionEntity.of(user.getId(), subscriptionItem);
+        subscriptionRepository.save(userSubscriptionEntity);
+
+
+        user.extendAdFreeBenefit(subscriptionItem.getAdSkipDays());
+        rewardProcessor.processSubscriptionReward(user, subscriptionItem);
     }
 }
