@@ -94,13 +94,6 @@ public class UserEntity extends BaseTimeEntity {
         return new UserEntity(username, uuid, 0, 1, 0, 0, 0, 0, 0, gender);
     }
 
-    public void updateRewards(int totalCoins, int totalTickets, int totalExperience) {
-        this.coin += totalCoins;
-        this.vacationTicket += totalTickets;
-        this.exp += totalExperience;
-        this.totalExp += totalExperience;
-    }
-
     public void increaseGachaTicket() {
         this.gachaTicket++;
     }
@@ -250,5 +243,10 @@ public class UserEntity extends BaseTimeEntity {
 
     public void hasMailToCheck() {
         this.hasPendingMail = true;
+    }
+
+    public void grantExperience(int totalExperience) {
+       this.exp += totalExperience;
+        this.totalExp += totalExperience;
     }
 }
