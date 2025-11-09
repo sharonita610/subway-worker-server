@@ -245,5 +245,10 @@ public class UserEntity extends BaseTimeEntity {
     public void updateClaimDailyRewardDone(final int dayClaimed) {
         this.claimedRewardDayUpTo = dayClaimed;
         this.hasDailyCheckInReward = false;
+        this.hasPendingMail = true;
+    }
+
+    public void hasMailToCheck() {
+        this.hasPendingMail = true;
     }
 }
