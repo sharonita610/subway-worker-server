@@ -21,11 +21,11 @@ public class RewardEntity extends BaseTimeEntity {
     private long mailId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(length = 50, nullable = false)
     private RewardType type;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(length = 50, nullable = false)
     private RewardSource source;
 
     @Column(nullable = false)
