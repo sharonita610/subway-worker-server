@@ -95,7 +95,7 @@ public class SystemController {
     }
 
     @Operation(
-            summary = "구독하기 [test]",
+            summary = "구독하기 [완]",
             description = "구독하기"
     )
     @PostMapping("/subscribe")
