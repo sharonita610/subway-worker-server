@@ -3,6 +3,7 @@ package com.game.subwayworkerserver.controller;
 import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.response.CheckInListResponse;
 import com.game.subwayworkerserver.controller.response.LevelUpRewardResponse;
+import com.game.subwayworkerserver.controller.response.SubscribeListResponse;
 import com.game.subwayworkerserver.controller.response.UserMailBoxResponse;
 import com.game.subwayworkerserver.service.SystemService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -74,12 +75,33 @@ public class SystemController {
 
     @Operation(
             summary = "출석 보상 받기 [완]",
-            description = "아직 받지 못한 축석 보상 받기"
+            description = "아직 받지 못한 출석 보상 받기"
     )
     @PostMapping("/check-in")
     public ResponseEntity<HttpStatus> claimCheckInReward() {
         String uuid = SecurityUtils.getCurrentUserUuid();
         systemService.claimCheckInReward(uuid);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "구독 리스트 조회 [완]",
+            description = "현재 구독 상태가 포함된 구독 리스트 조회"
+    )
+    @GetMapping("/subscribe-list")
+    public ResponseEntity<SubscribeListResponse> getSubscribeList() {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        return ResponseEntity.ok(systemService.getSubscribeList(uuid));
+    }
+
+    @Operation(
+            summary = "구독하기 [test]",
+            description = "구독하기"
+    )
+    @PostMapping("/subscribe")
+    public ResponseEntity<HttpStatus> subscribe(@RequestParam("id") long subscribeId) {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        systemService.subscribe(uuid, subscribeId);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 }
