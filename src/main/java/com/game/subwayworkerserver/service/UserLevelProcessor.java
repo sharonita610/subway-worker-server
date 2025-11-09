@@ -30,6 +30,11 @@ public class UserLevelProcessor {
         checkAndProcessLevelUp(user);
     }
 
+    public void processExpGainAndLevelUp(final UserEntity user, final int totalExperience) {
+        user.grantExperience(totalExperience);
+        checkAndProcessLevelUp(user);
+    }
+
     private void checkAndProcessLevelUp(UserEntity user) {
         int currentLevel = user.getLevel();
         int currentExp = user.getExp();
@@ -98,4 +103,5 @@ public class UserLevelProcessor {
 
         rewardRepository.saveAll(rewardsToSave);
     }
+
 }
