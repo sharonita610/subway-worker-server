@@ -2,15 +2,6 @@ spring:
 #  profiles:
 #    active: prod
 
-  config:
-    import: "aws-parameterstore:/"
-  cloud:
-    aws:
-      region:
-        static: ap-southeast-2
-  aws:
-    paramstore:
-      prefix: /config/subway-worker/prod/
 
   datasource:
     url: jdbc:mysql://subway-worker-db.c7iwywymw7wj.ap-southeast-2.rds.amazonaws.com:3306/subway_db?serverTimezone=UTC&characterEncoding=UTF-8
@@ -30,6 +21,18 @@ spring:
       password: ${redis.password}
       ssl:
         enabled: true
+
+---
+spring:
+  config:
+    import: 'aws-parameterstore:'
+
+aws:
+  region:
+    static: ap-southeast-2
+  paramstore:
+    enable : true
+    prefix: /config
 
   toss:
     auth:
