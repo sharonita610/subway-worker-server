@@ -15,7 +15,7 @@ spring:
   datasource:
     url: jdbc:mysql://subway-worker-db.c7iwywymw7wj.ap-southeast-2.rds.amazonaws.com:3306/subway_db?serverTimezone=UTC&characterEncoding=UTF-8&useSSL=false
     username: admin
-    password: '${rds.password}'
+    password: ${rds.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       connection-test-query: SELECT 1
