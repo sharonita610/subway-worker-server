@@ -4,9 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.game.subwayworkerserver.toss.util.TossAuthConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
-import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
+ import software.amazon.awssdk.regions.Region;
+ import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
+ import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
+ import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueResponse;
 
 import java.util.Map;
 
@@ -24,24 +25,27 @@ public class TossSecretsLoader { // SecretsLoader 대신 구체적인 이름 사
      * AWS Secrets Manager에서 mTLS 인증서와 개인 키를 로드합니다.
      */
     public MtlsCredentials getMtlsCredentials() {
-        String secretName = tossAuthConfig.getSecretName();
-        // AP-NORTHEAST-2 (서울) Region을 가정합니다.
+        String secretName = "toss-partner-mtls-certs";
         Region region = Region.of("ap-southeast-2");
 
+        // Create a Secrets Manager client
         SecretsManagerClient client = SecretsManagerClient.builder()
                 .region(region)
                 .build();
 
-        GetSecretValueRequest request = GetSecretValueRequest.builder()
+        GetSecretValueRequest getSecretValueRequest = GetSecretValueRequest.builder()
                 .secretId(secretName)
                 .build();
 
+        GetSecretValueResponse getSecretValueResponse;
+
         try {
-            String secretJson = client.getSecretValue(request).secretString();
+            getSecretValueResponse = client.getSecretValue(getSecretValueRequest);
+            String secret = getSecretValueResponse.secretString();
 
             // ⭐️ JSON 파싱 및 키 추출
             @SuppressWarnings("unchecked")
-            Map<String, String> secrets = objectMapper.readValue(secretJson, Map.class);
+            Map<String, String> secrets = objectMapper.readValue(secret, Map.class);
 
             String certPem = secrets.get("client-cert-pem");
             String keyPem = secrets.get("client-key-pem");
@@ -56,4 +60,5 @@ public class TossSecretsLoader { // SecretsLoader 대신 구체적인 이름 사
             throw new RuntimeException("Failed to load mTLS Secret from AWS: " + secretName, e);
         }
     }
+
 }
