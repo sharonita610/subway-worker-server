@@ -25,7 +25,7 @@ spring:
 ---
 spring:
   config:
-    import: aws-parameterstore:/config
+    import: aws-parameterstore:/
 
   region:
     static: ap-southeast-2
