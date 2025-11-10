@@ -48,6 +48,8 @@ public class SkillCardEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private int count = 1;
 
+    private int accumulateCount = 0;
+
     @Column(nullable = false)
     private int skillCardEnumId;
 
@@ -63,7 +65,7 @@ public class SkillCardEntity extends BaseTimeEntity {
     @Builder
     public SkillCardEntity(Long userId, String engName, String korName, SkillCardType type,
                            int currentLevel, int requiredCount, int count, int skillCardEnumId, boolean inUse,
-                           boolean onSale, boolean available, Long coworkerId
+                           boolean onSale, boolean available, Long coworkerId, int accumulateCount
     ) {
         this.userId = userId;
         this.engName = engName;
@@ -77,6 +79,7 @@ public class SkillCardEntity extends BaseTimeEntity {
         this.onSale = onSale;
         this.available = available;
         this.coworkerId = coworkerId;
+        this.accumulateCount = accumulateCount;
     }
 
     public static SkillCardEntity of(final long userId, final ActiveSkillCard randomCard) {
@@ -93,6 +96,7 @@ public class SkillCardEntity extends BaseTimeEntity {
                 .onSale(false)
                 .available(true)
                 .coworkerId(0L)
+                .accumulateCount(1)
                 .build();
     }
 
@@ -110,6 +114,7 @@ public class SkillCardEntity extends BaseTimeEntity {
                 .onSale(false)
                 .available(true)
                 .coworkerId(0L)
+                .accumulateCount(1)
                 .build();
     }
 
@@ -127,6 +132,7 @@ public class SkillCardEntity extends BaseTimeEntity {
                 .onSale(false)
                 .available(false)
                 .coworkerId(soldCard.getCoworkerId())
+                .accumulateCount(soldCard.getAccumulateCount())
                 .build();
     }
 
@@ -146,10 +152,10 @@ public class SkillCardEntity extends BaseTimeEntity {
         }
     }
 
-    public void updateFinalState(int newLevel, int finalCount) {
+    public void updateFinalState(int newLevel, int finalCount, int accumulateCount) {
         this.currentLevel = newLevel;
         this.count = finalCount;
-
+        this.accumulateCount = accumulateCount;
         if (newLevel < SKILL_MAX_LEVEL) {
             this.requiredCount = newLevel + 1;
         } else {
