@@ -105,7 +105,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           timeout: 30s
-          opts: '-o StrictHostKeyChecking=no -o ServerAliveInterval=10 -o ServerAliveCountMax=3'
           script: |
             # 🌟 스크립트 단순화: 환경 변수 export 및 파일 삭제 명령 제거
             
