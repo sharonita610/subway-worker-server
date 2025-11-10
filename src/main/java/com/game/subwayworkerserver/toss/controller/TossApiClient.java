@@ -4,6 +4,7 @@ import com.game.subwayworkerserver.toss.TLSClient;
 import com.game.subwayworkerserver.toss.service.ApiResponse;
 import com.game.subwayworkerserver.toss.service.TossSecretsLoader;
 import com.game.subwayworkerserver.toss.util.TossAuthConfig;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,10 +19,13 @@ public class TossApiClient {
     private final TossSecretsLoader tossSecretsLoader;
     private final TLSClient tlsClient;
 
-    private final SSLContext sslContext = initializeSslContext();
+    private SSLContext sslContext;
     private static final String API_VERSION = "/v1/apps-in-toss/user/oauth2";
     private static final String CONTENT_TYPE = "application/json";
-
+    @PostConstruct
+    private void init() {
+        this.sslContext = initializeSslContext();
+    }
     /**
      * mTLS 설정을 초기화하고 SSLContext를 생성합니다. (로직 유지)
      */
