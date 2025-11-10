@@ -8,7 +8,7 @@ spring:
     url: jdbc:mysql://localhost:3306/subway_game?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-    username: root
+    username: ${LOCALHOST_USER}
     password: ${LOCAL_DB_PASSWORD}
 
   jpa:
