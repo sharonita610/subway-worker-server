@@ -3,11 +3,6 @@ spring:
 #    active: prod
 
 
-  datasource:
-    url: jdbc:mysql://subway-worker-db.c7iwywymw7wj.ap-southeast-2.rds.amazonaws.com:3306/subway_db?serverTimezone=UTC&characterEncoding=UTF-8
-    username: sharon
-    password: ${rds.password}
-    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
@@ -32,6 +27,11 @@ spring:
     enable : true
     prefix: /config
 
+  datasource:
+    url: jdbc:mysql://subway-worker-db.c7iwywymw7wj.ap-southeast-2.rds.amazonaws.com:3306/subway_db?serverTimezone=UTC&characterEncoding=UTF-8
+    username: sharon
+    password: ${rds.password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
   toss:
     auth:
       secret-name: toss-partner-mtls-certs
