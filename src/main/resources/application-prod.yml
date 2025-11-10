@@ -1,28 +1,12 @@
-spring:
-#  profiles:
-#    active: prod
 
-
-
-  jpa:
-    hibernate:
-      ddl-auto: create
-
-  data:
-    redis:
-      host: REDACTED
-      port: 6379
-      username: default
-      password: ${redis.password}
-      ssl:
-        enabled: true
-
----
+cloud:
+  aws:
+    region:
+      static: ap-southeast-2
 spring:
   config:
     import: "optional:aws-parameterstore:/"
-  region:
-    static: ap-southeast-2
+
   paramstore:
     enable : true
     prefix: /config/subway-worker/prod/
@@ -35,6 +19,18 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       connection-test-query: SELECT 1
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+  data:
+    redis:
+      host: REDACTED
+      port: 6379
+      username: default
+      password: ${redis.password}
+      ssl:
+        enabled: true
 
   toss:
     auth:
