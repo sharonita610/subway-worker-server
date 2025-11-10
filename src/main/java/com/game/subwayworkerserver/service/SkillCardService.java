@@ -188,13 +188,12 @@ public class SkillCardService {
                 request.materialIds(), user.getId(), targetCard.getSkillCardEnumId()
         );
         int materialCount = materialCards.size();
-
         final int totalCost = getTotalCost(materialCount, request.price());
         user.checkAndPurchase(totalCost);
 
-        UpgradeResult result = upgradeExecutor.executeSkillCardLogic(targetCard, materialCount);
+        UpgradeResult result = upgradeExecutor.executeSkillCardLogic(targetCard, materialCards);
+        targetCard.updateFinalState(result.finalLevel(), result.finalCount(), result.accumulateCount());
 
-        targetCard.updateFinalState(result.finalLevel(), result.finalCount());
         skillCardRepository.deleteAll(materialCards);
         SkillCardEntity saved = skillCardRepository.save(targetCard);
         return UpgradedSkillCardResponse.of(saved);
