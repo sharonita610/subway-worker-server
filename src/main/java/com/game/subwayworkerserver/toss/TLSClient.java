@@ -23,7 +23,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.game.subwayworkerserver.toss.service.ApiResponse;
 import org.springframework.stereotype.Component;
 
-import static org.apache.http.HttpHeaders.CONTENT_TYPE;
+import static org.apache.tomcat.util.http.fileupload.FileUploadBase.CONTENT_TYPE;
+
 
 @Component
 public class TLSClient { // 실제 파일 이름은 TossTLSClient 등이 될 수 있습니다.
