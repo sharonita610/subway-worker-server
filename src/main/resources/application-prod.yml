@@ -3,7 +3,7 @@ spring:
 #    active: prod
 
   config:
-    import: aws-parameterstore:/config/subway-worker/
+    import: "aws-parameterstore:/"
 
   aws:
     paramstore:
