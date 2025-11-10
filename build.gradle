@@ -23,6 +23,7 @@ dependencyManagement {
         // AWS SDK v2 최신 버전으로 관리
         mavenBom "software.amazon.awssdk:bom:2.26.16"
         mavenBom "org.testcontainers:testcontainers-bom:1.19.8"
+        mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:3.1.1"
     }
 }
 
@@ -35,8 +36,12 @@ dependencies {
     implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    implementation 'software.amazon.awssdk:secretsmanager'
     implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameter-store-config:2.4.4'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter'
+
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
     compileOnly 'org.projectlombok:lombok'
 
     runtimeOnly 'com.mysql:mysql-connector-j'
