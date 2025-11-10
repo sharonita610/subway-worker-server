@@ -22,6 +22,7 @@ public class TossApiClient {
     private SSLContext sslContext;
     private static final String API_VERSION = "/v1/apps-in-toss/user/oauth2";
     private static final String CONTENT_TYPE = "application/json";
+
     @PostConstruct
     private void init() {
         this.sslContext = initializeSslContext();

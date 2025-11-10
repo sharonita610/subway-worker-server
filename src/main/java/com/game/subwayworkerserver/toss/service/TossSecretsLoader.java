@@ -26,7 +26,7 @@ public class TossSecretsLoader { // SecretsLoader 대신 구체적인 이름 사
     public MtlsCredentials getMtlsCredentials() {
         String secretName = tossAuthConfig.getSecretName();
         // AP-NORTHEAST-2 (서울) Region을 가정합니다.
-        Region region = Region.of("ap-northeast-2");
+        Region region = Region.of("ap-southeast-2");
 
         SecretsManagerClient client = SecretsManagerClient.builder()
                 .region(region)

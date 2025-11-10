@@ -19,7 +19,7 @@ public class TossAuthService {
 
     private final DecryptUserInfo decryptUserInfo;
     private final TossApiClient tossApiClient;
-    private final TossAuthConfig tossAuthConfig; // ⭐️ [추가] 키/AAD 설정을 위한 TossAuthConfig 주입
+    private final TossAuthConfig tossAuthConfig;
 
     // 🚨 함수형 인터페이스 정의 (API 호출 람다를 받기 위함)
     @FunctionalInterface
