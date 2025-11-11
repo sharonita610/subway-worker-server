@@ -1,12 +1,14 @@
 package com.game.subwayworkerserver.toss.util;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = ("spring.toss.auth"))
 @Getter
+@Setter
 public class TossAuthConfig {
 
     private String secretName;
