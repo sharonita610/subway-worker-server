@@ -3,6 +3,8 @@ package com.game.subwayworkerserver.controller.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
+import com.game.subwayworkerserver.domain.skill.SkillCardType;
+import com.game.subwayworkerserver.entity.SkillCardEntity;
 import lombok.Builder;
 
 import java.util.List;
@@ -53,5 +55,19 @@ public record SkillBaseInfo(
                         skillCard.getKoreanName(),
                         skillCard.getDescription()
                 )).toList();
+    }
+
+    public static SkillBaseInfo of(SkillCardEntity skillCard, SkillCardType skillCardType) {
+        String description = skillCardType == SkillCardType.PASSIVE ?
+                PassiveSkillCard.from(skillCard.getSkillCardEnumId()).getDescription() :
+                ActiveSkillCard.from(skillCard.getSkillCardEnumId()).getDescription();
+
+        return new SkillBaseInfo(
+                skillCard.getId(),
+                skillCard.getEngName(),
+                skillCard.getKorName(),
+                description,
+                skillCard.getCurrentLevel()
+        );
     }
 }
