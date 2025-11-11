@@ -69,7 +69,9 @@ public class TossAuthService {
 
                 // 4. 복호화에 필요한 키와 AAD를 미리 준비합니다.
                 String key = tossAuthConfig.getDecryptionKeyBase64();
+                System.out.println("key = " + key);
                 String aad = tossAuthConfig.getAadString();
+                System.out.println("aad = " + aad);
 
                 // 5. ⭐️ 복호화할 필드 목록 (로그에 보이는 암호화된 필드들)
                 String[] fieldsToDecrypt = {"name", "gender", "email"};
