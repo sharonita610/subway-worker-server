@@ -65,25 +65,39 @@ public class TossAuthService {
             Map<String, Object> parsedData = response.data();
 
             // Map에서 'success' 필드를 안전하게 추출하고 String 타입인지 확인
-            if (parsedData != null && parsedData.get("success") instanceof String encryptedData && !encryptedData.isBlank()) {
+            if (parsedData != null && parsedData.get("success") instanceof Map successMap) {
 
-                // ⭐️ [수정 완료] 3개의 인자를 전달하여 DecryptUserInfo.decrypt 시그니처와 일치시킵니다.
-                Object decryptedUser = decryptUserInfo.decrypt(
-                        encryptedData,
-                        tossAuthConfig.getDecryptionKeyBase64(), // ⭐️ 키 전달
-                        tossAuthConfig.getAadString()            // ⭐️ AAD 전달
-                );
-                System.out.println("decryptedUser = " + decryptedUser.toString());
-                for (Map.Entry<String, Object> stringObjectEntry : parsedData.entrySet()) {
-                    System.out.println(stringObjectEntry.getKey() + " = " + stringObjectEntry.getValue());
+                // 4. 복호화에 필요한 키와 AAD를 미리 준비합니다.
+                String key = tossAuthConfig.getDecryptionKeyBase64();
+                String aad = tossAuthConfig.getAadString();
+
+                // 5. ⭐️ 복호화할 필드 목록 (로그에 보이는 암호화된 필드들)
+                String[] fieldsToDecrypt = {"name", "gender", "email"};
+
+                // 6. ⭐️ 'success' 맵 내부를 순회하며 복호화
+                for (String fieldName : fieldsToDecrypt) {
+
+                    // 7. 해당 필드가 암호화된 String 값인지 확인
+                    if (successMap.get(fieldName) instanceof String encryptedData && !encryptedData.isBlank()) {
+
+                        // 8. 복호화 실행
+                        Object decryptedValue = decryptUserInfo.decrypt(encryptedData, key, aad);
+
+                        // 9. 복호화된 값으로 덮어쓰기
+                        successMap.put(fieldName, decryptedValue);
+                        System.out.println("복호화 [" + fieldName + "] = " + decryptedValue);
+                    }
                 }
-                // 복호화된 데이터를 응답 Map에 덮어쓰기
-                parsedData.put("success", decryptedUser);
+
+                // 10. (선택사항) 수정된 successMap을 다시 parsedData에 넣습니다. (이미 참조 중이라 안 해도 되지만 명시적으로)
+                parsedData.put("success", successMap);
+
             } else {
-                // 암호화 데이터가 없거나 형식이 잘못된 경우
-                throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR, "토스 사용자 정보 복호화 대상 필드(success)가 유효하지 않습니다.");
+                // 'success' 필드가 없거나 Map이 아닌 경우
+                throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR, "토스 사용자 정보의 'success' 필드가 유효하지 않거나 형식이 다릅니다.");
             }
 
+            // 11. 복호화된 데이터가 포함된 전체 응답(response) 반환
             return response;
         }, "사용자 정보 조회");
     }
