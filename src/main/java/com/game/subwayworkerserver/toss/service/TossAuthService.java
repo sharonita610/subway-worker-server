@@ -60,7 +60,7 @@ public class TossAuthService {
         return handleApiCall(() -> {
             // 1. 외부 API 호출
             ApiResponse<Map<String, Object>> response = tossApiClient.get("/login-me", accessToken);
-
+            System.out.println("response.data() = " + response.data());
             // 2. 복호화 로직
             Map<String, Object> parsedData = response.data();
 
@@ -73,7 +73,7 @@ public class TossAuthService {
                         tossAuthConfig.getDecryptionKeyBase64(), // ⭐️ 키 전달
                         tossAuthConfig.getAadString()            // ⭐️ AAD 전달
                 );
-                System.out.println("decryptedUser = " + decryptedUser);
+                System.out.println("decryptedUser = " + decryptedUser.toString());
                 for (Map.Entry<String, Object> stringObjectEntry : parsedData.entrySet()) {
                     System.out.println(stringObjectEntry.getKey() + " = " + stringObjectEntry.getValue());
                 }

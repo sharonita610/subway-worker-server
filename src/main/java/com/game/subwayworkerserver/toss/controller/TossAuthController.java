@@ -36,7 +36,8 @@ public class TossAuthController {
     // 사용자 정보 조회
     @GetMapping("/get-user-info")
     public ResponseEntity<?> getUserInfo(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
-        String accessToken = extractAccessToken(authorizationHeader); // ⭐️ 헬퍼 메서드 사용
+        String accessToken = extractAccessToken(authorizationHeader);
+        System.out.println("accessToken = " + accessToken);
         return ResponseEntity.ok(authService.getUserInfo(accessToken));
     }
 

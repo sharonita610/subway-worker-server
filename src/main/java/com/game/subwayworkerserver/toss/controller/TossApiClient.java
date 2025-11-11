@@ -55,7 +55,7 @@ public class TossApiClient {
     // --- GET 요청 (User Info) ---
     public ApiResponse<Map<String, Object>> get(String endpointPath, String accessToken) throws Exception {
         String fullUrl = tossAuthConfig.getAuthApiUrl(API_VERSION + endpointPath);
-
+        System.out.println("fullUrl = " + fullUrl);
         Map<String, String> headers = Map.of("Authorization", "Bearer " + accessToken);
 
         // ⭐️ [수정] GET 요청 전용 메서드 호출 (headers를 포함해야 함)
