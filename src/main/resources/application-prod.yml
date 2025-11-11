@@ -5,8 +5,7 @@ cloud:
       static: ap-southeast-2
 spring:
   config:
-    import: "optional:aws-parameterstore:/"
-
+  import: "optional:aws-parameterstore:/config/subway-worker/prod/"
   aws:
     paramstore:
       enable : true
