@@ -18,6 +18,6 @@ public class TossAuthConfig {
     // API 호출 시 편리하도록 헬퍼 메서드를 추가할 수 있습니다.
     public String getAuthApiUrl(String endpointPath) {
         // authApiBase + endpointPath
-        return "http://localhost:4000"+ endpointPath;
+        return "https://apps-in-toss-api.toss.im/api-partner"+ endpointPath;
     }
 }
