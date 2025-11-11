@@ -1,9 +1,11 @@
 package com.game.subwayworkerserver.controller;
 
 
+import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.response.MonsterResponse;
 import com.game.subwayworkerserver.controller.response.StageCoworkerListResponse;
 import com.game.subwayworkerserver.controller.sampleData.MonsterSampleData;
+import com.game.subwayworkerserver.service.CoworkerService;
 import com.game.subwayworkerserver.service.StageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,10 +24,16 @@ import java.util.List;
 public class StageController {
 
     private final StageService stageService;
+    private final CoworkerService coworkerService;
 
+    @Operation(
+            summary = "스테이지에서 사용할 동료들의 능력 리스트 조회기능 [완]",
+            description = "유저가 장착중인 동료, 그리고 그 동료의 능력을 조회"
+    )
     @GetMapping("/stage/coworkers")
-    public ResponseEntity<StageCoworkerListResponse>  getStageCoworkers() {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<StageCoworkerListResponse> getStageCoworkers() {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        return ResponseEntity.ok(coworkerService.getUsingCoworkers(uuid));
     }
 
     @Operation(
