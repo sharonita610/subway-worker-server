@@ -42,7 +42,9 @@ public class TossAuthService {
     // AccessToken 발급
     public ApiResponse<Map<String, Object>> getAccessToken(GetAccessTokenRequest request) {
         return handleApiCall(() -> {
-            return tossApiClient.post("/generate-token", request);
+            ApiResponse<Map<String, Object>> post = tossApiClient.post("/generate-token", request);
+            System.out.println("Toss API 응답: " + post.data());
+            return post;
         }, "AccessToken 발급");
     }
 
