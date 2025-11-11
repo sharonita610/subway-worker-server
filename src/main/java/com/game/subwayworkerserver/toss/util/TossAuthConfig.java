@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "toss.auth")
+@ConfigurationProperties(prefix = ("spring.toss.auth"))
 @Getter
 public class TossAuthConfig {
 
