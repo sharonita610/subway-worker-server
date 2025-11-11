@@ -34,9 +34,9 @@ spring:
 
   toss:
     auth:
-      secret_name: toss-partner-mtls-certs
-      aad_string: ${toss_aad_string}
-      decryption_key_base64: ${toss_decryption_key}
-      auth_api_base: https://apps-in-toss-api.toss.im/api-partner/v1/apps-in-toss/user/oauth2
+      secretName: toss-partner-mtls-certs
+      aadString: ${toss_aad_string}
+      decryptionKeyBase64: ${toss_decryption_key}
+      authApiBase: https://apps-in-toss-api.toss.im/api-partner/v1/apps-in-toss/user/oauth2
 
       port: 4000
