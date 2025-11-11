@@ -20,7 +20,7 @@ public class TossApiClient {
     private final TLSClient tlsClient;
 
     private SSLContext sslContext;
-    private static final String API_VERSION = "https://v1/apps-in-toss/user/oauth2";
+    private static final String API_VERSION = "/v1/apps-in-toss/user/oauth2";
     private static final String CONTENT_TYPE = "application/json";
 
     @PostConstruct
