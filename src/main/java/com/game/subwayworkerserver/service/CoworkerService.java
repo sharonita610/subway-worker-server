@@ -3,15 +3,18 @@ package com.game.subwayworkerserver.service;
 import com.game.subwayworkerserver.controller.request.PartnerConfigureRequest;
 import com.game.subwayworkerserver.controller.request.UpgradeRequest;
 import com.game.subwayworkerserver.controller.response.CoworkerTypesResponse;
+import com.game.subwayworkerserver.controller.response.StageCoworkerListResponse;
 import com.game.subwayworkerserver.controller.response.UserUpgradeResponse;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
 import com.game.subwayworkerserver.entity.SkillCardEntity;
 import com.game.subwayworkerserver.entity.UserEntity;
+import com.game.subwayworkerserver.entity.UserGachaEntity;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.SkillCardRepository;
+import com.game.subwayworkerserver.repository.UserGachaRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,7 @@ public class CoworkerService {
     private final CoworkerRepository coworkerRepository;
     private final UserRepository userRepository;
     private final SkillCardRepository skillCardRepository;
+    private final UserGachaRepository gachaRepository;
 
     private static final String ENERZ = "ENERZ";
 
@@ -128,5 +132,14 @@ public class CoworkerService {
         return userRepository.findByUuid(uuid).orElseThrow(
                 () -> new BaseException(ErrorCode.USER_NOT_FOUND)
         );
+    }
+
+    public StageCoworkerListResponse getUsingCoworkers(final String uuid) {
+        UserEntity user = getUserByUuid(uuid);
+        List<CoworkerEntity> coworkerEntityList =
+                coworkerRepository.findByUserIdAndOnSaleFalseAndAvailableTrueAndInUseTrue(user.getId());
+        List<UserGachaEntity> treasureList = gachaRepository.findAllByUserId(user.getId());
+        List<SkillCardEntity> skillCardList = skillCardRepository.findAllByUserIdAndInUseTrueAndAvailableTrue(user.getId());
+        return StageCoworkerListResponse.of(coworkerEntityList, treasureList, skillCardList);
     }
 }
