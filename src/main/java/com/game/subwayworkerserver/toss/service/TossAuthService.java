@@ -71,7 +71,10 @@ public class TossAuthService {
                         tossAuthConfig.getDecryptionKeyBase64(), // ⭐️ 키 전달
                         tossAuthConfig.getAadString()            // ⭐️ AAD 전달
                 );
-
+                System.out.println("decryptedUser = " + decryptedUser);
+                for (Map.Entry<String, Object> stringObjectEntry : parsedData.entrySet()) {
+                    System.out.println(stringObjectEntry.getKey() + " = " + stringObjectEntry.getValue());
+                }
                 // 복호화된 데이터를 응답 Map에 덮어쓰기
                 parsedData.put("success", decryptedUser);
             } else {
