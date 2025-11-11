@@ -20,7 +20,7 @@ public class TossApiClient {
     private final TLSClient tlsClient;
 
     private SSLContext sslContext;
-    private static final String API_VERSION = "/v1/apps-in-toss/user/oauth2";
+    private static final String API_VERSION = "https://v1/apps-in-toss/user/oauth2";
     private static final String CONTENT_TYPE = "application/json";
 
     @PostConstruct
@@ -43,6 +43,7 @@ public class TossApiClient {
     public ApiResponse<Map<String, Object>> post(String endpointPath, Object requestBody) throws Exception {
         String fullUrl = tossAuthConfig.getAuthApiUrl(API_VERSION + endpointPath);
 
+        System.out.println("fullUrl = " + fullUrl);
         // Node.js의 client.post(url, body) 역할
         return tlsClient.sendPostRequest( // ⭐️ TLSClient에 sendPostRequest(url, body, contentType, sslContext) 메서드 가정
                 fullUrl,
