@@ -6,10 +6,11 @@ cloud:
 spring:
   config:
     import: "optional:aws-parameterstore:/config/subway-worker/prod/"
-#  aws:
-#    paramstore:
-#      enable : true
-#      prefix: /config/subway-worker/prod/
+  aws:
+    paramstore:
+      enable : true
+      profile-separator: _
+#      prefix: /config/subway_worker/prod/
 
   datasource:
     url: jdbc:mysql://subway-worker-db.c7iwywymw7wj.ap-southeast-2.rds.amazonaws.com:3306/subway_db?serverTimezone=UTC&characterEncoding=UTF-8&useSSL=false
@@ -27,15 +28,15 @@ spring:
       host: REDACTED
       port: 6379
       username: default
-      password: ${redis.password}
+      password: ${redis_password}
       ssl:
         enabled: true
 
   toss:
     auth:
-      secret-name: toss-partner-mtls-certs
-      aad-string: ${toss-aad-string}
-      decryption-key-base64: ${toss-decryption-key}
-      auth-api-base: https://apps-in-toss-api.toss.im/api-partner/v1/apps-in-toss/user/oauth2
+      secret_name: toss-partner-mtls-certs
+      aad_string: ${toss_aad_string}
+      decryption_key_base64: ${toss_decryption_key}
+      auth_api_base: https://apps-in-toss-api.toss.im/api-partner/v1/apps-in-toss/user/oauth2
 
       port: 4000
