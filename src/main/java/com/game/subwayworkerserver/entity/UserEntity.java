@@ -255,4 +255,8 @@ public class UserEntity extends BaseTimeEntity {
         this.exp += totalExperience;
         this.totalExp += totalExperience;
     }
+
+    public void updateStageLevel(int requestedLevel) {
+        this.stage = requestedLevel;
+    }
 }
