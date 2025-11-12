@@ -2,7 +2,9 @@ package com.game.subwayworkerserver.controller;
 
 
 import com.game.subwayworkerserver.config.SecurityUtils;
+import com.game.subwayworkerserver.controller.request.StageClearRequest;
 import com.game.subwayworkerserver.controller.response.MonsterResponse;
+import com.game.subwayworkerserver.controller.response.StageClearResponse;
 import com.game.subwayworkerserver.controller.response.StageCoworkerListResponse;
 import com.game.subwayworkerserver.controller.sampleData.MonsterSampleData;
 import com.game.subwayworkerserver.service.CoworkerService;
@@ -11,10 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -53,8 +52,13 @@ public class StageController {
         return ResponseEntity.badRequest().build();
     }
 
+    @Operation(
+            summary = "사용자의 스테이지 기록하고 보상 받기 [개발중] ",
+            description = "완료한 스테이지를 기록하고 보상을 받는 기능"
+    )
     @PostMapping("/stage/record")
-    public ResponseEntity<?> recordStage(){
-        return ResponseEntity.ok().build();
+    public ResponseEntity<StageClearResponse> recordStage(@RequestBody StageClearRequest request){
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        return ResponseEntity.ok(stageService.recordStage(uuid, request));
     }
 }
