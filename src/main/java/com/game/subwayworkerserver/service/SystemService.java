@@ -96,13 +96,13 @@ public class SystemService {
         rewardList.forEach(reward -> {
             if (reward.getType().equals(RewardType.ENERZ)) {
                 processMaterialFriend(userId, reward.getExtraInfo());
-
             } else if (reward.getType().equals(RewardType.NO_ADS)) {
                 int days = Integer.parseInt(reward.getExtraInfo());
                 user.extendAdFreeBenefit(days);
+            } else {
+                user.giveReward(reward.getType(), reward.getQuantity());
             }
 
-            user.giveReward(reward.getType(), reward.getQuantity());
             reward.claimRewardDone();
         });
     }
