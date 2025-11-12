@@ -18,7 +18,7 @@ public class StageRecordEntity extends BaseTimeEntity {
     private Long userId;
 
     @Column(nullable = false)
-    private int stageLevel; // 클리어한 스테이지 레벨 (예: 15)
+    private int stageLevel;
 
     @Column(nullable = false)
     private int successCount;
