@@ -4,6 +4,7 @@ import com.game.subwayworkerserver.controller.request.CaptureItemListResponse;
 import com.game.subwayworkerserver.controller.request.UserCreateRequest;
 import com.game.subwayworkerserver.controller.response.*;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
+import com.game.subwayworkerserver.domain.baseinfo.SubscriptionItem;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
@@ -12,6 +13,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,6 +28,7 @@ public class UserService {
     private final UserGachaRepository gachaRepository;
     private final SkillCardRepository skillCardRepository;
     private final AttendanceChecker attendanceChecker;
+    private final UserSubscriptionRepository subscriptionRepository;
 
     public Boolean verifyUserName(final String name) {
         if (name == null) {
@@ -62,9 +65,12 @@ public class UserService {
         attendanceChecker.checkDailyAttendance(user);
 
         List<CoworkerEntity> coworkerInUse = coworkerRepository.findByUserIdAndInUseTrue(user.getId());
+        List<UserSubscriptionEntity> subscriptionList =
+                subscriptionRepository.findAllByUserIdAndExpirationDateGreaterThanEqual(user.getId(), LocalDate.now());
+        List<SubscriptionItem> items = subscriptionList.stream().map(UserSubscriptionEntity::getType).toList();
 
         return new UserResponse(
-                UserBaseInfo.of(user),
+                UserBaseInfo.of(user, items),
                 UserLevelInfo.of(user),
                 CoworkerInUseInfo.of(coworkerInUse)
         );
