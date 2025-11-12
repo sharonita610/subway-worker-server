@@ -18,6 +18,7 @@ public record CoworkerOnSale(
         String korName,
         boolean inUse,
         boolean onSale,
+        boolean isMaterial,
         int level,
         int exp,
         int totalExp,
@@ -68,6 +69,7 @@ public record CoworkerOnSale(
                             .sellerId(market.getSellerId())
                             .isPaid(market.isPaid())
                             .isSold(market.isSold())
+                            .isMaterial(coworker.isMaterial())
                             .engName(coworker.getCoworkerType().name())
                             .korName(coworker.getName())
                             .level(coworker.getLevel().getLevel())

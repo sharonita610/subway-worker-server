@@ -13,7 +13,6 @@ import com.game.subwayworkerserver.entity.SkillCardEntity;
 import com.game.subwayworkerserver.entity.UserGachaEntity;
 import lombok.Builder;
 
-import java.lang.annotation.ElementType;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,6 +28,7 @@ public record CoworkerBaseInfo(
         String korElement,
         boolean isPartner,
         boolean onSale,
+        boolean isMaterial,
         ExpInfo exp,
         StatsInfos statList,
         EnabledSkills enabledSkills,
@@ -49,6 +49,7 @@ public record CoworkerBaseInfo(
                 .korElement(coworkerOnSale.korElement())
                 .isPartner(coworkerOnSale.inUse())
                 .onSale(coworkerOnSale.onSale())
+                .isMaterial(coworkerOnSale.isMaterial())
                 .exp(ExpInfo.of(coworkerOnSale.level(), coworkerOnSale.exp(), coworkerOnSale.totalExp()))
                 .statList(StatsInfos.of(coworkerOnSale))
                 .enabledSkills(EnabledSkills.of(coworkerOnSale))
@@ -71,6 +72,7 @@ public record CoworkerBaseInfo(
                 .korElement(coworker.getCoworkerElement().getKoreanName())
                 .isPartner(coworker.isInUse())
                 .onSale(coworker.isOnSale())
+                .isMaterial(coworker.isMaterial())
                 .exp(ExpInfo.of(coworker))
                 .statList(StatsInfos.of(coworker, userGachaEntities))
                 .enabledSkills(EnabledSkills.of(coworker))

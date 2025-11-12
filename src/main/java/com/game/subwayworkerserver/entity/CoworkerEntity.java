@@ -239,7 +239,7 @@ public class CoworkerEntity extends BaseTimeEntity {
                 .defense(DEFAULT)
                 .onSale(false)
                 .inUse(false)
-                .available(false)
+                .available(true)
                 .activeSkill1(DEFAULT)
                 .activeSkill2(DEFAULT)
                 .passiveSkill1(DEFAULT)
