@@ -45,4 +45,9 @@ public class StageRecordEntity extends BaseTimeEntity {
         this.isFirstClear = isFirstClear;
         this.isRewardPaid = isRewardPaid;
     }
+
+    public void failStage(final int requestedLevel) {
+        this.stageLevel = requestedLevel;
+        this.failCount++;
+    }
 }
