@@ -7,14 +7,16 @@ public record UserLevelInfo(
         int currentLevel,
         long currentExp,
         long totalCumulativeExp,
-        long requiredExpToNextLevel
+        long requiredExpToNextLevel,
+        int stageLevel
 ) {
     public static UserLevelInfo of(UserEntity user) {
         return new UserLevelInfo(
                 user.getLevel(),
                 user.getExp(),
                 user.getTotalExp(),
-                UserLevelConfig.getRequiredExpForLevel(user.getLevel())
+                UserLevelConfig.getRequiredExpForLevel(user.getLevel()),
+                user.getStage()
         );
     }
 }
