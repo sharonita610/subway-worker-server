@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -35,7 +36,7 @@ public class MailEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private LocalDateTime sentAt;
 
-    private LocalDateTime expiresAt;
+    private LocalDate expiresAt;
 
     @Builder
     public MailEntity(Long userId, String sender, String title, String content, boolean isRead, boolean isClaimed, LocalDateTime sentAt) {
@@ -46,6 +47,7 @@ public class MailEntity extends BaseTimeEntity {
         this.isRead = isRead;
         this.isClaimed = isClaimed;
         this.sentAt = LocalDateTime.now();
+        this.expiresAt = LocalDate.from(this.sentAt.plusDays(7));
     }
 
     public void markAsRead() {
