@@ -12,6 +12,7 @@ import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.StageRecordRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +43,7 @@ public class StageService {
         return selectedMonsters;
     }
 
+    @Transactional
     public StageClearResponse recordStage(final String uuid, final StageClearRequest request) {
         UserEntity user = getUserByUuid(uuid);
         long userId = user.getId();
@@ -60,7 +62,6 @@ public class StageService {
                                     stageRecord.updateStageLevel(requestedLevel);
                                     stageRecordRepository.save(stageRecord);
 
-                                    // 최초 클리어 보상 지급
                                     StageRewardInfo result = stageRewardProcessor.giveFirstClearReward(user, requestedLevel);
 
                                 } else {
@@ -75,9 +76,8 @@ public class StageService {
                             }
                         },
                         () -> {
-                            // 기록이 존재하지 않는 경우 (첫 플레이)
                             if (requestedLevel == 1) {
-                                StageRecordEntity newRecord = StageRecordEntity.builder() // StageRecordEntity 빌더 가정
+                                StageRecordEntity newRecord = StageRecordEntity.builder()
                                         .userId(user.getId())
                                         .stageLevel(requestedLevel)
                                         .build();
@@ -85,7 +85,6 @@ public class StageService {
                                 StageRewardInfo result = stageRewardProcessor.giveFirstClearReward(user, requestedLevel);
 
                             } else {
-                                // 스테이지 1이 아닌데 기록이 없는 경우 (치트 또는 버그)
                                 throw new BaseException(BAD_REQUEST, "Invalid stage level. Must start from level 1.");
                             }
                         });
