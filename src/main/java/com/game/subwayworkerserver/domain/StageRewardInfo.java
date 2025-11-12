@@ -1,5 +1,7 @@
 package com.game.subwayworkerserver.domain;
 
+import lombok.Builder;
+
 public record StageRewardInfo(
         int userExp,
         int coworkerExp,
@@ -10,7 +12,11 @@ public record StageRewardInfo(
         ExtraReward extraReward
 ) {
 
-    private record ExtraReward(
+    @Builder
+    public StageRewardInfo {
+    }
+
+    public record ExtraReward(
             String name,
             int quantity
     ) {
