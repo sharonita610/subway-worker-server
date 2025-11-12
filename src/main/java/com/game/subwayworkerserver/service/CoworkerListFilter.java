@@ -54,7 +54,7 @@ public class CoworkerListFilter {
 
 
     private boolean coworkerHasAnyElement(CoworkerOnSale coworker, List<String> requiredAttributes) {
-         String coworkerElement = coworker.element();
+         String coworkerElement = coworker.engElement();
         return requiredAttributes.contains(coworkerElement);
     }
 
