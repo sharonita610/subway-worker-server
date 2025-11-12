@@ -161,8 +161,6 @@ public class StoreService {
         String name = request.name();
         ItemName itemName = ItemName.getRandomItem(name);
 
-        // 광고보고 오기
-
         saveUserItemIntoMap(user.getId(), itemName);
         saveUserStoreRecord(user.getId(), name, 1, 0, CurrencyType.FREE);
         return ItemResponse.of(itemName.name(), itemName.getName(), itemName.getDescription(), 1);
