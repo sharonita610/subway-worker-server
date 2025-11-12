@@ -29,6 +29,7 @@ public class StageRewardProcessor {
 
     public StageRewardInfo giveFirstClearReward(UserEntity user, int requestedLevel) {
         StageReward reward = getStageReward(requestedLevel);
+        ExtraReward additionalReward = processAdditionalReward(user, reward.getTreasureDropRate(), reward.getGachaTicketDropRate());
 
         return StageRewardInfo.builder()
                 .userExp(reward.getPersonalExp())
@@ -36,6 +37,7 @@ public class StageRewardProcessor {
                 .coin(reward.getFirstCoin())
                 .gachaTicket(reward.getGachaTicketCount())
                 .vacationTicket(reward.getVacationTicketCount())
+                .extraReward(additionalReward)
                 .build();
     }
 
@@ -46,25 +48,18 @@ public class StageRewardProcessor {
 
     public StageRewardInfo giveRepeatClearReward(UserEntity user, int requestedLevel) {
         StageReward reward = getStageReward(requestedLevel);
-        String additionalReward = processAdditionalReward(user, reward.getTreasureDropRate(), reward.getGachaTicketDropRate());
-
-        ExtraReward extraReward = null;
-        if (additionalReward != null && !additionalReward.isEmpty()) {
-            extraReward = new ExtraReward(additionalReward, TREASURE_COUNT);
-        } else {
-            extraReward = new ExtraReward("", 0);
-        }
+        ExtraReward additionalReward = processAdditionalReward(user, reward.getTreasureDropRate(), reward.getGachaTicketDropRate());
 
         return StageRewardInfo.builder()
                 .userExp(reward.getRePersonalExp())
                 .coworkerExp(reward.getRePartnerExp())
                 .coin(reward.getReCoin())
-                .extraReward(extraReward)
+                .extraReward(additionalReward)
                 .build();
 
     }
 
-    private String processAdditionalReward(UserEntity user, double treasureDropRate, double gachaTicketDropRate) {
+    private ExtraReward processAdditionalReward(UserEntity user, double treasureDropRate, double gachaTicketDropRate) {
         double randomValue = ThreadLocalRandom.current().nextDouble();
 
         double totalCombinedRate = treasureDropRate + gachaTicketDropRate;
@@ -72,17 +67,16 @@ public class StageRewardProcessor {
         if (randomValue < totalCombinedRate) {
 
             if (randomValue < treasureDropRate) {
-                // 보물 획득 (PT 확률)
 
                 GachaTreasure randomTreasure = getRandomTreasure(user.getId());
-                return randomTreasure.name();
+                return new ExtraReward(randomTreasure.name(), TREASURE_COUNT);
 
             } else {
-                return GACHA_TICKET;
+                return new ExtraReward(GACHA_TICKET, TREASURE_COUNT);
             }
         }
 
-        return "";
+        return new ExtraReward("", 0);
     }
 
     private GachaTreasure getRandomTreasure(final long userId) {
