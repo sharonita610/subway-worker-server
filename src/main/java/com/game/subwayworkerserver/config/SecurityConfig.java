@@ -51,8 +51,9 @@ public class SecurityConfig {
                 List.of(
                         "http://localhost:3000",
                         "http://localhost:8080",
-                        "http://10.0.2.2:8080",
-                        "http://127.0.0.1:8080",
+                        "capacitor://localhost",
+                        "ionic://localhost",
+                        "https://localhost",
                         "https://com-commute-adventure-app.apps.tossmini.com",
                         "https://com-commute-adventure-app.private-apps.tossmini.com"
                 )
