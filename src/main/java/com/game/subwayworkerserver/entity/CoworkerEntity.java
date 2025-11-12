@@ -339,4 +339,14 @@ public class CoworkerEntity extends BaseTimeEntity {
             }
         }
     }
+
+    public void updateExp(final int exp) {
+        this.currentExp += exp;
+        this.totalExp += exp;
+    }
+
+    public void levelUp(CoworkerLevel newLevelInfo, int currentExp) {
+        this.level = newLevelInfo;
+        this.currentExp = currentExp;
+    }
 }
