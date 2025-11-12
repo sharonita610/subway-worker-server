@@ -29,6 +29,8 @@ public class StageService {
     private final CoworkerRepository coworkerRepository;
     private final StageRecordRepository stageRecordRepository;
     private final StageRewardProcessor stageRewardProcessor;
+    private final UserLevelProcessor userLevelProcessor;
+    private final CoworkerLevelProcessor coworkerLevelProcessor;
 
     public List<MonsterSampleData.MonsterType> getStageMonsters(int num) {
         MonsterSampleData.initializeData();
@@ -49,50 +51,60 @@ public class StageService {
         long userId = user.getId();
         int requestedLevel = request.level();
 
-
-        Optional<StageRewardInfo> rewardResult = Optional.empty();
-
-        stageRecordRepository.findByUserId(userId)
-                .ifPresentOrElse(
-                        stageRecord -> {
-                            int currentMaxLevel = stageRecord.getStageLevel();
-
-                            if (requestedLevel > currentMaxLevel) {
-                                if (requestedLevel == currentMaxLevel + 1) {
-                                    stageRecord.updateStageLevel(requestedLevel);
-                                    stageRecordRepository.save(stageRecord);
-
-                                    StageRewardInfo result = stageRewardProcessor.giveFirstClearReward(user, requestedLevel);
-
-                                } else {
-                                    throw new BaseException(
-                                            BAD_REQUEST,
-                                            "Invalid stage sequence. Must clear level " + (currentMaxLevel + 1) + " next."
-                                    );
-                                }
-
-                            } else if (requestedLevel < currentMaxLevel) {
-                                StageRewardInfo result = stageRewardProcessor.giveRepeatClearReward(user, requestedLevel);
-                            }
-                        },
-                        () -> {
-                            if (requestedLevel == 1) {
-                                StageRecordEntity newRecord = StageRecordEntity.builder()
-                                        .userId(user.getId())
-                                        .stageLevel(requestedLevel)
-                                        .build();
-                                stageRecordRepository.save(newRecord);
-                                StageRewardInfo result = stageRewardProcessor.giveFirstClearReward(user, requestedLevel);
-
-                            } else {
-                                throw new BaseException(BAD_REQUEST, "Invalid stage level. Must start from level 1.");
-                            }
-                        });
-
-
         List<CoworkerEntity> usingCoworkers = coworkerRepository.findByUserIdAndInUseTrue(userId);
+        Optional<StageRecordEntity> stageRecordEntity = stageRecordRepository.findByUserId(userId);
 
-        return null;
+        if (stageRecordEntity.isPresent()) {
+            StageRecordEntity stageRecord = stageRecordEntity.get();
+            int currentMaxLevel = stageRecord.getStageLevel();
+
+            if (requestedLevel > currentMaxLevel) {
+                if (requestedLevel == currentMaxLevel + 1) {
+                    stageRecord.updateStageLevel(requestedLevel);
+
+                    StageRewardInfo stageRewardInfo = stageRewardProcessor.giveFirstClearReward(user, requestedLevel);
+                    updateReward(usingCoworkers, stageRewardInfo, user);
+                    return StageClearResponse.of(stageRewardInfo);
+                } else {
+                    throw new BaseException(
+                            BAD_REQUEST,
+                            "Invalid stage sequence. Must clear level " + (currentMaxLevel + 1) + " next."
+                    );
+                }
+
+            } else {
+                StageRewardInfo stageRewardInfo = stageRewardProcessor.giveRepeatClearReward(user, requestedLevel);
+                updateReward(usingCoworkers, stageRewardInfo, user);
+                return StageClearResponse.of(stageRewardInfo);
+
+            }
+        } else {
+            if (requestedLevel == 1) {
+                StageRecordEntity newRecord = StageRecordEntity.builder()
+                        .userId(userId)
+                        .stageLevel(requestedLevel)
+                        .build();
+                stageRecordRepository.save(newRecord);
+
+                StageRewardInfo stageRewardInfo = stageRewardProcessor.giveFirstClearReward(user, requestedLevel);
+                updateReward(usingCoworkers, stageRewardInfo, user);
+                return StageClearResponse.of(stageRewardInfo);
+
+            } else if( request.success()){
+            } else {
+                throw new BaseException(BAD_REQUEST, "Invalid stage level. Must start from level 1.");
+
+            }
+        }
+        return StageClearResponse.empty();
+    }
+
+    private void updateReward(List<CoworkerEntity> usingCoworkers, StageRewardInfo stageRewardInfo, UserEntity user) {
+        usingCoworkers.forEach(coworker -> {
+            coworkerLevelProcessor.processCoworkerExpAndLevelUp(coworker, stageRewardInfo.coworkerExp());
+        });
+        userLevelProcessor.processExpGainAndLevelUp(user, stageRewardInfo.userExp());
+        user.increaseCoin(stageRewardInfo.coin());
     }
 
     private UserEntity getUserByUuid(String uuid) {
