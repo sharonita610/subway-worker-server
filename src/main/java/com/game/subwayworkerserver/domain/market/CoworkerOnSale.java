@@ -22,7 +22,8 @@ public record CoworkerOnSale(
         int exp,
         int totalExp,
         String position,
-        String element,
+        String korElement,
+        String engElement,
         long hp,
         long attack,
         long defense,
@@ -75,7 +76,8 @@ public record CoworkerOnSale(
                             .position(coworker.getLevel().getTitle())
                             .inUse(coworker.isInUse())
                             .onSale(coworker.isOnSale())
-                            .element(coworker.getCoworkerElement().getKoreanName())
+                            .korElement(coworker.getCoworkerElement().getKoreanName())
+                            .engElement(coworker.getCoworkerElement().name())
                             .hp(coworker.getHp())
                             .attack(coworker.getAttack())
                             .defense(coworker.getDefense())

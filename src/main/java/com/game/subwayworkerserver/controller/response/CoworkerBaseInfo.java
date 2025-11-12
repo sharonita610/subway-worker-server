@@ -13,6 +13,7 @@ import com.game.subwayworkerserver.entity.SkillCardEntity;
 import com.game.subwayworkerserver.entity.UserGachaEntity;
 import lombok.Builder;
 
+import java.lang.annotation.ElementType;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -44,7 +45,8 @@ public record CoworkerBaseInfo(
                 .engName(coworkerOnSale.engName())
                 .korName(coworkerOnSale.korName())
                 .position(coworkerOnSale.position())
-                .korElement(coworkerOnSale.element())
+                .engElement(coworkerOnSale.engElement())
+                .korElement(coworkerOnSale.korElement())
                 .isPartner(coworkerOnSale.inUse())
                 .onSale(coworkerOnSale.onSale())
                 .exp(ExpInfo.of(coworkerOnSale.level(), coworkerOnSale.exp(), coworkerOnSale.totalExp()))
