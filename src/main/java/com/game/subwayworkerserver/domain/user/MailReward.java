@@ -3,6 +3,7 @@ package com.game.subwayworkerserver.domain.user;
 import com.game.subwayworkerserver.entity.MailEntity;
 import com.game.subwayworkerserver.entity.RewardEntity;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ public record MailReward(
                 .collect(Collectors.groupingBy(RewardEntity::getMailId));
 
         return mailList.stream()
+                .sorted(Comparator.comparing(MailEntity::isClaimed))
                 .map(mail -> {
                     List<RewardEntity> rewards = rewardsByMailId.getOrDefault(mail.getId(), List.of());
 
