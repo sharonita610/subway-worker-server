@@ -2,6 +2,7 @@ package com.game.subwayworkerserver.controller;
 
 
 import com.game.subwayworkerserver.config.SecurityUtils;
+import com.game.subwayworkerserver.controller.request.DungeonRequest;
 import com.game.subwayworkerserver.controller.request.StageClearRequest;
 import com.game.subwayworkerserver.controller.response.MonsterResponse;
 import com.game.subwayworkerserver.controller.response.StageClearResponse;
@@ -26,7 +27,7 @@ public class StageController {
     private final CoworkerService coworkerService;
 
     @Operation(
-            summary = "스테이지에서 사용할 동료들의 능력 리스트 조회기능 [완]",
+            summary = "스테이지에서 사용할 동료들의 능력 리스트 조회기능 [개선 진행중]",
             description = "유저가 장착중인 동료, 그리고 그 동료의 능력을 조회"
     )
     @GetMapping("/stage/coworkers")
@@ -40,25 +41,35 @@ public class StageController {
             description = "파라미터 num 1 or 2"
     )
     @GetMapping("/stage/monsters")
-    public ResponseEntity<MonsterResponse> getStageMonsters(@RequestParam("num") int num){
-        if(num<=0){
+    public ResponseEntity<MonsterResponse> getStageMonsters(@RequestParam("num") int num) {
+        if (num <= 0) {
             return ResponseEntity.badRequest().build();
         }
         List<MonsterSampleData.MonsterType> stageMonsters = stageService.getStageMonsters(num);
 
-        if(stageMonsters != null){
+        if (stageMonsters != null) {
             return ResponseEntity.ok(new MonsterResponse(stageMonsters));
         }
         return ResponseEntity.badRequest().build();
     }
 
     @Operation(
-            summary = "사용자의 스테이지 기록하고 보상 받기 [개발중] ",
+            summary = "사용자의 스테이지 기록하고 보상 받기 [완] ",
             description = "완료한 스테이지를 기록하고 보상을 받는 기능"
     )
     @PostMapping("/stage/record")
-    public ResponseEntity<StageClearResponse> recordStage(@RequestBody StageClearRequest request){
+    public ResponseEntity<StageClearResponse> recordStage(@RequestBody StageClearRequest request) {
         String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok(stageService.recordStage(uuid, request));
+    }
+
+    @Operation(
+            summary = "사용자의 던전을 기록하고 보상 받기 [개발 중] ",
+            description = "사용자가 방문한 던전을 기록하고 보상을 받는 기능"
+    )
+    @PostMapping("/dungeon/record")
+    public ResponseEntity<StageClearResponse> recordDungeon(@RequestBody DungeonRequest request) {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        return ResponseEntity.ok(stageService.recordDungeon(uuid, request));
     }
 }
