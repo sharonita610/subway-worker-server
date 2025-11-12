@@ -77,7 +77,6 @@ public class StageService {
             } else {
                 StageRewardInfo stageRewardInfo = stageRewardProcessor.giveRepeatClearReward(user, requestedLevel);
                 updateReward(usingCoworkers, stageRewardInfo, user);
-                user.updateStageLevel(requestedLevel);
                 return StageClearResponse.of(stageRewardInfo);
 
             }
