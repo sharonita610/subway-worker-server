@@ -35,19 +35,11 @@ public class SystemService {
 
     public UserMailBoxResponse getMailBox(final String uuid) {
         UserEntity user = getUserByUuid(uuid);
-        List<MailEntity> mailList = getMailListByUserId(user.getId());
+        List<MailEntity> mailList = mailRepository.findAllByUserIdAndExpiresAtAfter(user.getId(), LocalDate.now());
         List<Long> mailIdList = getMailIdList(mailList);
-        List<RewardEntity> allByMailIdIn = getAllRewardsByMailIds(mailIdList);
+        List<RewardEntity> allByMailIdIn = rewardRepository.findAllByMailIdIn(mailIdList);
         List<MailReward> domainList = MailReward.toDomain(mailList, allByMailIdIn);
         return UserMailBoxResponse.of(domainList);
-    }
-
-    private List<RewardEntity> getAllRewardsByMailIds(final List<Long> mailIdList) {
-        return rewardRepository.findAllByMailIdInAndIsClaimedFalse(mailIdList);
-    }
-
-    private List<MailEntity> getMailListByUserId(final long userId) {
-        return mailRepository.findByUserIdAndIsReadFalseAndIsClaimedFalse(userId);
     }
 
     private static List<Long> getMailIdList(final List<MailEntity> mailList) {
@@ -121,9 +113,9 @@ public class SystemService {
     @Transactional
     public void claimAllRewards(final String uuid) {
         UserEntity user = getUserByUuid(uuid);
-        List<MailEntity> mailList = getMailListByUserId(user.getId());
+        List<MailEntity> mailList = mailRepository.findByUserIdAndIsReadFalseAndIsClaimedFalse(user.getId());
         List<Long> mailIdList = getMailIdList(mailList);
-        List<RewardEntity> rewardList = getAllRewardsByMailIds(mailIdList);
+        List<RewardEntity> rewardList = rewardRepository.findAllByMailIdInAndIsClaimedFalse(mailIdList);
         processRewardList(rewardList, user.getId(), user);
         mailList.forEach(MailEntity::claimDone);
         user.claimMailDone();
