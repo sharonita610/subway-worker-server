@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.service;
 
+import com.game.subwayworkerserver.controller.request.DungeonRequest;
 import com.game.subwayworkerserver.controller.request.StageClearRequest;
 import com.game.subwayworkerserver.controller.response.StageClearResponse;
 import com.game.subwayworkerserver.controller.sampleData.MonsterSampleData;
@@ -50,18 +51,19 @@ public class StageService {
         UserEntity user = getUserByUuid(uuid);
         long userId = user.getId();
         int requestedLevel = request.level();
+        boolean success = request.success();
 
         List<CoworkerEntity> usingCoworkers = coworkerRepository.findByUserIdAndInUseTrue(userId);
         Optional<StageRecordEntity> stageRecordEntity = stageRecordRepository.findByUserId(userId);
 
-        if (stageRecordEntity.isPresent()) {
+        if (stageRecordEntity.isPresent() && success) {
             StageRecordEntity stageRecord = stageRecordEntity.get();
             int currentMaxLevel = stageRecord.getStageLevel();
 
             if (requestedLevel > currentMaxLevel) {
                 if (requestedLevel == currentMaxLevel + 1) {
                     stageRecord.updateStageLevel(requestedLevel);
-
+                    user.updateStageLevel(requestedLevel);
                     StageRewardInfo stageRewardInfo = stageRewardProcessor.giveFirstClearReward(user, requestedLevel);
                     updateReward(usingCoworkers, stageRewardInfo, user);
                     return StageClearResponse.of(stageRewardInfo);
@@ -75,9 +77,13 @@ public class StageService {
             } else {
                 StageRewardInfo stageRewardInfo = stageRewardProcessor.giveRepeatClearReward(user, requestedLevel);
                 updateReward(usingCoworkers, stageRewardInfo, user);
+                user.updateStageLevel(requestedLevel);
                 return StageClearResponse.of(stageRewardInfo);
 
             }
+        } else if (stageRecordEntity.isPresent()) {
+            StageRecordEntity stageRecord = stageRecordEntity.get();
+            stageRecord.failStage(requestedLevel);
         } else {
             if (requestedLevel == 1) {
                 StageRecordEntity newRecord = StageRecordEntity.builder()
@@ -85,12 +91,12 @@ public class StageService {
                         .stageLevel(requestedLevel)
                         .build();
                 stageRecordRepository.save(newRecord);
+                user.updateStageLevel(requestedLevel);
 
                 StageRewardInfo stageRewardInfo = stageRewardProcessor.giveFirstClearReward(user, requestedLevel);
                 updateReward(usingCoworkers, stageRewardInfo, user);
                 return StageClearResponse.of(stageRewardInfo);
 
-            } else if( request.success()){
             } else {
                 throw new BaseException(BAD_REQUEST, "Invalid stage level. Must start from level 1.");
 
@@ -100,9 +106,9 @@ public class StageService {
     }
 
     private void updateReward(List<CoworkerEntity> usingCoworkers, StageRewardInfo stageRewardInfo, UserEntity user) {
-        usingCoworkers.forEach(coworker -> {
-            coworkerLevelProcessor.processCoworkerExpAndLevelUp(coworker, stageRewardInfo.coworkerExp());
-        });
+        usingCoworkers.forEach(coworker ->
+                coworkerLevelProcessor.processCoworkerExpAndLevelUp(coworker, stageRewardInfo.coworkerExp())
+        );
         userLevelProcessor.processExpGainAndLevelUp(user, stageRewardInfo.userExp());
         user.increaseCoin(stageRewardInfo.coin());
     }
@@ -111,5 +117,9 @@ public class StageService {
         return userRepository.findByUuid(uuid).orElseThrow(
                 () -> new BaseException(ErrorCode.USER_NOT_FOUND)
         );
+    }
+
+    public StageClearResponse recordDungeon(String uuid, DungeonRequest request) {
+        return null;
     }
 }
