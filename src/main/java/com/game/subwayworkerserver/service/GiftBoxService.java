@@ -101,6 +101,7 @@ public class GiftBoxService {
         }
 
         // 3. 유저 잔고 업데이트
+        user.increaseCoin(totalCoins);
         user.increaseVacationTicket(totalTickets);
         userLevelProcessor.processExpGainAndLevelUp(user, totalExperience);
         // 4. 추가 아이템 인벤토리 업데이트 (재료, 도구 등)
