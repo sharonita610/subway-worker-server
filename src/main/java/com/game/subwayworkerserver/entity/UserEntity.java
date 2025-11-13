@@ -259,4 +259,10 @@ public class UserEntity extends BaseTimeEntity {
     public void updateStageLevel(int requestedLevel) {
         this.stage = requestedLevel;
     }
+
+    public void updateDungeonReward(final int coin, final int gachaTicket, final int vacationTicket) {
+        this.coin += coin;
+        this.gachaTicket += gachaTicket;
+        this.vacationTicket += vacationTicket;
+    }
 }
