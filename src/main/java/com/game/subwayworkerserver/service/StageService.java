@@ -5,12 +5,15 @@ import com.game.subwayworkerserver.controller.request.StageClearRequest;
 import com.game.subwayworkerserver.controller.response.StageClearResponse;
 import com.game.subwayworkerserver.controller.sampleData.MonsterSampleData;
 import com.game.subwayworkerserver.domain.StageRewardInfo;
+import com.game.subwayworkerserver.domain.reward.DungeonReward;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
+import com.game.subwayworkerserver.entity.DungeonRecordEntity;
 import com.game.subwayworkerserver.entity.StageRecordEntity;
 import com.game.subwayworkerserver.entity.UserEntity;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
+import com.game.subwayworkerserver.repository.DungeonRecordRepository;
 import com.game.subwayworkerserver.repository.StageRecordRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -32,6 +35,7 @@ public class StageService {
     private final StageRewardProcessor stageRewardProcessor;
     private final UserLevelProcessor userLevelProcessor;
     private final CoworkerLevelProcessor coworkerLevelProcessor;
+    private final DungeonRecordRepository dungeonRecordRepository;
 
     public List<MonsterSampleData.MonsterType> getStageMonsters(int num) {
         MonsterSampleData.initializeData();
@@ -119,6 +123,48 @@ public class StageService {
     }
 
     public StageClearResponse recordDungeon(String uuid, DungeonRequest request) {
-        return null;
+        UserEntity user = getUserByUuid(uuid);
+        long userId = user.getId();
+        Optional<DungeonRecordEntity> dungeonRecord =
+                dungeonRecordRepository.findByUserIdAndStationName(userId, request.stationName());
+        DungeonReward successReward = DungeonReward.SUCCESS_REWARD;
+
+        List<CoworkerEntity> usingCoworkers = coworkerRepository.findByUserIdAndInUseTrue(userId);
+
+        if (dungeonRecord.isPresent() && !dungeonRecord.get().canRetry()) {
+
+            throw new BaseException(BAD_REQUEST, "입장 후 8시간 미만으로 재입장 불가합니다.");
+
+        } else if (dungeonRecord.isPresent() && request.success()) {
+
+            DungeonRecordEntity dungeonRecordEntity = dungeonRecord.get();
+            dungeonRecordEntity.updateSuccess();
+            updateDungeonReward(usingCoworkers, successReward, user);
+            return StageClearResponse.of(successReward);
+
+        } else if (dungeonRecord.isEmpty() && request.success()) {
+            DungeonRecordEntity newDungeon = DungeonRecordEntity.builder()
+                    .userId(userId)
+                    .stationName(request.stationName())
+                    .isFirstClear(true)
+                    .isRewardPaid(true)
+                    .build();
+
+            dungeonRecordRepository.save(newDungeon);
+            updateDungeonReward(usingCoworkers, successReward, user);
+            return StageClearResponse.of(successReward);
+        } else {
+            return StageClearResponse.empty();
+
+        }
+    }
+
+
+    private void updateDungeonReward(List<CoworkerEntity> usingCoworkers, DungeonReward successReward, UserEntity user) {
+        usingCoworkers.forEach(coworker ->
+                coworkerLevelProcessor.processCoworkerExpAndLevelUp(coworker, successReward.getCoworkerExp())
+        );
+        userLevelProcessor.processExpGainAndLevelUp(user, successReward.getUserExp());
+        user.updateDungeonReward(successReward.getCoin(), successReward.getGacha(), successReward.getVacation());
     }
 }
