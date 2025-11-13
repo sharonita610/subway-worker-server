@@ -64,12 +64,22 @@ public class StageController {
     }
 
     @Operation(
-            summary = "사용자의 던전을 기록하고 보상 받기 [개발 중] ",
+            summary = "사용자의 던전을 기록하고 보상 받기 [test] ",
             description = "사용자가 방문한 던전을 기록하고 보상을 받는 기능"
     )
     @PostMapping("/dungeon/record")
     public ResponseEntity<StageClearResponse> recordDungeon(@RequestBody DungeonRequest request) {
         String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok(stageService.recordDungeon(uuid, request));
+    }
+
+    @Operation(
+            summary = "사용자의 던전을 기록 조회 [test]",
+            description = "사용자가 8시간 안에 방문한적이 있는지 조회"
+    )
+    @GetMapping("/dungeon/record")
+    public ResponseEntity<Boolean> checkDungeon(@RequestBody DungeonRequest request) {
+        String uuid = SecurityUtils.getCurrentUserUuid();
+        return ResponseEntity.ok(stageService.checkDungeon(uuid, request));
     }
 }

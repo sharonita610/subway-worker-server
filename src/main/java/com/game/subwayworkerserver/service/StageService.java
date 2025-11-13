@@ -125,8 +125,7 @@ public class StageService {
     public StageClearResponse recordDungeon(String uuid, DungeonRequest request) {
         UserEntity user = getUserByUuid(uuid);
         long userId = user.getId();
-        Optional<DungeonRecordEntity> dungeonRecord =
-                dungeonRecordRepository.findByUserIdAndStationName(userId, request.stationName());
+        Optional<DungeonRecordEntity> dungeonRecord = getDungeonByUserIdAnsStationName(request.stationName(), userId);
         DungeonReward successReward = DungeonReward.SUCCESS_REWARD;
 
         List<CoworkerEntity> usingCoworkers = coworkerRepository.findByUserIdAndInUseTrue(userId);
@@ -159,6 +158,9 @@ public class StageService {
         }
     }
 
+    private Optional<DungeonRecordEntity> getDungeonByUserIdAnsStationName(final String stationName, long userId) {
+        return dungeonRecordRepository.findByUserIdAndStationName(userId, stationName);
+    }
 
     private void updateDungeonReward(List<CoworkerEntity> usingCoworkers, DungeonReward successReward, UserEntity user) {
         usingCoworkers.forEach(coworker ->
@@ -166,5 +168,11 @@ public class StageService {
         );
         userLevelProcessor.processExpGainAndLevelUp(user, successReward.getUserExp());
         user.updateDungeonReward(successReward.getCoin(), successReward.getGacha(), successReward.getVacation());
+    }
+
+    public boolean checkDungeon(String uuid, DungeonRequest request) {
+        UserEntity user = getUserByUuid(uuid);
+        Optional<DungeonRecordEntity> dungeon = getDungeonByUserIdAnsStationName(request.stationName(), user.getId());
+        return dungeon.map(DungeonRecordEntity::canRetry).orElse(false);
     }
 }
