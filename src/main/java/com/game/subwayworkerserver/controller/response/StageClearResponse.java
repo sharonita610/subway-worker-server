@@ -2,6 +2,7 @@ package com.game.subwayworkerserver.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.game.subwayworkerserver.domain.StageRewardInfo;
+import com.game.subwayworkerserver.domain.reward.DungeonReward;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record StageClearResponse(
@@ -25,6 +26,17 @@ public record StageClearResponse(
 
     public static StageClearResponse empty() {
         return new StageClearResponse(0,0,0,0,0, null);
+    }
+
+    public static StageClearResponse of(DungeonReward reward) {
+        return new StageClearResponse(
+                reward.getUserExp(),
+                reward.getCoworkerExp(),
+                reward.getCoin(),
+                reward.getGacha(),
+                reward.getVacation(),
+                null
+        );
     }
 
     public record ExtraReward(
