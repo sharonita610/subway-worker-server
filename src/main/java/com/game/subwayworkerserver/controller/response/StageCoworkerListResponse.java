@@ -1,8 +1,8 @@
 package com.game.subwayworkerserver.controller.response;
 
-import com.game.subwayworkerserver.domain.baseinfo.CoworkerLevel;
+import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.GachaTreasure;
-import com.game.subwayworkerserver.domain.market.CoworkerOnSale;
+import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import com.game.subwayworkerserver.domain.skill.SkillCardType;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
 import com.game.subwayworkerserver.entity.SkillCardEntity;
@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public record StageCoworkerListResponse(
         List<StageCoworkerInfo> coworkerList
 ) {
+
     public static StageCoworkerListResponse of(
             List<CoworkerEntity> coworkerEntityList,
             List<UserGachaEntity> treasureList,
@@ -36,12 +37,13 @@ public record StageCoworkerListResponse(
             String engElement,
             String korElement,
             boolean isPartner,
-            boolean onSale,
-            ExpInfo exp,
-            StatsInfos statList,
-            EnabledSkills enabledSkills,
-            SkillBaseInfo passiveSkillCard,
-            SkillBaseInfo activeSkillCard
+            HpInfo hp,
+            MpInfo mp,
+            AttackInfo attack,
+            DefenseInfo defense,
+            StagePassiveSkill passiveSkill,
+            StageActiveSkill activeSkill,
+            ResurrectionInfo resurrection
     ) {
         @Builder
         private StageCoworkerInfo {
@@ -56,77 +58,17 @@ public record StageCoworkerListResponse(
                     .filter(e -> Objects.equals(e.getCoworkerId(), coworkerId))
                     .filter(e -> e.getType() == SkillCardType.PASSIVE)
                     .filter(SkillCardEntity::isInUse)
-                    .findFirst() // 하나만 가능하므로 findFirst() 사용
+                    .findFirst()
                     .orElse(null);
 
-            // 2. 해당 Coworker의 ID를 가지며, 장착된 액티브 스킬 카드를 찾습니다.
             SkillCardEntity equippedActive = skillCardList.stream()
                     .filter(e -> Objects.equals(e.getCoworkerId(), coworkerId))
                     .filter(e -> e.getType() == SkillCardType.ACTIVE)
                     .filter(SkillCardEntity::isInUse)
-                    .findFirst() // 하나만 가능하므로 findFirst() 사용
+                    .findFirst()
                     .orElse(null);
 
-            // 3. SkillBaseInfo로 변환 (없으면 null)
-            SkillBaseInfo passiveInfo = equippedPassive != null ?
-                    SkillBaseInfo.of(equippedPassive, SkillCardType.PASSIVE) : null;
-
-            SkillBaseInfo activeInfo = equippedActive != null ?
-                    SkillBaseInfo.of(equippedActive, SkillCardType.ACTIVE) : null;
-
-            return StageCoworkerInfo.builder()
-                    .id(coworker.getId())
-                    .engName(String.valueOf(coworker.getCoworkerType()))
-                    .korName(coworker.getName())
-                    .position(coworker.getLevel().getTitle())
-                    .engElement(coworker.getCoworkerElement().name())
-                    .korElement(coworker.getCoworkerElement().getKoreanName())
-                    .isPartner(coworker.isInUse())
-                    .onSale(coworker.isOnSale())
-                    .exp(ExpInfo.of(coworker))
-                    .statList(StatsInfos.of(coworker, treasureList))
-                    .enabledSkills(EnabledSkills.of(coworker))
-                    .passiveSkillCard(passiveInfo)
-                    .activeSkillCard(activeInfo)
-                    .build();
-        }
-    }
-
-
-    private record ExpInfo(
-            int level, int now, int max, int total
-    ) {
-
-        public static ExpInfo of(CoworkerEntity coworker) {
-            return new ExpInfo(
-                    coworker.getLevel().getLevel(),
-                    coworker.getCurrentExp(),
-                    coworker.getLevel().getRequiredExpToNextLevel(),
-                    coworker.getTotalExp()
-            );
-        }
-    }
-
-    private record StatBaseInfo(
-            long defaultPower, long treasure, long total
-    ) {
-
-        public static StatBaseInfo of(long defaultPower, long treasure) {
-            return new StatBaseInfo(defaultPower, treasure, defaultPower + treasure);
-        }
-    }
-
-    private record StatsInfos(
-            StatBaseInfo hp,
-            StatBaseInfo initMana,
-            StatBaseInfo maxMana,
-            StatBaseInfo attack,
-            StatBaseInfo defense,
-            StatBaseInfo manaRecovery
-    ) {
-        public static StatsInfos of(final CoworkerEntity coworker, List<UserGachaEntity> userGachaEntities) {
-
-            Map<GachaTreasure, Long> bonusMap = userGachaEntities.stream()
+            Map<GachaTreasure, Long> bonusMap = treasureList.stream()
                     .collect(Collectors.groupingBy(
                             UserGachaEntity::getGacha,
                             Collectors.summingLong(UserGachaEntity::getGachaCount)
@@ -137,15 +79,137 @@ public record StageCoworkerListResponse(
             long defenseBonus = bonusMap.getOrDefault(GachaTreasure.DEFENSE_UP, 0L);
             long manaRecoveryBonus = bonusMap.getOrDefault(GachaTreasure.MP_RECOVERY_UP, 0L);
 
+            assert equippedPassive != null;
+            assert equippedActive != null;
+            return StageCoworkerInfo.builder()
+                    .id(coworker.getId())
+                    .engName(String.valueOf(coworker.getCoworkerType()))
+                    .korName(coworker.getName())
+                    .position(coworker.getLevel().getTitle())
+                    .engElement(coworker.getCoworkerElement().name())
+                    .korElement(coworker.getCoworkerElement().getKoreanName())
+                    .isPartner(coworker.isInUse())
+                    .hp(HpInfo.of(coworker.getHp(), hpBonus, defenseBonus))
+                    .mp(MpInfo.of(coworker.getInitMana(), coworker.getMaxMana(), coworker.getManaRecovery(), manaRecoveryBonus))
+                    .attack(AttackInfo.of(coworker.getAttack(), attackBonus))
+                    .defense(DefenseInfo.of(coworker.getDefense()))
+                    .passiveSkill(StagePassiveSkill.of(equippedPassive))
+                    .activeSkill(StageActiveSkill.of(equippedActive))
+                    .resurrection(ResurrectionInfo.of(equippedPassive.getSkillCardEnumId()))
+                    .build();
+        }
 
-            StatBaseInfo hpInfo = StatBaseInfo.of(coworker.getHp(), hpBonus);
-            StatBaseInfo manaInfo = StatBaseInfo.of(coworker.getInitMana(), 0L);
-            StatBaseInfo maxManaInfo = StatBaseInfo.of(coworker.getMaxMana(), 0L);
-            StatBaseInfo attackInfo = StatBaseInfo.of(coworker.getAttack(), attackBonus);
-            StatBaseInfo defenseInfo = StatBaseInfo.of(coworker.getDefense(), defenseBonus);
-            StatBaseInfo manaRecoveryInfo = StatBaseInfo.of(coworker.getManaRecovery(), manaRecoveryBonus);
 
-            return new StatsInfos(hpInfo, manaInfo, maxManaInfo, attackInfo, defenseInfo, manaRecoveryInfo);
+        private record HpInfo(
+                long nowHp, long maxHp, long hpRecover, long shield, long armor
+        ) {
+
+            public static HpInfo of(long hp, long hpBonus, long defenseBonus) {
+                return new HpInfo( hp + hpBonus, 0, 0, 0, defenseBonus);
+            }
+
+        }
+
+        private record MpInfo(
+                long nowMp, long maxMp, long mpRecover
+        ) {
+            public static MpInfo of(long initMana, long maxMana, long manaRecovery, long manaRecoveryBonus) {
+                return new MpInfo(initMana, maxMana, manaRecovery + manaRecoveryBonus);
+            }
+        }
+
+        private record AttackInfo(
+                boolean isGlobal, long value
+        ) {
+            public static AttackInfo of(long coworkerAttack, long attack) {
+                // global 은 어케암?
+                return new AttackInfo(false, coworkerAttack + attack);
+            }
+        }
+
+        private record DefenseInfo(
+                long defense
+        ) {
+            public static DefenseInfo of(long defense) {
+                return new DefenseInfo(defense);
+            }
         }
     }
+
+    private record StagePassiveSkill(
+            long id,
+            String korName,
+            String engName,
+            String description,
+            int level,
+            String targetProperty,
+            CountInfo count,
+            double effectRate
+    ) {
+
+        public static StagePassiveSkill of(SkillCardEntity equippedPassive) {
+
+            PassiveSkillCard card = PassiveSkillCard.from(equippedPassive.getSkillCardEnumId());
+
+            return new StagePassiveSkill(
+                    equippedPassive.getId(),
+                    equippedPassive.getKorName(),
+                    equippedPassive.getEngName(),
+                    card.getDescription(),
+                    equippedPassive.getCurrentLevel(),
+                    card.getProperty(),
+                    new CountInfo(1,1),
+                    card.getFinalEffectValue(equippedPassive.getCurrentLevel())
+            );
+        }
+    }
+
+    private record CountInfo(
+            long now, long max
+    ) {
+    }
+
+    private record StageActiveSkill(
+            long id,
+            String korName,
+            String engName,
+            String description,
+            int level,
+            CountInfo count,
+            int cost,
+            String targetProperty,
+            double effectRate
+    ) {
+        public static StageActiveSkill of(SkillCardEntity equippedActive) {
+            ActiveSkillCard card = ActiveSkillCard.from(equippedActive.getSkillCardEnumId());
+
+            return new StageActiveSkill(
+                    equippedActive.getId(),
+                    equippedActive.getKorName(),
+                    equippedActive.getEngName(),
+                    card.getDescription(),
+                    equippedActive.getCurrentLevel(),
+                    new CountInfo(1,1),
+                    card.getManaCost(),
+                    card.getProperty(),
+                    card.getFinalEffectValue(equippedActive.getCurrentLevel())
+            );
+        }
+    }
+
+
+    private record ResurrectionInfo(
+            boolean hasResurrection,
+            int resurrectionTurn
+    ) {
+        public static ResurrectionInfo of(int passiveCardEnumId) {
+
+            PassiveSkillCard card = PassiveSkillCard.from(passiveCardEnumId);
+            if (card.name().equals(String.valueOf(PassiveSkillCard.SECOND_CHANCE))){
+                return new ResurrectionInfo(true, 0);
+            }
+            return new ResurrectionInfo(false, 0);
+        }
+    }
+
 }
