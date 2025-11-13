@@ -106,7 +106,6 @@ public class GpsRandomDataScheduler {
             }
         }
 
-        log.info(String.format("    - 신규 동료/선물상자 데이터 생성 완료. [총 셀 수: %d, 총 객체 수: %d]", totalCells, totalCoworkersAndGifts));
         if (!isScheduledExecution) {
             log.info("    - 일반 아이템 (ITEM_LOCATIONS_KEY) 생성 완료.");
         }
