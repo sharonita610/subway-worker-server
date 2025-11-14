@@ -11,10 +11,7 @@ import org.springframework.data.geo.Point;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -39,12 +36,12 @@ public class GpsRandomDataScheduler {
     private static final double MAX_LON = 131.0;
 
     // 1km Grid 셀 간격 (약 1km에 해당하는 도(degree) 값)
-    private static final double LAT_STEP = 0.009;
-    private static final double LON_STEP = 0.011;
+    private static final double LAT_STEP = 0.018;
+    private static final double LON_STEP = 0.022;
 
     // Grid 셀당 생성할 아이템 수
-    private static final int COWORKER_PER_CELL = 5;
-    private static final int GIFTS_PER_CELL = 2; // 선물상자 수
+    private static final int COWORKER_PER_CELL = 10;
+    private static final int GIFTS_PER_CELL = 4; // 선물상자 수
     private static final double MAX_JITTER = 0.1; // 셀 내에서 흩뿌릴 최대 오프셋
 
     // --- 스케줄링 및 초기화 ---
@@ -74,6 +71,7 @@ public class GpsRandomDataScheduler {
 
     /**
      * 핵심 로직: Redis의 데이터를 삭제하고 새로운 Grid 데이터를 생성합니다.
+     *
      * @param isScheduledExecution 스케줄링 실행 여부 (true인 경우 Item 생성 건너뛰기)
      */
     public void generateFullMapData(boolean isScheduledExecution) {
@@ -82,6 +80,13 @@ public class GpsRandomDataScheduler {
             // 1. 기존 데이터 삭제 (Item_Locations_Key는 제외)
             redisTemplate.delete(COWORKER_LOCATIONS_KEY);
             redisTemplate.delete(RANDOM_GIFT_BOX_KEY);
+            // **[추가 필요]** 동료 상세 데이터 일괄 삭제 (coworker:data:*)
+            Set<String> coworkerDataKeys = redisTemplate.keys(COWORKER_DATA_PREFIX + "*");
+            if (coworkerDataKeys != null && !coworkerDataKeys.isEmpty()) {
+                redisTemplate.delete(coworkerDataKeys);
+                log.info("--- 동료 상세 데이터 ({}개) 삭제 완료 ---", coworkerDataKeys.size());
+            }
+
             weeklyAcquiredKeyCleanup();
             log.info("--- 동료/선물상자 기존 데이터 삭제 완료 ---");
         }
@@ -140,7 +145,7 @@ public class GpsRandomDataScheduler {
 
     private void createAndSaveCoworkerHashData(final String coworkerId) {
         Map<String, String> dataToSave = coworkerDataCreator.createRandomCoworkerAttribute();
-        if(dataToSave.isEmpty()) {
+        if (dataToSave.isEmpty()) {
             return;
         }
         String instanceKey = COWORKER_DATA_PREFIX + coworkerId;
@@ -153,8 +158,9 @@ public class GpsRandomDataScheduler {
         return Math.round((center + offset) * 1000000.0) / 1000000.0;
     }
 
+    @Scheduled(fixedRate = 432000000) // 5일 (432,000,000 밀리초)
     public void weeklyAcquiredKeyCleanup() {
-
+        log.info("--- [Scheduler] 5일 주기 데이터 정리 시작 ---");
         // 1. 모든 사용자 UUID 목록을 조회합니다. (예: DB 또는 다른 Redis 키에서)
         List<String> allUserUuids = userService.getAllUserUuids();
 
@@ -166,6 +172,5 @@ public class GpsRandomDataScheduler {
             redisTemplate.delete(coworkerKey);
             redisTemplate.delete(giftBoxKey);
         }
-        log.info("Weekly acquired key cleanup finished.");
-    }
+        log.info("--- [Scheduler] 5일 주기 데이터 정리 완료 ---");    }
 }
