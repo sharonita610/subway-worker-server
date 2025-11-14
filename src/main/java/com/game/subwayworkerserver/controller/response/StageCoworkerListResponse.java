@@ -105,7 +105,7 @@ public record StageCoworkerListResponse(
         ) {
 
             public static HpInfo of(long hp, long hpBonus, long defenseBonus) {
-                return new HpInfo( hp + hpBonus, 0, 0, 0, defenseBonus);
+                return new HpInfo( hp + hpBonus, hp + hpBonus, 0, 0, defenseBonus);
             }
 
         }
@@ -122,7 +122,6 @@ public record StageCoworkerListResponse(
                 boolean isGlobal, long value
         ) {
             public static AttackInfo of(long coworkerAttack, long attack) {
-                // global 은 어케암?
                 return new AttackInfo(false, coworkerAttack + attack);
             }
         }
@@ -189,7 +188,7 @@ public record StageCoworkerListResponse(
                     equippedActive.getEngName(),
                     card.getDescription(),
                     equippedActive.getCurrentLevel(),
-                    new CountInfo(1,1),
+                    new CountInfo(equippedActive.getCount(), equippedActive.getRequiredCount()),
                     card.getManaCost(),
                     card.getProperty(),
                     card.getFinalEffectValue(equippedActive.getCurrentLevel())
@@ -211,5 +210,4 @@ public record StageCoworkerListResponse(
             return new ResurrectionInfo(false, 0);
         }
     }
-
 }

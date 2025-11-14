@@ -35,7 +35,7 @@ public class CaptureCoworkerService {
     private static final String USER_ACQUIRED_PREFIX = "user:acquired:";
     private static final String COWORKER_DATA_PREFIX = "coworker:data:";
 
-    private static final long ACQUIRED_KEY_TTL_DAYS = 5;
+    private static final long ACQUIRED_KEY_TTL_HOURS = 4;
 
     @Transactional
     public CaptureResponse tryToCapture(final String uuid, final CaptureCoworkerRequest request) {
@@ -132,6 +132,6 @@ public class CaptureCoworkerService {
 
     private void hideCoworkerFromUser(final String coworkerId, final String acquiredKey) {
         redisTemplate.opsForSet().add(acquiredKey, coworkerId);
-        redisTemplate.expire(acquiredKey, ACQUIRED_KEY_TTL_DAYS, TimeUnit.DAYS);
+        redisTemplate.expire(acquiredKey, ACQUIRED_KEY_TTL_HOURS, TimeUnit.HOURS);
     }
 }

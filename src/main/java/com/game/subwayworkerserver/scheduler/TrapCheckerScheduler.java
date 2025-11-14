@@ -37,7 +37,7 @@ public class TrapCheckerScheduler {
 
     private static final String COWORKER_DATA_PREFIX = "coworker:data:";
     private static final String TRAPPED_COWORKER_DATA_PREFIX = "trapped:coworker:data:";
-    private static final long TRAPPED_DATA_TTL_DAYS = 14;
+    private static final long TRAPPED_DATA_TTL_DAYS = 7;
 
     /**
      * 💡 3. 트랩-동료 겹침 확인 스케줄러 (30분마다 실행)

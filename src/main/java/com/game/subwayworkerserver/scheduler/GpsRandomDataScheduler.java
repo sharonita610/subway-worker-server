@@ -5,6 +5,8 @@ import com.game.subwayworkerserver.service.UserService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.stereotype.Component;
 
 import org.springframework.data.geo.Point;
@@ -82,35 +84,33 @@ public class GpsRandomDataScheduler {
             // 1. 기존 데이터 삭제 (Item_Locations_Key는 제외)
             redisTemplate.delete(COWORKER_LOCATIONS_KEY);
             redisTemplate.delete(RANDOM_GIFT_BOX_KEY);
-
+            redisTemplate.delete(COWORKER_DATA_PREFIX);
             log.info("--- 동료/선물상자 기존 데이터 삭제 완료 ---");
         }
 
         int totalCells = 0;
         int totalCoworkersAndGifts = 0;
+        redisTemplate.executePipelined((RedisConnection connection) -> {
 
-        // 2. 대한민국 Grid 순회 및 데이터 생성
-        for (double lat = MIN_LAT; lat < MAX_LAT; lat += LAT_STEP) {
-            for (double lon = MIN_LON; lon < MAX_LON; lon += LON_STEP) {
+            // 2. 대한민국 Grid 순회 및 데이터 생성
+            for (double lat = MIN_LAT; lat < MAX_LAT; lat += LAT_STEP) {
+                for (double lon = MIN_LON; lon < MAX_LON; lon += LON_STEP) {
 
-                double cellCenterLat = lat + (LAT_STEP / 2);
-                double cellCenterLon = lon + (LON_STEP / 2);
+                    double cellCenterLat = lat + (LAT_STEP / 2);
+                    double cellCenterLon = lon + (LON_STEP / 2);
 
-                // 동료 생성 (1개)
-                createItemsInCell(cellCenterLat, cellCenterLon, COWORKER_PER_CELL, COWORKER_LOCATIONS_KEY, "COWORKER");
+                    // 동료 생성 (1개) - createItemsInCell 내부의 redisTemplate 호출이 Pipeline에 기록됨
+                    createItemsInCell(cellCenterLat, cellCenterLon, COWORKER_PER_CELL, COWORKER_LOCATIONS_KEY, "COWORKER");
 
-                // 선물 상자 생성 (2개)
-                createItemsInCell(cellCenterLat, cellCenterLon, GIFTS_PER_CELL, RANDOM_GIFT_BOX_KEY, "GIFT");
-                totalCells++;
-                totalCoworkersAndGifts += COWORKER_PER_CELL + GIFTS_PER_CELL;
+                    // 선물 상자 생성 (2개)
+                    createItemsInCell(cellCenterLat, cellCenterLon, GIFTS_PER_CELL, RANDOM_GIFT_BOX_KEY, "GIFT");
+                }
             }
-        }
 
-        if (!isScheduledExecution) {
-            log.info("    - 일반 아이템 (ITEM_LOCATIONS_KEY) 생성 완료.");
-        }
+            // ⭐ 루프가 완전히 끝난 후 Pipeline 작업이 Redis로 전송됩니다. ⭐
+            return null;
+        });
     }
-
 
     /**
      * Helper: 특정 셀 중심에 N개의 아이템을 랜덤하게 생성하여 Redis에 저장합니다.
@@ -141,7 +141,7 @@ public class GpsRandomDataScheduler {
 
     private void createAndSaveCoworkerHashData(final String coworkerId) {
         Map<String, String> dataToSave = coworkerDataCreator.createRandomCoworkerAttribute();
-        if(dataToSave.isEmpty()) {
+        if (dataToSave.isEmpty()) {
             return;
         }
         String instanceKey = COWORKER_DATA_PREFIX + coworkerId;
