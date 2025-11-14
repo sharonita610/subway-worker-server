@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +34,8 @@ public class CaptureCoworkerService {
     private static final String COWORKER_LOCATIONS_KEY = "coworker:locations";
     private static final String USER_ACQUIRED_PREFIX = "user:acquired:";
     private static final String COWORKER_DATA_PREFIX = "coworker:data:";
+
+    private static final long ACQUIRED_KEY_TTL_DAYS = 5;
 
     @Transactional
     public CaptureResponse tryToCapture(final String uuid, final CaptureCoworkerRequest request) {
@@ -129,5 +132,6 @@ public class CaptureCoworkerService {
 
     private void hideCoworkerFromUser(final String coworkerId, final String acquiredKey) {
         redisTemplate.opsForSet().add(acquiredKey, coworkerId);
+        redisTemplate.expire(acquiredKey, ACQUIRED_KEY_TTL_DAYS, TimeUnit.DAYS);
     }
 }

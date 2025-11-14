@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -39,6 +40,7 @@ public class GiftBoxService {
     private static final double SEARCH_RADIUS_METER = 50.0;
 
     private static final int BASE_EXP = 20;
+    private static final long ACQUIRED_KEY_TTL_DAYS = 5;
 
     // --- 보상 상수 (이전 답변에서 사용된 것 재활용) ---
     private static final long COIN_MIN_ORIGINAL = 10000; // 원본 값
@@ -66,6 +68,8 @@ public class GiftBoxService {
 
         // 획득 기록 저장 (A user가 획득하면 A user의 Set에만 저장)
         redisTemplate.opsForSet().add(acquiredKey, giftBoxId);
+
+        redisTemplate.expire(acquiredKey, ACQUIRED_KEY_TTL_DAYS, TimeUnit.DAYS);
 
         // 3. 기본 선물 랜덤 뽑기 및 4. 추가 선물 랜덤 뽑기
         List<DefaultGift> defaultGifts = calculateDefaultRewards();
