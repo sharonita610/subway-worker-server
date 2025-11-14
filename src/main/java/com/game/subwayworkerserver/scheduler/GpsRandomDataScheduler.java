@@ -33,10 +33,16 @@ public class GpsRandomDataScheduler {
     private static final long MAP_DATA_TTL_DAYS = 1;
     private static final long MAP_DATA_TTL_HOURS = 4;
     // 대한민국 지도 범위 (대략적)
-    private static final double MIN_LAT = 33.0;
-    private static final double MAX_LAT = 38.5;
-    private static final double MIN_LON = 124.0;
-    private static final double MAX_LON = 131.0;
+//    private static final double MIN_LAT = 33.0;
+//    private static final double MAX_LAT = 38.5;
+//    private static final double MIN_LON = 124.0;
+//    private static final double MAX_LON = 131.0;
+
+    // 서울/수도권 지도 범위 (대략적)
+    private static final double MIN_LAT = 37.4;
+    private static final double MAX_LAT = 37.7;
+    private static final double MIN_LON = 126.8;
+    private static final double MAX_LON = 127.2;
 
     // 1km Grid 셀 간격 (약 1km에 해당하는 도(degree) 값)
     // 2km Grid 셀 간격 (약 2km에 해당하는 도(degree) 값)
