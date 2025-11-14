@@ -85,7 +85,6 @@ public class GpsRandomDataScheduler {
             // 1. 기존 데이터 삭제 (Item_Locations_Key는 제외)
             redisTemplate.delete(COWORKER_LOCATIONS_KEY);
             redisTemplate.delete(RANDOM_GIFT_BOX_KEY);
-            redisTemplate.delete(COWORKER_DATA_PREFIX);
             log.info("--- 동료/선물상자 기존 데이터 삭제 완료 ---");
         }
 
@@ -147,7 +146,7 @@ public class GpsRandomDataScheduler {
         }
         String instanceKey = COWORKER_DATA_PREFIX + coworkerId;
         redisTemplate.opsForHash().putAll(instanceKey, dataToSave);
-        redisTemplate.expire(instanceKey, MAP_DATA_TTL_DAYS, TimeUnit.DAYS);
+        redisTemplate.expire(instanceKey, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
     }
 
     private double generateRandomCoordinate(double center, double maxOffset) {
