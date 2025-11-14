@@ -39,13 +39,14 @@ public class GpsRandomDataScheduler {
     private static final double MAX_LON = 131.0;
 
     // 1km Grid 셀 간격 (약 1km에 해당하는 도(degree) 값)
-    private static final double LAT_STEP = 0.045;
-    private static final double LON_STEP = 0.055;
+    // 2km Grid 셀 간격 (약 2km에 해당하는 도(degree) 값)
+    private static final double LAT_STEP = 0.018;
+    private static final double LON_STEP = 0.022;
 
     // Grid 셀당 생성할 아이템 수
-    private static final int COWORKER_PER_CELL = 25;
-    private static final int GIFTS_PER_CELL = 10; // 선물상자 수
-    private static final double MAX_JITTER = 0.5; // 셀 내에서 흩뿌릴 최대 오프셋
+    private static final int COWORKER_PER_CELL = 10;
+    private static final int GIFTS_PER_CELL = 4; // 선물상자 수
+    private static final double MAX_JITTER = 0.008; // 셀 내에서 흩뿌릴 최대 오프셋
 
 
     // --- 스케줄링 및 초기화 ---
@@ -120,7 +121,7 @@ public class GpsRandomDataScheduler {
         Map<String, Point> locations = new HashMap<>();
 
         for (int i = 0; i < count; i++) {
-            String memberName = prefix + "_" + UUID.randomUUID().toString().substring(0, 20);
+            String memberName = prefix + "_" + UUID.randomUUID().toString().substring(0, 18);
 
             // 셀 중심 좌표에서 MAX_JITTER 내에서 랜덤하게 위치를 흩뿌립니다.
             double randomLat = generateRandomCoordinate(centerLat, MAX_JITTER);
