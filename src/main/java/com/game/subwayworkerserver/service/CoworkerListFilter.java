@@ -4,12 +4,11 @@ import com.game.subwayworkerserver.controller.request.CoworkerFilterRequest;
 import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import com.game.subwayworkerserver.domain.market.CoworkerOnSale;
+import com.game.subwayworkerserver.domain.market.SkillCardOnSale;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -24,7 +23,7 @@ public class CoworkerListFilter {
             if (attributes != null && !attributes.isEmpty()) {
                 filteredAndSortedCoworkers = filteredAndSortedCoworkers.stream()
                         .filter(coworker -> coworkerHasAnyElement(coworker, attributes))
-                        .toList();
+                        .collect(Collectors.toList());
             }
 
             // 2-2. 스킬 필터링
@@ -32,7 +31,7 @@ public class CoworkerListFilter {
             if (skills != null && !skills.isEmpty()) {
                 filteredAndSortedCoworkers = filteredAndSortedCoworkers.stream()
                         .filter(coworker -> coworkerHasAllSkills(coworker, skills))
-                        .toList();
+                        .collect(Collectors.toList());
             }
 
             // 3. 정렬 (req가 null이 아닐 때만 정렬 조건 적용)
@@ -61,42 +60,39 @@ public class CoworkerListFilter {
     /**
      * 동료가 요청된 모든 스킬을 가지고 있는지 확인합니다.
      */
+    // CoworkerListFilter.java
+
+    /**
+     * 동료가 요청된 모든 스킬을 가지고 있는지 확인합니다. (HashSet으로 최적화)
+     */
     private boolean coworkerHasAllSkills(CoworkerOnSale coworker, List<String> requiredSkills) {
 
-        // 1. CoworkerOnSale DTO에서 액티브 및 패시브 스킬 목록을 가져옵니다.
         List<ActiveSkillCard> activeSkills = coworker.activeSkills();
         List<PassiveSkillCard> passiveSkills = coworker.passiveSkills();
 
-        // 2. ⭐ 액티브 스킬 이름을 String 리스트로 변환 ⭐
-        // ActiveSkillCard::getKoreanName 메서드가 있다고 가정합니다.
-        List<String> activeSkillNames = activeSkills.stream()
-                .map(ActiveSkillCard::getKoreanName)
-                .toList();
+        // 1. 모든 스킬 이름을 통합하여 List에 모읍니다.
+        List<String> activeSkillNames = activeSkills.stream().map(ActiveSkillCard::name).toList();
+        List<String> passiveSkillNames = passiveSkills.stream().map(PassiveSkillCard::name).toList();
 
-        // 3. ⭐ 패시브 스킬 이름을 String 리스트로 변환 ⭐
-        // PassiveSkillCard::getKoreanName 메서드가 있다고 가정합니다.
-        List<String> passiveSkillNames = passiveSkills.stream()
-                .map(PassiveSkillCard::getKoreanName)
-                .toList();
+        List<String> combinedList = new ArrayList<>(activeSkillNames);
+        combinedList.addAll(passiveSkillNames);
 
-        // 4. ⭐ 두 목록을 하나로 통합 (List<String> coworkerList 생성) ⭐
-        List<String> coworkerList = new ArrayList<>(activeSkillNames);
-        coworkerList.addAll(passiveSkillNames);
+        Set<String> coworkerSkills = new HashSet<>(combinedList);
 
-        // 5. requiredSkills의 모든 요소가 통합된 coworkerSkills에 포함되는지 확인
-        return coworkerList.containsAll(requiredSkills);
+        return coworkerSkills.containsAll(requiredSkills);
     }
 
     /**
-     * 정렬 기준 문자열에 따라 Comparator를 생성합니다.
+     * 정렬 기준 문자열에 따라 Comparator를 생성합니다.ㅁ
      */
     private Comparator<CoworkerOnSale> createCoworkerComparator(String sortType) {
-        // ⭐ 모든 Comparator를 coworkerOnSale 타입으로 변경했습니다. ⭐
-        return switch (sortType.toLowerCase()) {
-            case "가격내림차순" -> Comparator.comparing(CoworkerOnSale::price).reversed();
-            case "가격오름차순" -> Comparator.comparing(CoworkerOnSale::price);
-            case "레벨높은순" -> Comparator.comparing(CoworkerOnSale::level).reversed();
-            case "공격력강한순" -> Comparator.comparing(CoworkerOnSale::attack).reversed();
+        if (sortType == null) {
+            return Comparator.comparing(CoworkerOnSale::level).reversed();
+        }
+        return switch (sortType) {
+            case "가격낮은순" -> Comparator.comparing(CoworkerOnSale::price).reversed();
+            case "가격높은순" -> Comparator.comparing(CoworkerOnSale::price);
+            case "공격력높은순" -> Comparator.comparing(CoworkerOnSale::attack).reversed();
             case "hp높은순" -> Comparator.comparing(CoworkerOnSale::hp).reversed();
             case "방어력높은순" -> Comparator.comparing(CoworkerOnSale::defense).reversed();
             default -> Comparator.comparing(CoworkerOnSale::level).reversed();
