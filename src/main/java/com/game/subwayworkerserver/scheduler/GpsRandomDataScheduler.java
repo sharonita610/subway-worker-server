@@ -38,11 +38,11 @@ public class GpsRandomDataScheduler {
 //    private static final double MIN_LON = 124.0;
 //    private static final double MAX_LON = 131.0;
 
-    // 서울/수도권 및 인천 지도 범위
-    private static final double MIN_LAT = 37.4;
+    // 서울/수도권 및 인천/성남/경기 동부 일부 확장 범위
+    private static final double MIN_LAT = 37.3;
     private static final double MAX_LAT = 37.7;
-    private static final double MIN_LON = 126.3; // 인천을 포함하도록 서쪽으로 확장
-    private static final double MAX_LON = 127.2;
+    private static final double MIN_LON = 126.3;
+    private static final double MAX_LON = 127.5; // 경기 광주 방면으로 확장
 
     // 1km Grid 셀 간격 (약 1km에 해당하는 도(degree) 값)
     // 2km Grid 셀 간격 (약 2km에 해당하는 도(degree) 값)
