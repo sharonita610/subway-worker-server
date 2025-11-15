@@ -2,6 +2,7 @@ package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.DungeonRequest;
 import com.game.subwayworkerserver.controller.request.StageClearRequest;
+import com.game.subwayworkerserver.controller.response.DungeonResponse;
 import com.game.subwayworkerserver.controller.response.StageClearResponse;
 import com.game.subwayworkerserver.controller.sampleData.MonsterSampleData;
 import com.game.subwayworkerserver.domain.StageRewardInfo;
@@ -20,8 +21,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.game.subwayworkerserver.exception.ErrorCode.BAD_REQUEST;
 
@@ -122,7 +125,7 @@ public class StageService {
         );
     }
 
-    public StageClearResponse recordDungeon(String uuid, DungeonRequest request) {
+    public StageClearResponse recordDungeon(final String uuid, final DungeonRequest request) {
         UserEntity user = getUserByUuid(uuid);
         long userId = user.getId();
         Optional<DungeonRecordEntity> dungeonRecord = getDungeonByUserIdAnsStationName(request.stationName(), userId);
@@ -142,15 +145,8 @@ public class StageService {
             return StageClearResponse.of(successReward);
 
         } else if (dungeonRecord.isEmpty() && request.success()) {
-            DungeonRecordEntity newDungeon = DungeonRecordEntity.builder()
-                    .userId(userId)
-                    .stationName(request.stationName())
-                    .isFirstClear(true)
-                    .isRewardPaid(true)
-                    .build();
-
-            dungeonRecordRepository.save(newDungeon);
-            updateDungeonReward(usingCoworkers, successReward, user);
+//            createNewDungeon(request.stationName(), userId, true);
+//            updateDungeonReward(usingCoworkers, successReward, user);
             return StageClearResponse.of(successReward);
         } else {
             return StageClearResponse.empty();
@@ -158,11 +154,26 @@ public class StageService {
         }
     }
 
+    private DungeonRecordEntity createNewDungeon(final String stationName, final long userId) {
+        String dungeonUUID = UUID.randomUUID().toString().substring(0, 8);
+        DungeonRecordEntity newDungeon = DungeonRecordEntity.builder()
+                .userId(userId)
+                .stationName(stationName)
+                .isFirstClear(false)
+                .isRewardPaid(false)
+                .dungeonUuId(dungeonUUID)
+                .build();
+
+        return dungeonRecordRepository.save(newDungeon);
+    }
+
     private Optional<DungeonRecordEntity> getDungeonByUserIdAnsStationName(final String stationName, long userId) {
         return dungeonRecordRepository.findByUserIdAndStationName(userId, stationName);
     }
 
-    private void updateDungeonReward(List<CoworkerEntity> usingCoworkers, DungeonReward successReward, UserEntity user) {
+    private void updateDungeonReward(
+            final List<CoworkerEntity> usingCoworkers, final DungeonReward successReward, final UserEntity user
+    ) {
         usingCoworkers.forEach(coworker ->
                 coworkerLevelProcessor.processCoworkerExpAndLevelUp(coworker, successReward.getCoworkerExp())
         );
@@ -170,9 +181,24 @@ public class StageService {
         user.updateDungeonReward(successReward.getCoin(), successReward.getGacha(), successReward.getVacation());
     }
 
-    public boolean checkDungeon(String uuid, DungeonRequest request) {
+    @Transactional
+    public DungeonResponse checkDungeon(final String uuid, final DungeonRequest request) {
         UserEntity user = getUserByUuid(uuid);
         Optional<DungeonRecordEntity> dungeon = getDungeonByUserIdAnsStationName(request.stationName(), user.getId());
-        return dungeon.map(DungeonRecordEntity::canRetry).orElse(false);
+
+        if (dungeon.isEmpty()) {
+            DungeonRecordEntity newDungeon = createNewDungeon(request.stationName(), user.getId());
+            return DungeonResponse.of(true, newDungeon.getDungeonUuId());
+
+
+        } else {
+            DungeonRecordEntity dungeonEntity = dungeon.get();
+            if(!dungeonEntity.canRetry()){
+                return DungeonResponse.of(false);
+            }
+            String dungeonUuId = dungeonEntity.getDungeonUuId();
+            return DungeonResponse.of(true, dungeonUuId);
+        }
+
     }
 }
