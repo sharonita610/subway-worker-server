@@ -96,7 +96,7 @@ public class CoworkerListFilter {
             case "가격낮은순" -> Comparator.comparing(CoworkerOnSale::price);
             case "가격높은순" -> Comparator.comparing(CoworkerOnSale::price).reversed();
             case "공격력높은순" -> Comparator.comparing(CoworkerOnSale::attack).reversed();
-            case "hp높은순" -> Comparator.comparing(CoworkerOnSale::hp).reversed();
+            case "HP높은순" -> Comparator.comparing(CoworkerOnSale::hp).reversed();
             case "방어력높은순" -> Comparator.comparing(CoworkerOnSale::defense).reversed();
             default -> Comparator.comparing(CoworkerOnSale::level).reversed();
         };
