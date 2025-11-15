@@ -52,11 +52,10 @@ public class SkillCardListFilter {
         }
 
         SkillSortType type = SkillSortType.fromKoreanName(sortType);
-
         return switch (type) {
-            case PRICE_ASC -> Comparator.comparing(SkillCardOnSale::price);
+            case PRICE_ASC, DEFAULT -> Comparator.comparing(SkillCardOnSale::price);
             case LEVEL_DESC -> Comparator.comparing(SkillCardOnSale::currentLevel).reversed();
-            case PRICE_DESC, DEFAULT -> Comparator.comparing(SkillCardOnSale::price).reversed();
+            case PRICE_DESC -> Comparator.comparing(SkillCardOnSale::price).reversed();
         };
     }
 
