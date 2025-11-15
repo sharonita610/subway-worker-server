@@ -38,7 +38,7 @@ public class SkillCardListFilter {
 
         List<String> combinedSkills = getCombinedSkills(request);
         if (!combinedSkills.isEmpty()) {
-            stream = stream.filter(card -> combinedSkills.contains(card.korName()));
+            stream = stream.filter(card -> combinedSkills.contains(card.engName()));
         }
 
         stream = stream.sorted(getComparator(request.sortType()));
