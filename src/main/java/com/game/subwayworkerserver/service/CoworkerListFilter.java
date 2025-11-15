@@ -9,7 +9,8 @@ import com.game.subwayworkerserver.entity.CoworkerEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Component
 public class CoworkerListFilter {
@@ -23,7 +24,7 @@ public class CoworkerListFilter {
             if (attributes != null && !attributes.isEmpty()) {
                 filteredAndSortedCoworkers = filteredAndSortedCoworkers.stream()
                         .filter(coworker -> coworkerHasAnyElement(coworker, attributes))
-                        .collect(Collectors.toList());
+                        .collect(toList());
             }
 
             // 2-2. 스킬 필터링
@@ -31,7 +32,7 @@ public class CoworkerListFilter {
             if (skills != null && !skills.isEmpty()) {
                 filteredAndSortedCoworkers = filteredAndSortedCoworkers.stream()
                         .filter(coworker -> coworkerHasAllSkills(coworker, skills))
-                        .collect(Collectors.toList());
+                        .collect(toList());
             }
 
             // 3. 정렬 (req가 null이 아닐 때만 정렬 조건 적용)
@@ -67,19 +68,21 @@ public class CoworkerListFilter {
      */
     private boolean coworkerHasAllSkills(CoworkerOnSale coworker, List<String> requiredSkills) {
 
-        List<ActiveSkillCard> activeSkills = coworker.activeSkills();
-        List<PassiveSkillCard> passiveSkills = coworker.passiveSkills();
+
+        List<Integer> userActiveSkills = coworker.getUserDefaultActiveSkills();
+        List<Integer> userPassiveSkills = coworker.getUserDefaultPassiveSkills();
 
         // 1. 모든 스킬 이름을 통합하여 List에 모읍니다.
-        List<String> activeSkillNames = activeSkills.stream().map(ActiveSkillCard::name).toList();
-        List<String> passiveSkillNames = passiveSkills.stream().map(PassiveSkillCard::name).toList();
-
+        List<String> activeSkillNames = userActiveSkills.stream()
+                .map(skill -> ActiveSkillCard.from(skill).name()).toList();
+        List<String> passiveSkillNames = userPassiveSkills.stream()
+                .map(skill -> PassiveSkillCard.from(skill).name()).toList();
         List<String> combinedList = new ArrayList<>(activeSkillNames);
         combinedList.addAll(passiveSkillNames);
 
         Set<String> coworkerSkills = new HashSet<>(combinedList);
 
-        return coworkerSkills.containsAll(requiredSkills);
+        return requiredSkills.stream().anyMatch(coworkerSkills::contains);
     }
 
     /**
@@ -90,8 +93,8 @@ public class CoworkerListFilter {
             return Comparator.comparing(CoworkerOnSale::level).reversed();
         }
         return switch (sortType) {
-            case "가격낮은순" -> Comparator.comparing(CoworkerOnSale::price).reversed();
-            case "가격높은순" -> Comparator.comparing(CoworkerOnSale::price);
+            case "가격낮은순" -> Comparator.comparing(CoworkerOnSale::price);
+            case "가격높은순" -> Comparator.comparing(CoworkerOnSale::price).reversed();
             case "공격력높은순" -> Comparator.comparing(CoworkerOnSale::attack).reversed();
             case "hp높은순" -> Comparator.comparing(CoworkerOnSale::hp).reversed();
             case "방어력높은순" -> Comparator.comparing(CoworkerOnSale::defense).reversed();
@@ -123,6 +126,6 @@ public class CoworkerListFilter {
         // 2. Stream을 사용하여 정렬 및 새로운 리스트 반환
         return coworkerEntityList.stream()
                 .sorted(coworkerComparator)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 }

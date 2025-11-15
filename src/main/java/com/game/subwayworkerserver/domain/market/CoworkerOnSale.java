@@ -97,4 +97,18 @@ public record CoworkerOnSale(
                 .filter(java.util.Objects::nonNull)
                 .toList();
     }
+
+    public List<Integer> getUserDefaultActiveSkills() {
+         return List.of(
+                this.activeSkillId1,
+                this.activeSkillId2
+        );
+    }
+
+    public List<Integer> getUserDefaultPassiveSkills() {
+        return List.of(
+                this.passiveSkillId1,
+                this.passiveSkillId2
+        );
+    }
 }
