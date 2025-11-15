@@ -2,10 +2,10 @@ package com.game.subwayworkerserver.service;
 
 public enum SkillSortType {
 
-    PRICE_ASC("가격오름차순"),
-    PRICE_DESC("가격내림차순"),
+    PRICE_ASC("가격높은순"),
+    PRICE_DESC("가격낮은순"),
     LEVEL_DESC("레벨높은순"),
-    DEFAULT("가격내림차순");
+    DEFAULT("가격낮은순");
 
     private final String koreanName;
 

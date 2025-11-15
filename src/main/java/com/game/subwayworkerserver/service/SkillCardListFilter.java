@@ -51,7 +51,7 @@ public class SkillCardListFilter {
             return Comparator.comparing(SkillCardOnSale::currentLevel).reversed();
         }
 
-        SkillSortType type = SkillSortType.fromKoreanName(sortType);
+        SkillSortType type = SkillSortType.valueOf(sortType);
 
         return switch (type) {
             case PRICE_ASC -> Comparator.comparing(SkillCardOnSale::price);
