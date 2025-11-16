@@ -309,37 +309,6 @@ public class CoworkerEntity extends BaseTimeEntity {
         }
     }
 
-    public void accumulateExp(final long totalGainedExp) {
-
-        // 1. 경험치 업데이트
-        this.totalExp += totalGainedExp;
-        this.currentExp += totalGainedExp;
-
-        // 2. 만렙이 아니고, 다음 레벨 필요 경험치를 충족했을 때 (단순 IF 조건)
-        if (this.level.getRequiredExpToNextLevel() > 0 &&
-                this.currentExp >= this.level.getRequiredExpToNextLevel()) {
-
-            // 현재 레벨업에 필요한 경험치를 초과분(남은 경험치) 계산
-            long requiredExp = this.level.getRequiredExpToNextLevel();
-            this.currentExp -= requiredExp;
-
-            // 다음 레벨 객체 획득
-            int nextLevelValue = this.level.getLevel() + 1;
-
-            try {
-                // 다음 레벨로 갱신
-                this.level = CoworkerLevel.of(nextLevelValue);
-
-                // TODO: 레벨업 시 스탯 증가 로직 호출 (updateStatsForLevelUp();)
-
-            } catch (IllegalArgumentException e) {
-                // 만렙 도달 (예외 발생 시 CHIEF로 설정)
-                this.level = CoworkerLevel.CHIEF;
-                this.currentExp = 0;
-            }
-        }
-    }
-
     public void updateExp(final int exp) {
         this.currentExp += exp;
         this.totalExp += exp;
