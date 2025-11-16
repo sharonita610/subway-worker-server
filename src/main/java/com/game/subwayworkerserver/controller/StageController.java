@@ -75,13 +75,13 @@ public class StageController {
     }
 
     @Operation(
-            summary = "사용자의 던전 참여 가능 후 uuid 를 조회 [test]",
+            summary = "사용자의 던전 참여 가능 후 uuid 를 조회 [완]",
             description = "사용자가 8시간 안에 방문한적이 있는지 조회하고 없으면 던전 uuid 받기"
     )
     @GetMapping("/dungeon/record")
-    public ResponseEntity<DungeonResponse> checkDungeon(@RequestBody DungeonRequest request) {
+    public ResponseEntity<DungeonResponse> checkDungeon(@RequestParam("stationName") String stationName) {
         String uuid = SecurityUtils.getCurrentUserUuid();
-        return ResponseEntity.ok(stageService.checkDungeon(uuid, request));
+        return ResponseEntity.ok(stageService.checkDungeon(uuid, stationName));
     }
 
 }
