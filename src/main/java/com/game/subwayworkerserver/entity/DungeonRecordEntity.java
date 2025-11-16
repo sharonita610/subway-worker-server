@@ -70,7 +70,10 @@ public class DungeonRecordEntity extends BaseTimeEntity {
     }
 
     public boolean canRetry() {
-        return retryTime.isBefore(LocalDateTime.now());
+        if (this.retryTime != null) {
+            return retryTime.isBefore(LocalDateTime.now());
+        }
+        return true;
     }
 
     public void updateSuccess() {
