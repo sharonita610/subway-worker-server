@@ -4,6 +4,7 @@ package com.game.subwayworkerserver.controller;
 import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.DungeonRequest;
 import com.game.subwayworkerserver.controller.request.StageClearRequest;
+import com.game.subwayworkerserver.controller.response.DungeonResponse;
 import com.game.subwayworkerserver.controller.response.MonsterResponse;
 import com.game.subwayworkerserver.controller.response.StageClearResponse;
 import com.game.subwayworkerserver.controller.response.StageCoworkerListResponse;
@@ -27,7 +28,7 @@ public class StageController {
     private final CoworkerService coworkerService;
 
     @Operation(
-            summary = "스테이지에서 사용할 동료들의 능력 리스트 조회기능 [개선 진행중]",
+            summary = "스테이지에서 사용할 동료들의 능력 리스트 조회기능 [완]",
             description = "유저가 장착중인 동료, 그리고 그 동료의 능력을 조회"
     )
     @GetMapping("/stage/coworkers")
@@ -74,12 +75,13 @@ public class StageController {
     }
 
     @Operation(
-            summary = "사용자의 던전을 기록 조회 [test]",
-            description = "사용자가 8시간 안에 방문한적이 있는지 조회"
+            summary = "사용자의 던전 참여 가능 후 uuid 를 조회 [완]",
+            description = "사용자가 8시간 안에 방문한적이 있는지 조회하고 없으면 던전 uuid 받기"
     )
     @GetMapping("/dungeon/record")
-    public ResponseEntity<Boolean> checkDungeon(@RequestBody DungeonRequest request) {
+    public ResponseEntity<DungeonResponse> checkDungeon(@RequestParam("stationName") String stationName) {
         String uuid = SecurityUtils.getCurrentUserUuid();
-        return ResponseEntity.ok(stageService.checkDungeon(uuid, request));
+        return ResponseEntity.ok(stageService.checkDungeon(uuid, stationName));
     }
+
 }

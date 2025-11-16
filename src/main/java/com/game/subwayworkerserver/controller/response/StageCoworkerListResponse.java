@@ -79,8 +79,7 @@ public record StageCoworkerListResponse(
             long defenseBonus = bonusMap.getOrDefault(GachaTreasure.DEFENSE_UP, 0L);
             long manaRecoveryBonus = bonusMap.getOrDefault(GachaTreasure.MP_RECOVERY_UP, 0L);
 
-            assert equippedPassive != null;
-            assert equippedActive != null;
+            int passiveCardEnumId = equippedPassive != null ? equippedPassive.getSkillCardEnumId() : 0;
             return StageCoworkerInfo.builder()
                     .id(coworker.getId())
                     .engName(String.valueOf(coworker.getCoworkerType()))
@@ -95,7 +94,7 @@ public record StageCoworkerListResponse(
                     .defense(DefenseInfo.of(coworker.getDefense()))
                     .passiveSkill(StagePassiveSkill.of(equippedPassive))
                     .activeSkill(StageActiveSkill.of(equippedActive))
-                    .resurrection(ResurrectionInfo.of(equippedPassive.getSkillCardEnumId()))
+                    .resurrection(ResurrectionInfo.of(passiveCardEnumId))
                     .build();
         }
 
@@ -105,7 +104,7 @@ public record StageCoworkerListResponse(
         ) {
 
             public static HpInfo of(long hp, long hpBonus, long defenseBonus) {
-                return new HpInfo( hp + hpBonus, hp + hpBonus, 0, 0, defenseBonus);
+                return new HpInfo(hp + hpBonus, hp + hpBonus, 0, 0, defenseBonus);
             }
 
         }
@@ -147,7 +146,12 @@ public record StageCoworkerListResponse(
     ) {
 
         public static StagePassiveSkill of(SkillCardEntity equippedPassive) {
-
+            if (equippedPassive == null) {
+                return new StagePassiveSkill(
+                        0, "", "", "", 0, "",
+                        new CountInfo(0, 0), 0.0
+                );
+            }
             PassiveSkillCard card = PassiveSkillCard.from(equippedPassive.getSkillCardEnumId());
 
             return new StagePassiveSkill(
@@ -157,7 +161,7 @@ public record StageCoworkerListResponse(
                     card.getDescription(),
                     equippedPassive.getCurrentLevel(),
                     card.getProperty(),
-                    new CountInfo(1,1),
+                    new CountInfo(1, 1),
                     card.getFinalEffectValue(equippedPassive.getCurrentLevel())
             );
         }
@@ -180,6 +184,12 @@ public record StageCoworkerListResponse(
             double effectRate
     ) {
         public static StageActiveSkill of(SkillCardEntity equippedActive) {
+            if (equippedActive == null) {
+                return new StageActiveSkill(
+                        0, "", "", "", 0,
+                        new CountInfo(0, 0), 0, "", 0.0
+                );
+            }
             ActiveSkillCard card = ActiveSkillCard.from(equippedActive.getSkillCardEnumId());
 
             return new StageActiveSkill(
@@ -202,9 +212,11 @@ public record StageCoworkerListResponse(
             int resurrectionTurn
     ) {
         public static ResurrectionInfo of(int passiveCardEnumId) {
-
+             if (passiveCardEnumId == 0) {
+                 return new ResurrectionInfo(false,0);
+             }
             PassiveSkillCard card = PassiveSkillCard.from(passiveCardEnumId);
-            if (card.name().equals(String.valueOf(PassiveSkillCard.SECOND_CHANCE))){
+            if (card.name().equals(String.valueOf(PassiveSkillCard.SECOND_CHANCE))) {
                 return new ResurrectionInfo(true, 0);
             }
             return new ResurrectionInfo(false, 0);

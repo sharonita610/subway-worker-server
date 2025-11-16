@@ -18,7 +18,7 @@ public class DungeonRecordEntity extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private Long userId;
 
     @Column(nullable = false)
@@ -39,8 +39,10 @@ public class DungeonRecordEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private LocalDateTime visitTime;
 
-    @Column(nullable = false)
     private LocalDateTime retryTime;
+
+    @Column(nullable = false, unique = true)
+    private String dungeonUuId;
 
     public void updateDungeonName(final String stationName) {
         this.stationName = stationName;
@@ -48,7 +50,8 @@ public class DungeonRecordEntity extends BaseTimeEntity {
 
     @Builder
     public DungeonRecordEntity(
-            Long userId, String stationName, int successCount, int failCount, boolean isFirstClear, boolean isRewardPaid
+            Long userId, String stationName, int successCount, int failCount, boolean isFirstClear, boolean isRewardPaid,
+            String dungeonUuId, LocalDateTime retryTime
     ) {
         this.userId = userId;
         this.stationName = stationName;
@@ -57,7 +60,8 @@ public class DungeonRecordEntity extends BaseTimeEntity {
         this.isFirstClear = isFirstClear;
         this.isRewardPaid = isRewardPaid;
         this.visitTime = LocalDateTime.now();
-        this.retryTime = visitTime.plusHours(8);
+        this.retryTime = retryTime;
+        this.dungeonUuId = dungeonUuId;
     }
 
     public void failDungeon(final String stationName) {
@@ -66,11 +70,18 @@ public class DungeonRecordEntity extends BaseTimeEntity {
     }
 
     public boolean canRetry() {
-        return retryTime.isBefore(LocalDateTime.now());
+        if (this.retryTime != null) {
+            return retryTime.isBefore(LocalDateTime.now());
+        }
+        return true;
     }
 
     public void updateSuccess() {
         this.successCount++;
         this.retryTime = LocalDateTime.now().plusHours(8);
+    }
+
+    public void updateFail() {
+        this.failCount++;
     }
 }
