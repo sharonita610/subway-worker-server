@@ -28,7 +28,7 @@ public class StageController {
     private final CoworkerService coworkerService;
 
     @Operation(
-            summary = "스테이지에서 사용할 동료들의 능력 리스트 조회기능 [개선 진행중]",
+            summary = "스테이지에서 사용할 동료들의 능력 리스트 조회기능 [완]",
             description = "유저가 장착중인 동료, 그리고 그 동료의 능력을 조회"
     )
     @GetMapping("/stage/coworkers")
