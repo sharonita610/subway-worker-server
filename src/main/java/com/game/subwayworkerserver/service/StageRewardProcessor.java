@@ -37,6 +37,7 @@ public class StageRewardProcessor {
                 .coin(reward.getFirstCoin())
                 .gachaTicket(reward.getGachaTicketCount())
                 .vacationTicket(reward.getVacationTicketCount())
+                .firstClear(true)
                 .extraReward(additionalReward)
                 .build();
     }
@@ -54,6 +55,7 @@ public class StageRewardProcessor {
                 .userExp(reward.getRePersonalExp())
                 .coworkerExp(reward.getRePartnerExp())
                 .coin(reward.getReCoin())
+                .firstClear(false)
                 .extraReward(additionalReward)
                 .build();
 
