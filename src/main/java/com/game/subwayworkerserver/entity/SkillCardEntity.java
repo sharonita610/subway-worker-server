@@ -159,7 +159,7 @@ public class SkillCardEntity extends BaseTimeEntity {
         if (newLevel < SKILL_MAX_LEVEL) {
             this.requiredCount = newLevel + 1;
         } else {
-            this.requiredCount = 0;
+            this.requiredCount = SKILL_MAX_LEVEL + 1;
         }
     }
 

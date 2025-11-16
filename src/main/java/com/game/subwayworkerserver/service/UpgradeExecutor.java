@@ -3,6 +3,7 @@ package com.game.subwayworkerserver.service;
 import com.game.subwayworkerserver.entity.SkillCardEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -34,11 +35,11 @@ public class UpgradeExecutor {
      */
     // ⭐️ [수정된 맵] 해당 레벨 달성 직후, 카운트 1로 시작하기 위해 필요한 총 누적 갯수
     private static final Map<Integer, Integer> LEVEL_START_CUMULATIVE_COUNT = Map.of(
-            1, 1,  // Lv 1 시작점 (총 누적 1장 필요)
-            2, 3,  // Lv 2 시작점 (총 누적 3장 필요)
-            3, 5,  // Lv 3 시작점 (총 누적 5장 필요)
-            4, 8,  // Lv 4 시작점 (총 누적 8장 필요)
-            5, 12  // Lv 5 시작점 (총 누적 12장 필요)
+            1, 1,
+            2, 2,
+            3, 4,
+            4, 7,
+            5, 11
     );
 
     /**
@@ -51,41 +52,41 @@ public class UpgradeExecutor {
                 .mapToInt(SkillCardEntity::getAccumulateCount)
                 .sum();
 
-        // 2. ⭐️ 최종 총 누적 획득 카드 수 계산 (레벨업 판정의 유일한 기준)
         int finalTotalAccumulatedCount = targetCard.getAccumulateCount() + addedMaterialValue;
 
-        // 3. 레벨 역산 및 잔여 카운트 계산
         int calculatedLevel = 1;
+        int requiredForCurrentLevelStart = 1;
 
-        // 3-1. 도달 레벨 판정
-        for (int level = 1; level < MAX_LEVEL; level++) {
-            int requiredToStartNextLevel = LEVEL_START_CUMULATIVE_COUNT.getOrDefault(level, Integer.MAX_VALUE);
+        // 2. 레벨 역순 순회 및 판정 (수정된 맵 사용)
+        List<Integer> sortedLevels = LEVEL_START_CUMULATIVE_COUNT.keySet().stream()
+                .sorted(Comparator.reverseOrder())
+                .toList();
 
-            if (finalTotalAccumulatedCount >= requiredToStartNextLevel) {
-                // 누적 카운트가 다음 레벨의 시작점보다 크거나 같으면 레벨 증가
-                calculatedLevel++;
-            } else {
+        for (int level : sortedLevels) {
+            int requiredStartCount = LEVEL_START_CUMULATIVE_COUNT.get(level);
+
+            if (finalTotalAccumulatedCount >= requiredStartCount) {
+                calculatedLevel = level;
+                requiredForCurrentLevelStart = requiredStartCount;
                 break;
             }
         }
 
-        // 4. ⭐️ 최종 잔여 카운트 (분자) 계산
+        // 3. 현재 레벨의 최대 필요 Count (Req) 계산
+        int requiredToStartNextLevel = LEVEL_START_CUMULATIVE_COUNT.getOrDefault(calculatedLevel + 1, Integer.MAX_VALUE);
+        int maxRequiredCountForCurrentLevel = requiredToStartNextLevel - requiredForCurrentLevelStart;
 
-        // 해당 레벨이 시작된 시점의 총 누적 갯수를 찾습니다.
-        int requiredForCurrentLevelStart = LEVEL_START_CUMULATIVE_COUNT.getOrDefault(calculatedLevel, 1);
-
-        // 최종 잔여 카운트 = (최종 총 누적 갯수) - (최종 레벨 시작에 필요한 누적 갯수) + 1 (Count 1부터 시작)
+        // 4. 최종 잔여 카운트 (Count 1부터 시작)
+        // 예시: 누적 2 (목표) - 시작 2 = 0. Count는 1부터 시작하므로 +1 필요
         int finalRemainingCount = (finalTotalAccumulatedCount - requiredForCurrentLevelStart) + 1;
 
-        if (finalRemainingCount == targetCard.getCurrentLevel() + 1) {
+        // 5. ⭐ 레벨업 조건 확인 (Max Count 초과 시 레벨업) ⭐
+        if (finalRemainingCount > maxRequiredCountForCurrentLevel) {
             calculatedLevel++;
-            finalRemainingCount = 1;
-        } else {
-            finalRemainingCount += 1;
-
+            finalRemainingCount = 1; // 다음 레벨의 1/N로 리셋
         }
-        // 5. 최종 결과 반환
-        return new UpgradeResult(calculatedLevel, finalRemainingCount, targetCard.getAccumulateCount() + addedMaterialValue);
+
+        return new UpgradeResult(calculatedLevel, finalRemainingCount, finalTotalAccumulatedCount);
     }
 
     public record UpgradeResult(int finalLevel, int finalCount, int accumulateCount) {
