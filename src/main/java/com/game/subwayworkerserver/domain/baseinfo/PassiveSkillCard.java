@@ -21,7 +21,7 @@ public enum PassiveSkillCard {
             SkillCardType.PASSIVE, 1.1, 0.10, "내 턴", "attack", true),
 
     WARM_EMBRACE(103, "동기의 위로", "상극에게 받는 데미지가 0.9배로 감소합니다.",
-            SkillCardType.PASSIVE, 0.9, -0.10, "상대 턴 공격", "damage", false), // 0.9배 -> 0.9, 10p 감소 -> -0.10 (감소율)
+            SkillCardType.PASSIVE, 0.9, 0.10, "상대 턴 공격", "damage", false), // 0.9배 -> 0.9, 10p 감소 -> -0.10 (감소율)
 
     SHIELD(104, "잘 만든 보고서", "매 턴 새로운 보호막이 생성됩니다. 보호막 수치는 내 방어력의 40%입니다.",
             SkillCardType.PASSIVE, 0.40, 0.05, "시작 시점.", "defense", true), // 40% -> 0.40, 5p 증가 -> 0.05
