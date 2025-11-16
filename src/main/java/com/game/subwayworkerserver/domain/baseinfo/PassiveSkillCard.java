@@ -96,11 +96,11 @@ public enum PassiveSkillCard {
      */
     public double getFinalEffectValue(int skillLevel) {
 
-        double diff = this.diffForLevel * skillLevel;
+        double diff = this.diffForLevel * skillLevel - 1;
         double effectRate = this.isIncrease
                 ? (this.level1EffectRate + diff)
                 : (this.level1EffectRate - diff);
 
-        return Math.round(effectRate * 100);
+        return Math.round(effectRate);
     }
 }
