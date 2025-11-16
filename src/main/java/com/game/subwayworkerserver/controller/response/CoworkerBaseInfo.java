@@ -13,6 +13,7 @@ import com.game.subwayworkerserver.entity.SkillCardEntity;
 import com.game.subwayworkerserver.entity.UserGachaEntity;
 import lombok.Builder;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -81,6 +82,9 @@ public record CoworkerBaseInfo(
     }
 
     private static List<SkillCard> getSelectedSkill(final long coworkerId, List<SkillCardEntity> skillCardEntityList) {
+        if(skillCardEntityList == null || skillCardEntityList.isEmpty()){
+            return Collections.emptyList();
+        }
         return skillCardEntityList.stream()
                 .filter(card -> Objects.equals(coworkerId, card.getCoworkerId()))
                 .filter(SkillCardEntity::isInUse)
