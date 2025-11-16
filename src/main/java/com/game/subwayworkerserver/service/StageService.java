@@ -129,29 +129,24 @@ public class StageService {
     public StageClearResponse recordDungeon(final String uuid, final DungeonRequest request) {
         UserEntity user = getUserByUuid(uuid);
         long userId = user.getId();
-        Optional<DungeonRecordEntity> dungeonRecord = getDungeonByUserIdAnsStationName(request.stationName(), userId);
-        DungeonReward successReward = DungeonReward.SUCCESS_REWARD;
 
+        DungeonRecordEntity dungeonRecord = getDungeonByUserIdAnsStationNameAndUuid(
+                request.stationName(), userId, request.dungeonUuId()
+        );
+        DungeonReward successReward = DungeonReward.SUCCESS_REWARD;
         List<CoworkerEntity> usingCoworkers = coworkerRepository.findByUserIdAndInUseTrue(userId);
 
-        if (dungeonRecord.isPresent() && !dungeonRecord.get().canRetry()) {
-
+        if (!dungeonRecord.canRetry()) {
             throw new BaseException(BAD_REQUEST, "입장 후 8시간 미만으로 재입장 불가합니다.");
+        } else if (request.success()) {
 
-        } else if (dungeonRecord.isPresent() && request.success()) {
-
-            DungeonRecordEntity dungeonRecordEntity = dungeonRecord.get();
-            dungeonRecordEntity.updateSuccess();
+            dungeonRecord.updateSuccess();
             updateDungeonReward(usingCoworkers, successReward, user);
             return StageClearResponse.of(successReward);
 
-        } else if (dungeonRecord.isEmpty() && request.success()) {
-//            createNewDungeon(request.stationName(), userId, true);
-//            updateDungeonReward(usingCoworkers, successReward, user);
-            return StageClearResponse.of(successReward);
         } else {
+            dungeonRecord.updateFail();
             return StageClearResponse.empty();
-
         }
     }
 
@@ -168,8 +163,10 @@ public class StageService {
         return dungeonRecordRepository.save(newDungeon);
     }
 
-    private Optional<DungeonRecordEntity> getDungeonByUserIdAnsStationName(final String stationName, long userId) {
-        return dungeonRecordRepository.findByUserIdAndStationName(userId, stationName);
+    private DungeonRecordEntity getDungeonByUserIdAnsStationNameAndUuid(
+            final String stationName, final long userId, final String uuid) {
+        return dungeonRecordRepository.findByUserIdAndStationNameAndDungeonUuId(userId, stationName, uuid)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND, "Dungeon uuid not found."));
     }
 
     private void updateDungeonReward(
@@ -185,7 +182,7 @@ public class StageService {
     @Transactional
     public DungeonResponse checkDungeon(final String uuid, final String stationName) {
         UserEntity user = getUserByUuid(uuid);
-        Optional<DungeonRecordEntity> dungeon = getDungeonByUserIdAnsStationName(stationName, user.getId());
+        Optional<DungeonRecordEntity> dungeon = dungeonRecordRepository.findByUserIdAndStationName(user.getId(), stationName);
 
         if (dungeon.isEmpty()) {
             DungeonRecordEntity newDungeon = createNewDungeon(stationName, user.getId());
@@ -193,7 +190,7 @@ public class StageService {
 
         } else {
             DungeonRecordEntity dungeonEntity = dungeon.get();
-            if(!dungeonEntity.canRetry()){
+            if (!dungeonEntity.canRetry()) {
                 return DungeonResponse.of(false);
             }
             String dungeonUuId = dungeonEntity.getDungeonUuId();
