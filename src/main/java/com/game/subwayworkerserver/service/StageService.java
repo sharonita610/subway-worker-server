@@ -125,6 +125,7 @@ public class StageService {
         );
     }
 
+    @Transactional
     public StageClearResponse recordDungeon(final String uuid, final DungeonRequest request) {
         UserEntity user = getUserByUuid(uuid);
         long userId = user.getId();
@@ -182,14 +183,13 @@ public class StageService {
     }
 
     @Transactional
-    public DungeonResponse checkDungeon(final String uuid, final DungeonRequest request) {
+    public DungeonResponse checkDungeon(final String uuid, final String stationName) {
         UserEntity user = getUserByUuid(uuid);
-        Optional<DungeonRecordEntity> dungeon = getDungeonByUserIdAnsStationName(request.stationName(), user.getId());
+        Optional<DungeonRecordEntity> dungeon = getDungeonByUserIdAnsStationName(stationName, user.getId());
 
         if (dungeon.isEmpty()) {
-            DungeonRecordEntity newDungeon = createNewDungeon(request.stationName(), user.getId());
+            DungeonRecordEntity newDungeon = createNewDungeon(stationName, user.getId());
             return DungeonResponse.of(true, newDungeon.getDungeonUuId());
-
 
         } else {
             DungeonRecordEntity dungeonEntity = dungeon.get();
@@ -199,6 +199,5 @@ public class StageService {
             String dungeonUuId = dungeonEntity.getDungeonUuId();
             return DungeonResponse.of(true, dungeonUuId);
         }
-
     }
 }
