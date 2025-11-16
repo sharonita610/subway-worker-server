@@ -97,7 +97,7 @@ public class SkillCardService {
         coworker.checkUser(user.getId());
 
         if (request.skillCardId() == 0) {
-            removeSkillCardFromCoworker(user.getId(), skillCardType);
+            removeSkillCardFromCoworker(coworker.getId(), skillCardType);
             return;
         }
 
