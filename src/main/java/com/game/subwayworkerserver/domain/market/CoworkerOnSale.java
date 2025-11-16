@@ -1,6 +1,7 @@
 package com.game.subwayworkerserver.domain.market;
 
 import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
+import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
 import com.game.subwayworkerserver.entity.CoworkerMarketEntity;
@@ -40,7 +41,8 @@ public record CoworkerOnSale(
         int price,
         long sellerId,
         boolean isPaid,
-        boolean isSold
+        boolean isSold,
+        CoworkerType type
 ) {
     // 2. 정적 팩토리 메서드 구현
     public static List<CoworkerOnSale> toDomain(final List<CoworkerMarketEntity> marketCoworkers, final List<CoworkerEntity> allCoworkersOnSale) {
@@ -78,6 +80,7 @@ public record CoworkerOnSale(
                             .position(coworker.getLevel().getTitle())
                             .inUse(coworker.isInUse())
                             .onSale(coworker.isOnSale())
+                            .type(coworker.getCoworkerType())
                             .korElement(coworker.getCoworkerElement().getKoreanName())
                             .engElement(coworker.getCoworkerElement().name())
                             .hp(coworker.getHp())
