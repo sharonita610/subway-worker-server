@@ -91,24 +91,31 @@ public class StageService {
             StageRecordEntity stageRecord = stageRecordEntity.get();
             stageRecord.failStage(requestedLevel);
         } else {
-            if (requestedLevel == 1) {
-                StageRecordEntity newRecord = StageRecordEntity.builder()
-                        .userId(userId)
-                        .stageLevel(requestedLevel)
-                        .build();
-                stageRecordRepository.save(newRecord);
+            if (requestedLevel == 1 && success) {
+                StageRecordEntity stage = createStage(userId, requestedLevel);
                 user.updateStageLevel(requestedLevel);
 
                 StageRewardInfo stageRewardInfo = stageRewardProcessor.giveFirstClearReward(user, requestedLevel);
                 updateReward(usingCoworkers, stageRewardInfo, user);
                 return StageClearResponse.of(stageRewardInfo);
 
+            } else if (requestedLevel == 1) {
+                StageRecordEntity stage = createStage(userId, requestedLevel);
+                stage.failStage(requestedLevel);
             } else {
                 throw new BaseException(BAD_REQUEST, "Invalid stage level. Must start from level 1.");
 
             }
         }
         return StageClearResponse.empty();
+    }
+
+    private StageRecordEntity createStage(long userId, int requestedLevel) {
+        StageRecordEntity newRecord = StageRecordEntity.builder()
+                .userId(userId)
+                .stageLevel(requestedLevel)
+                .build();
+        return stageRecordRepository.save(newRecord);
     }
 
     private void updateReward(List<CoworkerEntity> usingCoworkers, StageRewardInfo stageRewardInfo, UserEntity user) {
