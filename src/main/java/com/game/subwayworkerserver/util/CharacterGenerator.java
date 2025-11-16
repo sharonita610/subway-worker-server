@@ -1,6 +1,7 @@
 package com.game.subwayworkerserver.util;
 
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerElement;
+import com.game.subwayworkerserver.domain.baseinfo.CoworkerLevel;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 
 import java.util.Random;
@@ -52,33 +53,28 @@ public class CharacterGenerator {
      * @param type 스탯 계산에 사용할 CoworkerType Enum
      * @return 랜덤 스탯이 부여된 CharacterStats 객체
      */
-    public static CharacterStats generateStats(CoworkerType type) {
+    public static CharacterStats generateStats(CoworkerType type, int level) {
 
-        // 1. HP: 단일 값으로 계산
         int hpValue = getRandomStat(type.getHpRange().min(), type.getHpRange().max());
-
-        // 2. MP Max: 최대 마나 계산
         int maxMp = getRandomStat(type.getMpMaxRange().min(), type.getMpMaxRange().max());
-
-        // 3. MP Now: 초기 마나 계산. 최대 마나를 초과하지 않도록 보장합니다.
         int initialMp = Math.min(
                 getRandomStat(type.getMpNowRange().min(), type.getMpNowRange().max()),
                 maxMp
         );
-
-        // 4. 공격력 / 방어력
         int attack = getRandomStat(type.getAttackRange().min(), type.getAttackRange().max());
         int defense = getRandomStat(type.getDefenseRange().min(), type.getDefenseRange().max());
+        CoworkerLevel coworkerLevel = CoworkerLevel.of(level);
+        double increaseRate = coworkerLevel.getLevelUpStatIncreaseRate();
+        double multiplier = 1.0 + increaseRate;
 
-        // CoworkerType getJob() 대신 getJob()의 역할을 하던 필드를 type으로 사용
         return new CharacterStats(
                 CoworkerElement.getRandomAttribute(),
-                hpValue,
-                initialMp, // 현재 MP
-                maxMp,     // 최대 MP
-                type.getManaRecovery(),
-                attack,
-                defense
+                (int) Math.round(hpValue * multiplier),
+                (int) Math.round(initialMp * multiplier),
+                (int) Math.round(maxMp * multiplier),
+                (int) Math.round(type.getManaRecovery() * multiplier),
+                (int) Math.round(attack * multiplier),
+                (int) Math.round(defense * multiplier)
         );
     }
 
@@ -94,13 +90,13 @@ public class CharacterGenerator {
         );
     }
 
-    public static CharacterGenerator.CharacterStats getRandomCoworkerStat(CoworkerType coworkerType) {
-        return generateStats(coworkerType);
+    public static CharacterGenerator.CharacterStats getRandomCoworkerStat(CoworkerType coworkerType, int level) {
+        return generateStats(coworkerType, level);
     }
         // --- 예시 사용 ---
     public static void main(String[] args) {
-        CharacterStats tanker = generateStats(CoworkerType.MOONGSHIL);
-        CharacterStats defenseTanker = generateStats(CoworkerType.POOBY);
+        CharacterStats tanker = generateStats(CoworkerType.MOONGSHIL, 1);
+        CharacterStats defenseTanker = generateStats(CoworkerType.POOBY, 7);
 
         System.out.println("--- 랜덤 스탯 생성 결과 ---");
         System.out.println(tanker);
