@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public enum CoworkerLevel {
 
     INTERN(1, "인턴", 100, 100, 0.0, 1.0),
-    WORKER(2, "사원", 200, 300, 0.05, 1.06), // level 2: 이전 * 105% (0.05 증가)
+    WORKER(2, "사원", 200, 300, 0.05, 1.05), // level 2: 이전 * 105% (0.05 증가)
     SENIOR(3, "주임", 500, 800, 0.10, 1.155), // level 3: 이전 * 110% (0.10 증가) -> 스크린샷 110%
     ASSISTANT_MANAGER(4, "대리", 800, 1600, 0.15, 1.328), // level 4: 이전 * 115% (0.15 증가)
     MANAGER(5, "과장", 1400, 3000, 0.20, 1.594), // level 5: 이전 * 120% (0.20 증가)

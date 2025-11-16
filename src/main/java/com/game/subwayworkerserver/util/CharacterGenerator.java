@@ -64,8 +64,7 @@ public class CharacterGenerator {
         int attack = getRandomStat(type.getAttackRange().min(), type.getAttackRange().max());
         int defense = getRandomStat(type.getDefenseRange().min(), type.getDefenseRange().max());
         CoworkerLevel coworkerLevel = CoworkerLevel.of(level);
-        double increaseRate = coworkerLevel.getLevelUpStatIncreaseRate();
-        double multiplier = 1.0 + increaseRate;
+        double multiplier = coworkerLevel.getStatRatioToInitial();
 
         return new CharacterStats(
                 CoworkerElement.getRandomAttribute(),
