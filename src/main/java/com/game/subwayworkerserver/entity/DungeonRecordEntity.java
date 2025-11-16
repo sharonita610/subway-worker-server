@@ -80,4 +80,8 @@ public class DungeonRecordEntity extends BaseTimeEntity {
         this.successCount++;
         this.retryTime = LocalDateTime.now().plusHours(8);
     }
+
+    public void updateFail() {
+        this.failCount++;
+    }
 }
