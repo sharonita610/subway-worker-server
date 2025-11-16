@@ -16,6 +16,7 @@ import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.SkillCardRepository;
 import com.game.subwayworkerserver.repository.UserGachaRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
+import com.game.subwayworkerserver.service.dto.CoworkerUpgradeVO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,8 +31,10 @@ public class CoworkerService {
     private final UserRepository userRepository;
     private final SkillCardRepository skillCardRepository;
     private final UserGachaRepository gachaRepository;
+    private final CoworkerUpgradeProcessor coworkerUpgradeProcessor;
+    private final CoworkerLevelProcessor coworkerLevelProcessor;
 
-    private static final String ENERZ = "ENERZ";
+    private static final int UPGRADE_PRICE_PER_COWORKER = 300;
 
     public CoworkerTypesResponse getCoworkerElements() {
         return CoworkerTypesResponse.from(CoworkerType.getAll());
@@ -67,17 +70,18 @@ public class CoworkerService {
     public UserUpgradeResponse upgradeCoworker(final String uuid, final UpgradeRequest request) {
 
         UserEntity user = getUserByUuid(uuid);
-        user.checkAndPurchase(request.price());
 
         CoworkerEntity target = coworkerRepository.findById(request.targetId())
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND, "대상이 존재하지 않습니다."));
 
         List<CoworkerEntity> materials = getMaterialEntityList(request.materialIds(), user.getId());
 
-        long totalGainedExp = calculateGainedExperience(target, materials);
+        CoworkerUpgradeVO upgradeVO = coworkerUpgradeProcessor.upgradeCoworker(target, materials);
+        int upgradePrice = upgradeVO.basePoint() * UPGRADE_PRICE_PER_COWORKER;
+        user.checkAndPurchase(upgradePrice);
 
         coworkerRepository.deleteAll(materials);
-        target.accumulateExp(totalGainedExp);
+        coworkerLevelProcessor.processCoworkerExpAndLevelUp(target, upgradeVO.newExp());
         CoworkerEntity upgraded = coworkerRepository.save(target);
         List<SkillCardEntity> coworkerSkills = skillCardRepository.findAllByCoworkerIdAndInUseTrue(upgraded.getId());
 
@@ -99,32 +103,6 @@ public class CoworkerService {
                 });
 
         return materials;
-    }
-
-
-    private long calculateGainedExperience(CoworkerEntity target, List<CoworkerEntity> materials) {
-
-        long totalBaseXP = 0;
-
-        for (CoworkerEntity material : materials) {
-
-            long materialLevelXP = material.getLevel().getBaseXpForMaterial();
-            long materialCurrentXP = material.getCurrentExp();
-            long baseXP = materialLevelXP + materialCurrentXP;
-
-            double multiplier = 1.0;
-
-            if (material.getCoworkerType().name().equals(ENERZ) ||
-                    material.getCoworkerType().equals(target.getCoworkerType())) {
-
-                multiplier = EnhanceConstants.EXTRA_MULTIPLIER;
-            }
-            totalBaseXP += (long) (baseXP * multiplier);
-        }
-
-        double critMultiplier = EnhanceConstants.getCriticalMultiplier();
-        long critXP = (long) (EnhanceConstants.CRIT_STANDARD_XP * critMultiplier);
-        return totalBaseXP + critXP;
     }
 
     private UserEntity getUserByUuid(String uuid) {
