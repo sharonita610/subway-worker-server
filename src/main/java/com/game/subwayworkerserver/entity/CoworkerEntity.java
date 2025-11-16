@@ -156,22 +156,22 @@ public class CoworkerEntity extends BaseTimeEntity {
 
     public static CoworkerEntity of(final long userId, String coworkerName, int coworkerLevel) {
         CoworkerType coworkerType = CoworkerType.fromName(coworkerName);
-        CharacterGenerator.CharacterStats stats = getRandomCoworkerStat(coworkerType);
+        CharacterGenerator.CharacterStats stats = getRandomCoworkerStat(coworkerType, coworkerLevel);
         List<PassiveSkillCard> randomPassiveSkills = getRandomPassiveSkills(2);
         List<ActiveSkillCard> randomActiveSkills = getRandomActiveSkills(2);
 
-        int cumulativeExp = 0;
+        CoworkerLevel coworkerRealLevel = CoworkerLevel.of(coworkerLevel);
 
+        int cumulativeExp = 0;
         if (coworkerLevel != ONE) {
-            CoworkerLevel coworkerLevel1 = CoworkerLevel.of(coworkerLevel - 1);
-            cumulativeExp = coworkerLevel1.getCumulativeExp() + 1;
+            cumulativeExp = CoworkerLevel.of(coworkerLevel - ONE).getCumulativeExp();
         }
+
         return CoworkerEntity.builder()
                 .name(coworkerName)
-                .level(CoworkerLevel.of(coworkerLevel))
+                .level(coworkerRealLevel)
                 .currentExp(DEFAULT)
                 .totalExp(cumulativeExp)
-                .totalExp(1)
                 .userId(userId)
                 .coworkerType(coworkerType)
                 .hp(stats.hp())
@@ -218,10 +218,8 @@ public class CoworkerEntity extends BaseTimeEntity {
 
     public static CoworkerEntity of(final long userId, final CoworkerType coworkerType, final CoworkerLevel level) {
         int cumulativeExp = 0;
-
         if (level.getLevel() != ONE) {
-            CoworkerLevel coworkerLevel1 = CoworkerLevel.of(level.getLevel() - 1);
-            cumulativeExp = coworkerLevel1.getCumulativeExp() + 1;
+            cumulativeExp = CoworkerLevel.of(level.getLevel() - ONE).getCumulativeExp();
         }
 
         return CoworkerEntity.builder()
@@ -315,7 +313,17 @@ public class CoworkerEntity extends BaseTimeEntity {
     }
 
     public void levelUp(CoworkerLevel newLevelInfo, int currentExp) {
+        double increaseRate = newLevelInfo.getLevelUpStatIncreaseRate();
+        double multiplier = 1.0 + increaseRate;
+
         this.level = newLevelInfo;
         this.currentExp = currentExp;
+
+        this.hp = Math.round(this.hp * multiplier);
+        this.initMana = Math.round(this.initMana * multiplier);
+        this.maxMana = Math.round(this.maxMana * multiplier);
+        this.manaRecovery = Math.round(this.manaRecovery * multiplier);
+        this.attack = Math.round(this.attack * multiplier);
+        this.defense = Math.round(this.defense * multiplier);
     }
 }
