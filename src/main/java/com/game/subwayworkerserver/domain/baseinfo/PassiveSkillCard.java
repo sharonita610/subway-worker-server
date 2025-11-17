@@ -9,10 +9,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Stream;
 
 @Getter
 public enum PassiveSkillCard {
 
+    NONE(0, "", "", SkillCardType.PASSIVE, 0, 0,
+            "", "", false),
 
     PEACE_OF_MIND(101, "커피 한 잔의 여유", "턴 당 명상 포인트가 1.1배 증가합니다.",
             SkillCardType.PASSIVE, 1.1, 0.10, "시작 시점.", "mp", true), // 1.1배 -> 1.1, 10p 증가 -> 0.10
@@ -72,17 +75,20 @@ public enum PassiveSkillCard {
     }
 
     public static List<PassiveSkillCard> getRandomCard(final int count) {
-        PassiveSkillCard[] allCardsArray = PassiveSkillCard.values();
-        int totalAvailable = allCardsArray.length;
-        List<PassiveSkillCard> resultCards = new ArrayList<>(count);
+        List<PassiveSkillCard> availableCards = Stream.of(PassiveSkillCard.values())
+                .filter(card -> card != PassiveSkillCard.NONE)
+                .toList();
 
-        if (count <= 0) {
+        int totalAvailable = availableCards.size();
+        if (count <= 0 || totalAvailable == 0) {
             return Collections.emptyList();
         }
 
+        List<PassiveSkillCard> resultCards = new ArrayList<>(count);
+
         for (int i = 0; i < count; i++) {
             int randomIndex = ThreadLocalRandom.current().nextInt(totalAvailable);
-            resultCards.add(allCardsArray[randomIndex]);
+            resultCards.add(availableCards.get(randomIndex));
         }
         return resultCards;
     }

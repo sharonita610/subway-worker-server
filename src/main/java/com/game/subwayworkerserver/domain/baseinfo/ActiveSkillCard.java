@@ -9,9 +9,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
 public enum ActiveSkillCard {
+
+    NONE(0, "", "", SkillCardType.ACTIVE, 0, 0, 0,
+            "", "", false),
 
     // 201 피로회복제 복용 (내 HP 회복)
     FATIGUE_RELIEVER(201, "피로회복제 복용", "내 HP의 20%를 회복합니다. (필요 마나: 30)",
@@ -82,17 +87,20 @@ public enum ActiveSkillCard {
     }
 
     public static List<ActiveSkillCard> getRandomCard(final int count) {
-        ActiveSkillCard[] allCardsArray = ActiveSkillCard.values();
-        int totalAvailable = allCardsArray.length;
-        List<ActiveSkillCard> resultCards = new ArrayList<>(count);
+        List<ActiveSkillCard> availableCards = Stream.of(ActiveSkillCard.values())
+                .filter(card -> card != ActiveSkillCard.NONE)
+                .toList();
 
-        if (count <= 0) {
+        int totalAvailable = availableCards.size();
+        if (count <= 0 || totalAvailable == 0) {
             return Collections.emptyList();
         }
 
+        List<ActiveSkillCard> resultCards = new ArrayList<>(count);
+
         for (int i = 0; i < count; i++) {
             int randomIndex = ThreadLocalRandom.current().nextInt(totalAvailable);
-            resultCards.add(allCardsArray[randomIndex]);
+            resultCards.add(availableCards.get(randomIndex));
         }
         return resultCards;
     }
