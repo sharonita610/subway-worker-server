@@ -4,6 +4,7 @@ import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.CaptureItemListResponse;
 import com.game.subwayworkerserver.controller.request.UserCreateRequest;
 import com.game.subwayworkerserver.controller.response.*;
+import com.game.subwayworkerserver.profanity.ProfanityCheck;
 import com.game.subwayworkerserver.service.SkillCardService;
 import com.game.subwayworkerserver.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,8 +15,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @Tag(name = "User API", description = "사용자 정보 및 프로필 관리 API")
 @RestController
 @RequiredArgsConstructor
@@ -32,7 +35,7 @@ public class UserController {
             }
     )
     @PostMapping("/verify")
-    public ResponseEntity<Boolean> verifyUser(@RequestParam("name") String name) {
+    public ResponseEntity<Boolean> verifyUser(@ProfanityCheck @RequestParam("name") String name) {
         return ResponseEntity.ok(userService.verifyUserName(name));
     }
 
@@ -98,7 +101,7 @@ public class UserController {
             }
     )
     @GetMapping("/user/coworkers")
-    public ResponseEntity<CoworkerListResponse> getCoworkersListByUser( ) {
+    public ResponseEntity<CoworkerListResponse> getCoworkersListByUser() {
         String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok(userService.getCoworkerListByUser(uuid));
     }
@@ -111,7 +114,7 @@ public class UserController {
             }
     )
     @DeleteMapping("/user")
-    public ResponseEntity<Void> deleteUser( ) {
+    public ResponseEntity<Void> deleteUser() {
         String uuid = SecurityUtils.getCurrentUserUuid();
         userService.deleteUser(uuid);
         return ResponseEntity.ok().build();
