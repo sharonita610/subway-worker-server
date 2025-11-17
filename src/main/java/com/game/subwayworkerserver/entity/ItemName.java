@@ -1,10 +1,12 @@
 package com.game.subwayworkerserver.entity;
 
+import com.game.subwayworkerserver.domain.baseinfo.CoworkerLevel;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -76,20 +78,50 @@ public enum ItemName {
         throw new BaseException(ErrorCode.BAD_REQUEST, "Unknown ItemName for korean name: " + name);
     }
 
-    public static boolean canCaptureSucceed(final String koreanName) {
+    private static final Map<Integer, Integer> BASE_CAPTURE_CHANCE_BY_LEVEL = Map.of(
+            1, 30, // 레벨 1: 35%
+            2, 25, // 레벨 2: 26%
+            3, 17, // 레벨 3: 22%
+            4, 13, // 레벨 4: 18% (추정)
+            5, 8, // 레벨 5: 15% (추정)
+            6, 4, // 레벨 6: 12% (추정)
+            7, 3 // 레벨 7: 10% (추정)
+            // 최대 레벨이 오를 경우 여기에 추가
+    );
+
+    public static boolean canCaptureSucceed(final String koreanName, final int level) {
         ItemName tool = fromConstantName(koreanName);
 
-        // 1. 포획 도구 카테고리 확인 (CAPTURE인지 TRAP인지 확인)
         if (tool.category != ItemCategory.CAPTURE) {
             throw new BaseException(ErrorCode.BAD_REQUEST, "'" + tool.name + "'은 포획(Capture) 도구가 아닙니다.");
         }
 
-        // 2. 포획 확률 (%) 추출
-        int chance = tool.percentage;
+        // 1. 레벨별 기본 포획 확률 조회 (baseChance: 레벨에 따른 절대 확률)
+        int baseChance = BASE_CAPTURE_CHANCE_BY_LEVEL.getOrDefault(level, 0);
 
-        // 3. 포획 시뮬레이션: 0부터 99 사이의 난수 생성
+        if (baseChance <= 0) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "정의되지 않았거나 포획 확률이 0%인 레벨입니다: " + level);
+        }
+
+        // 2. 아이템 확률 가중치 적용
+        // tool.percentage는 50, 90 등 100점 만점의 확률값이므로, 100.0으로 나누어 가중치(0.5, 0.9)를 만듭니다.
+        double itemMultiplier = tool.percentage / 100.0;
+
+        // 최종 확률 계산: baseChance (30) * multiplier (0.5) = 15.0
+        double calculatedChance = baseChance * itemMultiplier;
+
+        // 3. ⭐ 최종 확률 확정 및 최소값 보장 ⭐
+        // 반올림하여 정수로 만들고, 최소 1%는 보장하도록 합니다.
+        int finalChance = (int) Math.round(calculatedChance);
+        finalChance = Math.max(1, finalChance); // 최소 1% 보장 (0% 방지)
+
+        // 4. 포획 시뮬레이션
         int randomRoll = ThreadLocalRandom.current().nextInt(100);
-        return randomRoll < chance;
+
+        // 디버깅을 위해 로그를 남기는 것이 좋습니다.
+        // log.info("Capture attempt: Level {}, Item Chance {}%, Final Chance {}%, Roll {}", level, tool.percentage, finalChance, randomRoll);
+
+        return randomRoll < finalChance;
     }
 
     public static ItemName fromConstantName(final String constantName) {

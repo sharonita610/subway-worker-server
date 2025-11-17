@@ -27,7 +27,7 @@ public class CaptureCoworkerService {
 
     private final UserRepository userRepository;
     private final CaptureRecordRepository captureRecordRepository;
-    private final UserItemMapRepository  userItemMapRepository;
+    private final UserItemMapRepository userItemMapRepository;
     private final CoworkerRepository coworkerRepository;
     private final UserLevelProcessor userLevelProcessor;
 
@@ -84,12 +84,12 @@ public class CaptureCoworkerService {
         CaptureRecordEntity captureRecord = captureRecordRepository.findByUserId(userId)
                 .orElseThrow(() -> new BaseException(ErrorCode.INTERNAL_SERVER_ERROR));
 
-        int captureAttemptCount = Integer.parseInt((String)hashData.get("captureAttemptCount"));
+        int captureAttemptCount = Integer.parseInt((String) hashData.get("captureAttemptCount"));
+        int coworkerLevel = Integer.parseInt((String) hashData.get("coworkerLevel"));
 
-        boolean succeed = ItemName.canCaptureSucceed(request.captureItemName());
+        boolean succeed = ItemName.canCaptureSucceed(request.captureItemName(), coworkerLevel);
         if (succeed) {
             String coworkerName = (String) hashData.get("coworkerName");
-            int coworkerLevel = Integer.parseInt((String) hashData.get("coworkerLevel"));
             String position = (String) hashData.get("position");
 
             CoworkerEntity coworkerEntity = CoworkerEntity.of(userId, coworkerName, coworkerLevel);
