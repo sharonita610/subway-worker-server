@@ -30,6 +30,7 @@ public class CaptureCoworkerService {
     private final UserItemMapRepository userItemMapRepository;
     private final CoworkerRepository coworkerRepository;
     private final UserLevelProcessor userLevelProcessor;
+    private final CaptureCoworkerProcessor captureCoworkerProcessor;
 
     private static final String COWORKER_LOCATIONS_KEY = "coworker:locations";
     private static final String USER_ACQUIRED_PREFIX = "user:acquired:";
@@ -87,7 +88,7 @@ public class CaptureCoworkerService {
         int captureAttemptCount = Integer.parseInt((String) hashData.get("captureAttemptCount"));
         int coworkerLevel = Integer.parseInt((String) hashData.get("coworkerLevel"));
 
-        boolean succeed = ItemName.canCaptureSucceed(request.captureItemName(), coworkerLevel);
+        boolean succeed = captureCoworkerProcessor.calculateCaptureSucceed(request.captureItemName(), coworkerLevel);
         if (succeed) {
             String coworkerName = (String) hashData.get("coworkerName");
             String position = (String) hashData.get("position");
@@ -113,20 +114,11 @@ public class CaptureCoworkerService {
 
             captureRecord.increaseFailCount();
 
-            // 3-2. 30% 확률로 도망갈지 시뮬레이션
-            final int ESCAPE_PROBABILITY = 30; // 30% 도망 확률
-            int randomRoll = ThreadLocalRandom.current().nextInt(100); // 0부터 99까지 난수
-
-            if (randomRoll < ESCAPE_PROBABILITY) {
-                // 3-2-1. 도망 성공 (Escape - 30%)
-                // 도망갔으므로, 해당 동료 인스턴스를 Redis에서 삭제하는 로직이 필요합니다.
+            CaptureResponse captureResponse = captureCoworkerProcessor.calculateEscape(coworkerLevel);
+            if (captureResponse.run()) {
                 hideCoworkerFromUser(request.coworkerId(), acquiredKey);
-                return CaptureResponse.of(false, true);
-
-            } else {
-                // 3-2-2. 도망 실패 (Failure, Remain - 70%)
-                return CaptureResponse.of(false, false);
             }
+            return captureResponse;
         }
     }
 
