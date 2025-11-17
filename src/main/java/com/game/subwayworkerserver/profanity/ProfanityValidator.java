@@ -2,20 +2,23 @@ package com.game.subwayworkerserver.profanity;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
+@Component
+@RequiredArgsConstructor
 public class ProfanityValidator implements ConstraintValidator<ProfanityCheck, String> {
 
-    // ⚠️ 실제 서비스에서는 데이터베이스나 설정 파일에서 관리해야 합니다.
-    private static final List<String> PROFANITY_LIST = Arrays.asList(
-            "badword",
-            "damn",     // 영어 예시
-            "ㅅㅂ",    // 한국어 초성/자음 예시
-            "바보",     // 한국어 예시
-            "욕설"      // 한국어 예시
-    );
+    private final ProfanityService profanityService;
+
+    @Override
+    public void initialize(ProfanityCheck constraintAnnotation) {
+    }
 
     @Override
     public boolean isValid(String username, ConstraintValidatorContext context) {
@@ -23,13 +26,18 @@ public class ProfanityValidator implements ConstraintValidator<ProfanityCheck, S
             return true;
         }
 
-        String lowerCaseUsername = username.toLowerCase(Locale.ROOT);
+        String normalizedUsername = username
+                .replaceAll("\\s", "") // 띄어쓰기 제거
+                .toLowerCase(Locale.ROOT);
 
-        for (String profanity : PROFANITY_LIST) {
-            if (lowerCaseUsername.contains(profanity.toLowerCase(Locale.ROOT))) {
+        Set<String> profanitySet = profanityService.getProfanitySet();
+
+        for (String profanity : profanitySet) {
+            if (normalizedUsername.contains(profanity)) {
                 return false;
             }
         }
+
 
         return true;
     }

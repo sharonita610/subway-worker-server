@@ -35,13 +35,21 @@ public class ProfanityService {
     public void refreshProfanityList() {
         List<ProfanityWordEntity> words = profanityWordRepository.findAll();
 
-        // 메모리에 저장할 Set을 생성하고 모든 단어를 소문자로 변환합니다.
         Set<String> newSet = words.stream()
-                .map(ProfanityWordEntity::getWord)
-                .map(String::toLowerCase)
+                .map(entity -> {
+                    String word = entity.getWord();
+                    String language = entity.getLanguage();
+
+                    if ("eng".equalsIgnoreCase(language)) {
+                        return word.toLowerCase();
+                    }
+
+                    return word;
+                })
                 .collect(Collectors.toSet());
 
         this.profanitySet = newSet;
     }
+
 
 }
