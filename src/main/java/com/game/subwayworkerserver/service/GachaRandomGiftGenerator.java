@@ -19,18 +19,19 @@ public class GachaRandomGiftGenerator {
     private static final String TREASURE = "TREASURE";
 
     private static final double SKEW_FACTOR = 3.5;
-    private static final long COIN_MIN_ADJUSTED = 15000;
+    private static final double COIN_SKEW_FACTOR = 6.0;
+    private static final long COIN_MIN_ADJUSTED = 10000;
     private static final long COIN_MAX_ADJUSTED = 150000;
-    private static final int TICKET_MIN_ADJUSTED = 5;
-    private static final int TICKET_MAX_ADJUSTED = 100;
+    private static final int TICKET_MIN_ADJUSTED = 20;
+    private static final int TICKET_MAX_ADJUSTED = 200;
 
     private static final List<RewardConfig> EXTRA_REWARDS_CONFIGS = List.of(
-            new RewardConfig(ItemName.BRIEFCASE.name(), 10),
-            new RewardConfig(ItemName.BUSINESS_CARRIER.name(), 5),
-            new RewardConfig(ItemName.SILVER_SHOVEL.name(), 10),
-            new RewardConfig(ItemName.GOLD_SHOVEL.name(), 5),
-            new RewardConfig(MATERIAL_COWORKER, 3),
-            new RewardConfig(TREASURE, 10)
+            new RewardConfig(ItemName.BRIEFCASE.name(), 30),
+            new RewardConfig(ItemName.BUSINESS_CARRIER.name(), 10),
+            new RewardConfig(ItemName.SILVER_SHOVEL.name(), 30),
+            new RewardConfig(ItemName.GOLD_SHOVEL.name(), 10),
+            new RewardConfig(MATERIAL_COWORKER, 10),
+            new RewardConfig(TREASURE, 25)
     );
 
     private record RewardConfig(String type, int chancePercent) {
@@ -65,7 +66,7 @@ public class GachaRandomGiftGenerator {
         ThreadLocalRandom random = ThreadLocalRandom.current();
 
         final long COIN_RANGE = COIN_MAX_ADJUSTED - COIN_MIN_ADJUSTED;
-        double skewedRandomCoin = Math.pow(ThreadLocalRandom.current().nextDouble(0, 1), SKEW_FACTOR);
+        double skewedRandomCoin = Math.pow(ThreadLocalRandom.current().nextDouble(0, 1), COIN_SKEW_FACTOR);
         long coins = (long) (COIN_MIN_ADJUSTED + skewedRandomCoin * COIN_RANGE);
 
         final int TICKET_RANGE = TICKET_MAX_ADJUSTED - TICKET_MIN_ADJUSTED;

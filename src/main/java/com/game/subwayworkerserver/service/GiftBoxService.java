@@ -42,11 +42,10 @@ public class GiftBoxService {
     private static final int BASE_EXP = 20;
     private static final long ACQUIRED_KEY_TTL_DAYS = 5;
 
-    // --- 보상 상수 (이전 답변에서 사용된 것 재활용) ---
-    private static final long COIN_MIN_ORIGINAL = 10000; // 원본 값
-    private static final long COIN_MAX_ORIGINAL = 200000; // 원본 값
-    private static final int TICKET_MIN_ORIGINAL = 3; // 원본 값
-    private static final int TICKET_MAX_ORIGINAL = 200; // 원본 값
+     private static final long COIN_MIN_ADJUSTED = 10000;
+     private static final long COIN_MAX_ADJUSTED = 80000;
+     private static final int TICKET_MIN_ADJUSTED = 3;
+     private static final int TICKET_MAX_ADJUSTED = 200;
 
     @Transactional
     public GpsRandomGiftResponse getRandomGift(GpsRandomGiftRequest request, String userUuid) {
@@ -129,10 +128,6 @@ public class GiftBoxService {
         }
     }
 
-
-    /**
-     * Helper: 사용자 좌표에서 가장 가까운 선물 상자 ID를 검색합니다. (요청하신 findNearestGiftBoxId 그대로 사용)
-     */
     private String findNearestGiftBoxId(double lat, double lon) {
         Circle searchArea = new Circle(
                 new Point(lon, lat),
@@ -141,7 +136,6 @@ public class GiftBoxService {
 
         RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().limit(1);
 
-        // 3인수 radius 시그니처가 없으므로, 3인수 radius(Key, Circle, Args)를 사용합니다.
         GeoResults<RedisGeoCommands.GeoLocation<String>> results = redisTemplate.opsForGeo()
                 .radius(
                         RANDOM_GIFT_BOX_KEY,
@@ -156,28 +150,17 @@ public class GiftBoxService {
     }
 
     private List<DefaultGift> calculateDefaultRewards() {
-        // 코인 (기대값 30,000, 범위 1만~20만)
-        // 낮은 값에 치우친 분포를 만들기 위해 높은 skewFactor(3.5)를 적용합니다.
         final double SKEW_FACTOR = 3.5;
+        final double COIN_SKEW_FACTOR = 6.0;
         ThreadLocalRandom random = ThreadLocalRandom.current();
 
-        final long COIN_MIN_ADJUSTED = 15000;
-        final long COIN_MAX_ADJUSTED = 150000;
-        // ⭐ 오류 수정: MAX - MIN = 135000 ⭐
         final long COIN_RANGE = COIN_MAX_ADJUSTED - COIN_MIN_ADJUSTED;
 
-        // 1. 0~1 사이의 난수를 생성하고 SKEW_FACTOR 제곱하여 0에 가깝게 만듭니다.
-        double skewedRandomCoin = Math.pow(ThreadLocalRandom.current().nextDouble(0, 1), SKEW_FACTOR);
-        // 2. 이 값을 범위에 적용하여 낮은 코인 값을 생성합니다.
+        double skewedRandomCoin = Math.pow(ThreadLocalRandom.current().nextDouble(0, 1), COIN_SKEW_FACTOR);
         long coins = (long) (COIN_MIN_ADJUSTED + skewedRandomCoin * COIN_RANGE);
 
-        // TICKET_RANGE 계산 오류 수정 및 조정된 값 사용
-        final int TICKET_MIN_ADJUSTED = 5;
-        final int TICKET_MAX_ADJUSTED = 100;
-        // ⭐ 오류 수정: MAX - MIN = 95 ⭐
         final int TICKET_RANGE = TICKET_MAX_ADJUSTED - TICKET_MIN_ADJUSTED;
 
-        // 2. 휴가티켓 계산
         double skewedRandomTicket = Math.pow(random.nextDouble(0, 1), SKEW_FACTOR);
         int tickets = (int) (TICKET_MIN_ADJUSTED + skewedRandomTicket * TICKET_RANGE);
 
@@ -192,38 +175,22 @@ public class GiftBoxService {
     private List<ExtraGift> calculateBonusRewards() {
         List<ExtraGift> rewards = new ArrayList<>();
 
-        // 아이템 종류별 확률 정의 (Integer는 확률을 % 단위로 사용)
         Map<String, Integer> probabilityMap = Map.of(
-                // ItemName.PAPER_BOX와 ItemName.BRIEFCASE는 포획 도구, SHOVEL은 트랩 도구입니다.
-                // 확률표의 종류에 맞게 기존 ItemName을 매핑하여 사용합니다.
 
-                // 하급 채집툴 1개: 60% (WOOD_SHOVEL로 대체)
-                ItemName.WOOD_SHOVEL.getName(), 60,
-
-                // 중급 채집툴 1개: 10% (SILVER_SHOVEL로 대체)
+                ItemName.WOOD_SHOVEL.getName(), 50,
                 ItemName.SILVER_SHOVEL.getName(), 10,
-
-                // 하급 덫 1개: 30% (PAPER_BOX로 대체)
                 ItemName.PAPER_BOX.getName(), 30,
-
-                // 중급 덫 1개: 5% (BRIEFCASE로 대체)
                 ItemName.BRIEFCASE.getName(), 5,
-
-                // 럭키 가챠 티켓 1개: 10% (BUSINESS_CARRIER로 대체)
-                "gachaTicket", 10
+                "gachaTicket", 30
         );
 
-        // Map을 순회하며 각 아이템에 대해 독립적으로 확률을 검사합니다.
         for (Map.Entry<String, Integer> entry : probabilityMap.entrySet()) {
             String item = entry.getKey();
             int requiredProbability = entry.getValue();
 
-            // 0.0 ~ 100.0 사이의 난수 생성
             double roll = ThreadLocalRandom.current().nextDouble(0, 100);
 
-            // 난수(roll)가 요구 확률보다 작거나 같으면 획득 성공 (예: 60% 확률이면 roll이 60.0 미만)
             if (roll < requiredProbability) {
-                // 획득 성공 시 ExtraGift DTO 생성
                 rewards.add(new ExtraGift(item, 1));
             }
         }
