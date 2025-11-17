@@ -9,7 +9,7 @@ public record StageRewardInfo(
         int coin,
         int gachaTicket,
         int vacationTicket,
-        boolean firstClear,
+        Boolean firstClear,
         ExtraReward extraReward
 ) {
 

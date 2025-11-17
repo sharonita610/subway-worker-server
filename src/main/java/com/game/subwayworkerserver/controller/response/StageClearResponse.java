@@ -11,6 +11,7 @@ public record StageClearResponse(
         int coin,
         int gachaTicket,
         int vacationTicket,
+        Boolean firstClear,
         ExtraReward extraReward
 ) {
     public static StageClearResponse of(final StageRewardInfo reward) {
@@ -20,12 +21,13 @@ public record StageClearResponse(
                 reward.coin(),
                 reward.gachaTicket(),
                 reward.vacationTicket(),
+                reward.firstClear(),
                 ExtraReward.of(reward.extraReward().name(), reward.extraReward().quantity())
         );
     }
 
     public static StageClearResponse empty() {
-        return new StageClearResponse(0,0,0,0,0, null);
+        return new StageClearResponse(0,0,0,0,0, null, null);
     }
 
     public static StageClearResponse of(DungeonReward reward) {
@@ -35,6 +37,7 @@ public record StageClearResponse(
                 reward.getCoin(),
                 reward.getGacha(),
                 reward.getVacation(),
+                null,
                 null
         );
     }
