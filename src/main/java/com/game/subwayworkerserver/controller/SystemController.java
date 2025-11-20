@@ -8,7 +8,10 @@ import com.game.subwayworkerserver.controller.response.UserMailBoxResponse;
 import com.game.subwayworkerserver.service.SystemService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SystemController {
 
     private final SystemService systemService;
+    private final ResourceLoader resourceLoader;
 
     @Operation(
             summary = "우편함 조회 [완]",
@@ -103,5 +107,22 @@ public class SystemController {
         String uuid = SecurityUtils.getCurrentUserUuid();
         systemService.subscribe(uuid, subscribeId);
         return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "logo 조회 api [완]",
+            description = "로고를 조회하는 api"
+    )
+    @GetMapping("/logo")
+    public ResponseEntity<Resource> getLogo() {
+        Resource resource = resourceLoader.getResource("classpath:/static/logo.png");
+
+        if (!resource.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .body(resource);
     }
 }
