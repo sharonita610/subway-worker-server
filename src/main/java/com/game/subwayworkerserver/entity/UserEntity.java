@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.entity;
 
-import com.game.subwayworkerserver.domain.level.UserLevel;
+import com.game.subwayworkerserver.domain.StageRewardInfo;
 import com.game.subwayworkerserver.domain.level.UserLevelConfig;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
@@ -264,5 +264,17 @@ public class UserEntity extends BaseTimeEntity {
         this.coin += coin;
         this.gachaTicket += gachaTicket;
         this.vacationTicket += vacationTicket;
+    }
+
+    public void processReward(StageRewardInfo stageRewardInfo) {
+        if (stageRewardInfo.gachaTicket() != 0) {
+            this.gachaTicket += stageRewardInfo.gachaTicket();
+        } else if (stageRewardInfo.vacationTicket() != 0) {
+            this.vacationTicket += stageRewardInfo.vacationTicket();
+        } else if (stageRewardInfo.coin() != 0) {
+            this.coin += stageRewardInfo.coin();
+        } else if (stageRewardInfo.extraReward().name().equals("GACHA_TICKET")) {
+           this.gachaTicket += stageRewardInfo.extraReward().quantity();
+        }
     }
 }
