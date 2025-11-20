@@ -30,6 +30,8 @@ public class TossUserDataProcessor {
                 } else {
                     userDataMap.put("uuid", "");
                 }
+            } else {
+                userDataMap.put("uuid", "");
             }
         }
         return userInfo;
