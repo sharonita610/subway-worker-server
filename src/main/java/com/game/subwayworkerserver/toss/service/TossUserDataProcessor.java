@@ -19,7 +19,6 @@ public class TossUserDataProcessor {
         Map<String, Object> topLevelMap = userInfo.data();
         Map<String, Object> successMap = null;
 
-        System.out.println("userDataMap = " + topLevelMap);
         if (topLevelMap != null && topLevelMap.containsKey("success")) {
             Object successObject = topLevelMap.get("success");
             if (successObject instanceof Map) {
@@ -37,7 +36,6 @@ public class TossUserDataProcessor {
                 Optional<String> uuid = userRepository.findUuidByRealNameAndEmail(username, email);
 
                 if (uuid.isPresent()) {
-                    System.out.println("uuid = " + uuid);
                     successMap.put("uuid", uuid.get());
                 } else {
                     successMap.put("uuid", "");
@@ -45,7 +43,6 @@ public class TossUserDataProcessor {
             }
         }
 
-        System.out.println(" userInfo = " +  userInfo);
         return userInfo;
     }
 }
