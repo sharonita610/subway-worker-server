@@ -74,10 +74,29 @@ public class UserEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private int claimedRewardDayUpTo = 0;
 
+    private String email;
+
+    private String realName;
+
     private LocalDate adFreeExpirationDate;
 
     private LocalDate lastAttendanceDate;
 
+    public UserEntity(String name, String uuid, int exp, int level, int totalExp, int coin, int vacationTicket,
+                      int gachaTicket, int stage, Gender gender, String email, String realName) {
+        this.name = name;
+        this.uuid = uuid;
+        this.exp = exp;
+        this.level = level;
+        this.totalExp = totalExp;
+        this.coin = coin;
+        this.vacationTicket = vacationTicket;
+        this.gachaTicket = gachaTicket;
+        this.stage = stage;
+        this.gender = gender;
+        this.email = email;
+        this.realName = realName;
+    }
     public UserEntity(String name, String uuid, int exp, int level, int totalExp, int coin, int vacationTicket,
                       int gachaTicket, int stage, Gender gender) {
         this.name = name;
@@ -92,7 +111,10 @@ public class UserEntity extends BaseTimeEntity {
         this.gender = gender;
     }
 
-    public static UserEntity of(final String username, final String uuid, Gender gender) {
+    public static UserEntity of(final String username, final String uuid, final Gender gender, final String email, final String realName) {
+        if (email != null && realName != null) {
+            return new UserEntity(username, uuid, 0, 1, 0, 0, 0, 0, 0, gender, email, realName);
+        }
         return new UserEntity(username, uuid, 0, 1, 0, 0, 0, 0, 0, gender);
     }
 
