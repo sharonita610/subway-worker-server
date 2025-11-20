@@ -15,6 +15,9 @@ public record UserCreateRequest(
         String coworkerName,
 
         @NotNull(message = "성별은 필수 입력 항목입니다.")
-        String gender
+        String gender,
+
+        String email,
+        String realName
 ) {
 }
