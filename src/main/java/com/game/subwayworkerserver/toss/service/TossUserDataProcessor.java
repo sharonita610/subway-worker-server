@@ -23,7 +23,8 @@ public class TossUserDataProcessor {
         if (userDataMap != null) {
             username = Optional.ofNullable(userDataMap.get("name")).map(Object::toString).orElse(null);
             email = Optional.ofNullable(userDataMap.get("email")).map(Object::toString).orElse(null);
-
+            System.out.println("email = " + email);
+            System.out.println("username = " + username);
             if (username != null && email != null) {
                 Optional<String> uuid = userRepository.findUuidByRealNameAndEmail(username, email);
                 if (uuid.isPresent()) {
