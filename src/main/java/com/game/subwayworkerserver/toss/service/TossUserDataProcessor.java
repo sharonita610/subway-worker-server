@@ -21,10 +21,9 @@ public class TossUserDataProcessor {
         String username = null;
         String email = null;
 
-        if (userDataMap != null && userDataMap.containsKey("fullInfo")) {
-
+        System.out.println("userDataMap = " + userDataMap);
+        if (userDataMap != null && userDataMap.containsKey("data")) {
             fullInfoMap = (Map<String, Object>) userDataMap.get("fullInfo");
-
         }
 
         username = Optional.ofNullable(fullInfoMap.get("name")).map(Object::toString).orElse(null);
