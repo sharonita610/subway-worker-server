@@ -5,11 +5,15 @@ import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.toss.dto.GetAccessTokenRequest;
 import com.game.subwayworkerserver.toss.dto.LogoutByUserKeyRequest;
 import com.game.subwayworkerserver.toss.dto.RefreshTokenRequest;
+import com.game.subwayworkerserver.toss.service.ApiResponse;
 import com.game.subwayworkerserver.toss.service.TossAuthService;
+import com.game.subwayworkerserver.toss.service.TossUserDataProcessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class TossAuthController {
 
     private final TossAuthService authService;
+    private final TossUserDataProcessor tossUserDataProcessor;
 
     // Bearer 접두사 길이
     private static final int BEARER_PREFIX_LENGTH = 7;
@@ -37,8 +42,8 @@ public class TossAuthController {
     @GetMapping("/get-user-info")
     public ResponseEntity<?> getUserInfo(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         String accessToken = extractAccessToken(authorizationHeader);
-        System.out.println("accessToken = " + accessToken);
-        return ResponseEntity.ok(authService.getUserInfo(accessToken));
+        ApiResponse<Map<String, Object>> userInfo = authService.getUserInfo(accessToken);
+        return ResponseEntity.ok(tossUserDataProcessor.process(userInfo));
     }
 
     // AccessToken으로 로그아웃
