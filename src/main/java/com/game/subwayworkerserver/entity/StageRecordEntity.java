@@ -50,4 +50,8 @@ public class StageRecordEntity extends BaseTimeEntity {
         this.stageLevel = requestedLevel;
         this.failCount++;
     }
+
+    public void updateStageSuccessCount() {
+        this.successCount++;
+    }
 }

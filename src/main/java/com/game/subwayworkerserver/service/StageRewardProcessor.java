@@ -71,6 +71,8 @@ public class StageRewardProcessor {
             if (randomValue < treasureDropRate) {
 
                 GachaTreasure randomTreasure = getRandomTreasure(user.getId());
+                UserGachaEntity userGachaEntity = getUserGachaEntity(user, randomTreasure);
+                userGachaEntity.addGacha(TREASURE_COUNT);
                 return new ExtraReward(randomTreasure.name(), TREASURE_COUNT);
 
             } else {
@@ -79,6 +81,12 @@ public class StageRewardProcessor {
         }
 
         return new ExtraReward("", 0);
+    }
+
+    private UserGachaEntity getUserGachaEntity(UserEntity user, GachaTreasure randomTreasure) {
+        return gachaRepository.findByUserIdAndGacha(user.getId(), randomTreasure).orElseThrow(
+                () -> new BaseException(ErrorCode.NOT_FOUND, "Gacha treasure not found for userId: " + user.getId())
+        );
     }
 
     private GachaTreasure getRandomTreasure(final long userId) {
