@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.Optional;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class TossUserDataProcessor {
@@ -28,7 +27,7 @@ public class TossUserDataProcessor {
             if (username != null && email != null) {
                 Optional<String> uuid = userRepository.findUuidByRealNameAndEmail(username, email);
                 if (uuid.isPresent()) {
-                    log.info("uuid = {}", uuid);
+                    System.out.println("uuid = " + uuid);
                     userDataMap.put("uuid", uuid.get());
                 } else {
                     userDataMap.put("uuid", "");
