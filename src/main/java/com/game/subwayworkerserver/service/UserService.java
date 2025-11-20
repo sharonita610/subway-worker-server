@@ -47,7 +47,9 @@ public class UserService {
         }
 
         Gender userGender = Gender.fromString(request.gender());
-        UserEntity userEntity = UserEntity.of(request.username(), UUID.randomUUID().toString(), userGender);
+        UserEntity userEntity = UserEntity.of(
+                request.username(), UUID.randomUUID().toString(), userGender, request.email(), request.realName()
+        );
         UserEntity savedUser = userRepository.save(userEntity);
 
         CoworkerEntity coworkerEntity = CoworkerEntity.of(savedUser.getId(), coworkerType);
