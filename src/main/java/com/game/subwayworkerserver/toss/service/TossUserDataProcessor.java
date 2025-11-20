@@ -45,6 +45,7 @@ public class TossUserDataProcessor {
             }
         }
 
+        System.out.println(" userInfo = " +  userInfo);
         return userInfo;
     }
 }
