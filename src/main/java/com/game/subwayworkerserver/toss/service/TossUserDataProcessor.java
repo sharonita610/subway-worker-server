@@ -16,29 +16,35 @@ public class TossUserDataProcessor {
 
     public ApiResponse<Map<String, Object>> process(ApiResponse<Map<String, Object>> userInfo) {
 
-        Map<String, Object> userDataMap = userInfo.data();
-        Map<String, Object> fullInfoMap = null;
+        Map<String, Object> topLevelMap = userInfo.data();
+        Map<String, Object> successMap = null;
+
+        System.out.println("userDataMap = " + topLevelMap);
+        if (topLevelMap != null && topLevelMap.containsKey("success")) {
+            Object successObject = topLevelMap.get("success");
+            if (successObject instanceof Map) {
+                successMap = (Map<String, Object>) successObject;
+            }
+        }
         String username = null;
         String email = null;
 
-        System.out.println("userDataMap = " + userDataMap);
-        if (userDataMap != null && userDataMap.containsKey("data")) {
-            fullInfoMap = (Map<String, Object>) userDataMap.get("fullInfo");
+        if (successMap != null) {
+            username = Optional.ofNullable(successMap.get("name")).map(Object::toString).orElse(null);
+            email = Optional.ofNullable(successMap.get("email")).map(Object::toString).orElse(null);
+
+            if (username != null && email != null) {
+                Optional<String> uuid = userRepository.findUuidByRealNameAndEmail(username, email);
+
+                if (uuid.isPresent()) {
+                    System.out.println("uuid = " + uuid);
+                    successMap.put("uuid", uuid.get());
+                } else {
+                    successMap.put("uuid", "");
+                }
+            }
         }
 
-        username = Optional.ofNullable(fullInfoMap.get("name")).map(Object::toString).orElse(null);
-        email = Optional.ofNullable(fullInfoMap.get("email")).map(Object::toString).orElse(null);
-        System.out.println("email = " + email);
-        System.out.println("username = " + username);
-        if (username != null && email != null) {
-            Optional<String> uuid = userRepository.findUuidByRealNameAndEmail(username, email);
-            if (uuid.isPresent()) {
-                System.out.println("uuid = " + uuid);
-                fullInfoMap.put("uuid", uuid.get());
-            }
-        } else {
-            fullInfoMap.put("uuid", "");
-        }
         return userInfo;
     }
 }
