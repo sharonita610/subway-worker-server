@@ -2,11 +2,13 @@ package com.game.subwayworkerserver.toss.service;
 
 import com.game.subwayworkerserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class TossUserDataProcessor {
@@ -26,6 +28,7 @@ public class TossUserDataProcessor {
             if (username != null && email != null) {
                 Optional<String> uuid = userRepository.findUuidByRealNameAndEmail(username, email);
                 if (uuid.isPresent()) {
+                    log.info("uuid = {}", uuid);
                     userDataMap.put("uuid", uuid.get());
                 } else {
                     userDataMap.put("uuid", "");
