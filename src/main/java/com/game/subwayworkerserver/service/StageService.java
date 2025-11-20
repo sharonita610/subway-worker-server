@@ -21,7 +21,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -93,6 +92,7 @@ public class StageService {
         } else {
             if (requestedLevel == 1 && success) {
                 StageRecordEntity stage = createStage(userId, requestedLevel);
+                stage.updateStageSuccessCount();
                 user.updateStageLevel(requestedLevel);
 
                 StageRewardInfo stageRewardInfo = stageRewardProcessor.giveFirstClearReward(user, requestedLevel);
@@ -124,6 +124,11 @@ public class StageService {
         );
         userLevelProcessor.processExpGainAndLevelUp(user, stageRewardInfo.userExp());
         user.increaseCoin(stageRewardInfo.coin());
+        user.processReward(stageRewardInfo);
+    }
+
+    private void processReward(final UserEntity user, final StageRewardInfo stageRewardInfo) {
+
     }
 
     private UserEntity getUserByUuid(String uuid) {
