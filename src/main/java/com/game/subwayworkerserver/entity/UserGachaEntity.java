@@ -64,4 +64,10 @@ public class UserGachaEntity extends BaseTimeEntity {
             this.gachaCount += 1;
         }
     }
+
+    public void addGacha(final int treasureCount) {
+        if (this.gachaCount < MAX_COUNT) {
+            this.gachaCount += treasureCount;
+        }
+    }
 }
