@@ -40,6 +40,10 @@ public class UserItemMapEntity extends BaseTimeEntity{
        return new UserItemMapEntity(userId, itemName, 1);
     }
 
+    public static UserItemMapEntity of(long userId, ItemName itemName, int quantityToAdd) {
+        return new UserItemMapEntity(userId, itemName, quantityToAdd);
+    }
+
     public void increaseQuantity() {
         this.quantity += 1;
     }
