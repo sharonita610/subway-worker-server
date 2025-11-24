@@ -56,7 +56,7 @@ public class GpsRandomDataScheduler {
     public void initialMapGeneration() {
         log.info("--- [Initializer] 서버 시작, 초기 맵 생성 시작 ---");
         redisTemplate.execute((RedisConnection connection) -> {
-            connection.serverCommands();
+            connection.flushDb();
             return null;
         });
         generateFullMapData(false);
