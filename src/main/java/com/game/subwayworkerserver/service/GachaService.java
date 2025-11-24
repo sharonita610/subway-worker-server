@@ -108,9 +108,7 @@ public class GachaService {
             ItemName acquiredItem = ItemName.valueOf(giftType);
             userItemMapRepository.findByUserIdAndItemName(userId, acquiredItem)
                     .ifPresentOrElse(
-                            existingItem -> {
-                                existingItem.increaseQuantity(gift.quantity());
-                            },
+                            existingItem -> existingItem.increaseQuantity(gift.quantity()),
                             () -> {
                                 UserItemMapEntity newUserItem = UserItemMapEntity.of(
                                         userId,
