@@ -86,9 +86,9 @@ public class UpgradeExecutor {
             finalRemainingCount = 1; // 다음 레벨의 1/N로 리셋
         }
 
-        return new UpgradeResult(calculatedLevel, finalRemainingCount, finalTotalAccumulatedCount);
+        return new UpgradeResult(calculatedLevel, finalRemainingCount, finalTotalAccumulatedCount, addedMaterialValue);
     }
 
-    public record UpgradeResult(int finalLevel, int finalCount, int accumulateCount) {
+    public record UpgradeResult(int finalLevel, int finalCount, int accumulateCount, int addedMaterialValue) {
     }
 }
