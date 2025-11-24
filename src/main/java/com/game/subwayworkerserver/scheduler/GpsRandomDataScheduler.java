@@ -23,29 +23,20 @@ import java.util.concurrent.TimeUnit;
 public class GpsRandomDataScheduler {
 
     private final CoworkerDataCreator coworkerDataCreator;
-    private final UserService userService;
     private final RedisTemplate<String, String> redisTemplate;
 
     // Redis Key 상수
     private static final String COWORKER_LOCATIONS_KEY = "coworker:locations";
     private static final String RANDOM_GIFT_BOX_KEY = "giftbox:locations";
     private static final String COWORKER_DATA_PREFIX = "coworker:data:";
-    private static final long MAP_DATA_TTL_DAYS = 1;
-    private static final long MAP_DATA_TTL_HOURS = 4;
-    // 대한민국 지도 범위 (대략적)
-//    private static final double MIN_LAT = 33.0;
-//    private static final double MAX_LAT = 38.5;
-//    private static final double MIN_LON = 124.0;
-//    private static final double MAX_LON = 131.0;
+    private static final long MAP_DATA_TTL_HOURS = 3;
 
     // 서울/수도권 및 인천/성남/경기 동부 일부 확장 범위
-    private static final double MIN_LAT = 37.3;
-    private static final double MAX_LAT = 37.7;
-    private static final double MIN_LON = 126.3;
-    private static final double MAX_LON = 127.5; // 경기 광주 방면으로 확장
+    private static final double MIN_LAT = 35.0; // 부산 남부 포함
+    private static final double MAX_LAT = 38.5; // 전국 북부 포괄
+    private static final double MIN_LON = 126.0; // 서해안 포괄
+    private static final double MAX_LON = 129.5; // 부산 동부 포괄
 
-    // 1km Grid 셀 간격 (약 1km에 해당하는 도(degree) 값)
-    // 2km Grid 셀 간격 (약 2km에 해당하는 도(degree) 값)
     private static final double LAT_STEP = 0.018;
     private static final double LON_STEP = 0.022;
 
@@ -86,7 +77,7 @@ public class GpsRandomDataScheduler {
      * @param isScheduledExecution 스케줄링 실행 여부 (true인 경우 Item 생성 건너뛰기)
      */
     public void generateFullMapData(boolean isScheduledExecution) {
-
+        List<Map<String, String>> allCoworkerHashData = new ArrayList<>();
         if (!isScheduledExecution) {
             // 1. 기존 데이터 삭제 (Item_Locations_Key는 제외)
             redisTemplate.delete(COWORKER_LOCATIONS_KEY);
@@ -94,8 +85,6 @@ public class GpsRandomDataScheduler {
             log.info("--- 동료/선물상자 기존 데이터 삭제 완료 ---");
         }
 
-        int totalCells = 0;
-        int totalCoworkersAndGifts = 0;
         redisTemplate.executePipelined((RedisConnection connection) -> {
 
             // 2. 대한민국 Grid 순회 및 데이터 생성
@@ -105,23 +94,37 @@ public class GpsRandomDataScheduler {
                     double cellCenterLat = lat + (LAT_STEP / 2);
                     double cellCenterLon = lon + (LON_STEP / 2);
 
-                    // 동료 생성 (1개) - createItemsInCell 내부의 redisTemplate 호출이 Pipeline에 기록됨
-                    createItemsInCell(cellCenterLat, cellCenterLon, COWORKER_PER_CELL, COWORKER_LOCATIONS_KEY, "COWORKER");
-
-                    // 선물 상자 생성 (2개)
-                    createItemsInCell(cellCenterLat, cellCenterLon, GIFTS_PER_CELL, RANDOM_GIFT_BOX_KEY, "GIFT");
+                    createItemsInCell(cellCenterLat, cellCenterLon, COWORKER_PER_CELL, COWORKER_LOCATIONS_KEY, "COWORKER",  allCoworkerHashData);
+                    createItemsInCell(cellCenterLat, cellCenterLon, GIFTS_PER_CELL, RANDOM_GIFT_BOX_KEY, "GIFT", allCoworkerHashData);
                 }
             }
-
-            // ⭐ 루프가 완전히 끝난 후 Pipeline 작업이 Redis로 전송됩니다. ⭐
             return null;
         });
+
+        if (!allCoworkerHashData.isEmpty()) {
+            redisTemplate.executePipelined((RedisConnection connection) -> {
+                for (Map<String, String> data : allCoworkerHashData) {
+                    String coworkerId = data.get("id");
+                    String instanceKey = COWORKER_DATA_PREFIX + coworkerId;
+
+                    // Hash 데이터 저장 및 TTL 설정
+                    redisTemplate.opsForHash().putAll(instanceKey, data);
+                    redisTemplate.expire(instanceKey, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
+                }
+                log.info("--- 2차 Pipeline (Hash Data) {}개 저장 완료 ---", allCoworkerHashData.size());
+                return null;
+            });
+        }
+
+        log.info("--- [Initializer] 맵 생성 완료 ---");
     }
 
     /**
      * Helper: 특정 셀 중심에 N개의 아이템을 랜덤하게 생성하여 Redis에 저장합니다.
      */
-    private void createItemsInCell(double centerLat, double centerLon, int count, String key, String prefix) {
+    private void createItemsInCell(
+            double centerLat, double centerLon, int count, String key, String prefix, List<Map<String, String>> allCoworkerHashData
+    ) {
 
         Map<String, Point> locations = new HashMap<>();
 
@@ -135,7 +138,13 @@ public class GpsRandomDataScheduler {
             locations.put(memberName, new Point(randomLon, randomLat));
 
             if (key.equals(COWORKER_LOCATIONS_KEY)) {
-                createAndSaveCoworkerHashData(memberName);
+                // ⭐ Hash 데이터를 수집합니다. ⭐
+                // (이 메서드는 Redis I/O 없이 Map을 반환하도록 수정되어야 합니다.)
+                Map<String, String> hashData = createAndSaveCoworkerHashData(memberName);
+
+                if (!hashData.isEmpty()) {
+                    allCoworkerHashData.add(hashData);
+                }
             }
         }
 
@@ -145,14 +154,16 @@ public class GpsRandomDataScheduler {
         }
     }
 
-    private void createAndSaveCoworkerHashData(final String coworkerId) {
+    private Map<String, String> createAndSaveCoworkerHashData(final String coworkerId) {
         Map<String, String> dataToSave = coworkerDataCreator.createRandomCoworkerAttribute();
         if (dataToSave.isEmpty()) {
-            return;
+            return Collections.emptyMap();
         }
-        String instanceKey = COWORKER_DATA_PREFIX + coworkerId;
-        redisTemplate.opsForHash().putAll(instanceKey, dataToSave);
-        redisTemplate.expire(instanceKey, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
+        dataToSave.put("id", coworkerId);
+        return dataToSave;
+//        String instanceKey = COWORKER_DATA_PREFIX + coworkerId;
+//        redisTemplate.opsForHash().putAll(instanceKey, dataToSave);
+//        redisTemplate.expire(instanceKey, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
     }
 
     private double generateRandomCoordinate(double center, double maxOffset) {
