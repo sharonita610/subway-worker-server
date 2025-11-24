@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -107,7 +108,7 @@ public class UserService {
                         CaptureItemInfo.of(
                                 item.getItemName().getName(),
                                 item.getQuantity()
-                        )).toList();
+                        )).collect(Collectors.toList());
 
         return CaptureItemListResponse.of(list);
     }
@@ -129,7 +130,7 @@ public class UserService {
                         TrapItemInfo.of(
                                 item.getItemName().getName(),
                                 item.getQuantity()
-                        )).toList();
+                        )).collect(Collectors.toList());
 
         return TrapItemListResponse.of(list);
     }
