@@ -55,7 +55,7 @@ public class GpsRandomDataScheduler {
     @PostConstruct
     public void initialMapGeneration() {
         log.info("--- [Initializer] 서버 시작, 초기 맵 생성 시작 ---");
-        scheduledMapRegeneration();
+        deleteCoworkerDataByPattern();
         generateFullMapData(false);
         log.info("--- [Initializer] 초기 맵 생성 완료 ---");
     }
