@@ -24,6 +24,17 @@ public enum CoworkerLevel {
     private final double levelUpStatIncreaseRate; // 레벨업 시 수치 증가 (이전 대비 증가율) (예: 105% -> 0.05)
     private final double statRatioToInitial;  // 초기 능력치 대비 비율
 
+    final static List<Double> WEIGHTS = List.of(
+            35.00,
+            35.00,
+            20.00,
+            8.00,
+            1.90,
+            0.09,
+            0.01
+    );
+    private static final double TOTAL_WEIGHT = 100.0;
+
     CoworkerLevel(
             int level,
             String title,
@@ -52,21 +63,17 @@ public enum CoworkerLevel {
     public static CoworkerLevel getRandomLevel() {
         CoworkerLevel[] levels = CoworkerLevel.values();
 
-        double totalWeight = 0;
-        for (int i = 0; i < levels.length; i++) {
-            totalWeight += 1.0 / levels[i].level;
-        }
-        double randomValue = ThreadLocalRandom.current().nextDouble(0, totalWeight);
-
+        double randomValue = ThreadLocalRandom.current().nextDouble(0, TOTAL_WEIGHT);
         double cumulativeWeight = 0;
-        for (CoworkerLevel level : levels) {
-            cumulativeWeight += 1.0 / level.level;
+        for (int i = 0; i < levels.length; i++) {
+            cumulativeWeight += WEIGHTS.get(i);
 
-            if (randomValue <= cumulativeWeight) {
-                return level;
+            if (randomValue < cumulativeWeight) {
+                return levels[i];
             }
         }
-        return levels[0];
+
+        return levels[levels.length - 1];
     }
 
     public static CoworkerLevel getSpecialCoworkerLevel() {
