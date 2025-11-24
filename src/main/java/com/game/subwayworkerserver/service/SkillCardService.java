@@ -187,12 +187,11 @@ public class SkillCardService {
         List<SkillCardEntity> materialCards = checkMaterialCardIds(
                 request.materialIds(), user.getId(), targetCard.getSkillCardEnumId()
         );
-        int materialCount = materialCards.size();
-        final int totalCost = getTotalCost(materialCount, request.price());
-        user.checkAndPurchase(totalCost);
 
         UpgradeResult result = upgradeExecutor.executeSkillCardLogic(targetCard, materialCards);
         targetCard.updateFinalState(result.finalLevel(), result.finalCount(), result.accumulateCount());
+        final int totalCost = getTotalCost(result.addedMaterialValue(), request.price());
+        user.checkAndPurchase(totalCost);
 
         skillCardRepository.deleteAll(materialCards);
         SkillCardEntity saved = skillCardRepository.save(targetCard);
@@ -240,6 +239,4 @@ public class SkillCardService {
                 () -> new BaseException(ErrorCode.USER_NOT_FOUND)
         );
     }
-
-
 }
