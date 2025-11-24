@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisGeoCommands;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Component;
 
 import org.springframework.data.geo.Point;
@@ -54,7 +56,7 @@ public class GpsRandomDataScheduler {
     @PostConstruct
     public void initialMapGeneration() {
         log.info("--- [Initializer] 서버 시작, 초기 맵 생성 시작 ---");
-        // Item 생성 포함하여 맵 초기화
+        deleteKeysByPattern(COWORKER_DATA_PREFIX + "*");
         generateFullMapData(false);
         log.info("--- [Initializer] 초기 맵 생성 완료 ---");
     }
@@ -67,8 +69,30 @@ public class GpsRandomDataScheduler {
     public void scheduledMapRegeneration() {
         log.info("--- [Scheduler] 3시간 주기 맵 재생성 시작 ---");
         // Item 생성/삭제를 건너뛰고, 동료와 선물상자만 재생성
+        redisTemplate.delete(RANDOM_GIFT_BOX_KEY);
+
         generateFullMapData(false);
         log.info("--- [Scheduler] 3시간 주기 맵 재생성 완료 ---");
+    }
+
+    private void deleteKeysByPattern(String pattern) {
+        Set<String> keys = new HashSet<>();
+
+        redisTemplate.execute((RedisConnection connection) -> {
+            try (Cursor<byte[]> cursor = connection.scan(ScanOptions.scanOptions().match(pattern).count(1000).build())) {
+                while (cursor.hasNext()) {
+                    keys.add(new String(cursor.next()));
+                }
+            } catch (Exception e) {
+                log.error("Error during Redis SCAN operation for pattern: {}", pattern, e);
+            }
+            return null;
+        });
+
+        if (!keys.isEmpty()) {
+            Long deleted = redisTemplate.delete(keys);
+            log.info("Pattern deletion: {} keys matching '{}' deleted.", deleted, pattern);
+        }
     }
 
     /**
@@ -161,9 +185,6 @@ public class GpsRandomDataScheduler {
         }
         dataToSave.put("id", coworkerId);
         return dataToSave;
-//        String instanceKey = COWORKER_DATA_PREFIX + coworkerId;
-//        redisTemplate.opsForHash().putAll(instanceKey, dataToSave);
-//        redisTemplate.expire(instanceKey, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
     }
 
     private double generateRandomCoordinate(double center, double maxOffset) {
