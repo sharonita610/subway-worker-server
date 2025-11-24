@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -57,7 +58,23 @@ public class UserService {
 
         List<UserGachaEntity> gachaEntities = UserGachaEntity.from(userEntity.getId());
         gachaRepository.saveAll(gachaEntities);
+        saveUserItemIntoMap(savedUser.getId());
         return savedUser.getUuid();
+    }
+
+    private void saveUserItemIntoMap(final long userId) {
+        Map<String, Integer> defaultItems = ItemName.getDefaultItems();
+
+        List<UserItemMapEntity> entitiesToSave = defaultItems.entrySet().stream()
+                .map(entry -> {
+                    ItemName itemName = ItemName.fromConstantName(entry.getKey());
+                    return UserItemMapEntity.of(userId, itemName, entry.getValue());
+                })
+                .toList();
+
+        if (!entitiesToSave.isEmpty()) {
+            userItemMapRepository.saveAll(entitiesToSave);
+        }
     }
 
     @Transactional
