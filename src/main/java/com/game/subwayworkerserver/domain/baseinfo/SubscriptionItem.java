@@ -11,7 +11,7 @@ import java.util.List;
 public enum SubscriptionItem {
 
     SILVER_BADGE(1, "실버 뱃지", 8800, 30, 300, 30, 0),
-    GOLD_BADGE(2, "골드 뱃지", 14800, 30, 700, 60, 30);
+    GOLD_BADGE(2, "골드 뱃지", 14850, 30, 700, 60, 30);
 
     private final int id;
     private final String korName;
