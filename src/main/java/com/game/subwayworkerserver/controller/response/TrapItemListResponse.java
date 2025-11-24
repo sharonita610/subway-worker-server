@@ -11,7 +11,7 @@ public record TrapItemListResponse(List<TrapItemInfo> trapItemInfoList) {
             "금삽"
     );
 
-    public static TrapItemListResponse of(final List<TrapItemInfo> list) {
+    public static TrapItemListResponse of(List<TrapItemInfo> list) {
         Comparator<TrapItemInfo> customOrderComparator = Comparator.comparingInt(
                 itemInfo -> TRAP_ORDER.indexOf(itemInfo.korName())
         );

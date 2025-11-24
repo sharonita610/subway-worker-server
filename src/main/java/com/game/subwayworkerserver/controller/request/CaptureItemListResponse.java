@@ -13,7 +13,7 @@ public record CaptureItemListResponse(List<CaptureItemInfo> captureItemList) {
             "출장용캐리어"
     );
 
-    public static CaptureItemListResponse of(final List<CaptureItemInfo> list) {
+    public static CaptureItemListResponse of(List<CaptureItemInfo> list) {
         Comparator<CaptureItemInfo> customOrderComparator = Comparator.comparingInt(
                 itemInfo -> CAPTURE_ORDER.indexOf(itemInfo.korName())
         );
