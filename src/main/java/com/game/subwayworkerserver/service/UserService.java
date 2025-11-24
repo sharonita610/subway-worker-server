@@ -109,7 +109,7 @@ public class UserService {
                                 item.getQuantity()
                         )).toList();
 
-        return new CaptureItemListResponse(list);
+        return CaptureItemListResponse.of(list);
     }
 
     private UserEntity findUserBy(String uuid) {
@@ -124,14 +124,14 @@ public class UserService {
         List<UserItemMapEntity> userItems = userItemMapRepository.findByUserId(user.getId());
 
         List<TrapItemInfo> list = userItems.stream()
-                .filter(item -> item.getItemName().getCategory().equals(ItemCategory.TRAP)) // 포획 카테고리 필터링
+                .filter(item -> item.getItemName().getCategory().equals(ItemCategory.TRAP))
                 .map(item ->
                         TrapItemInfo.of(
                                 item.getItemName().getName(),
                                 item.getQuantity()
                         )).toList();
 
-        return new TrapItemListResponse(list);
+        return TrapItemListResponse.of(list);
     }
 
     @Transactional
