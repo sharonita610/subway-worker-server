@@ -23,8 +23,10 @@ public class AttendanceChecker {
                 user.resetDailyAttendance();
                 return;
             }
-
-            user.dailyAttendanceCheck();
+            if (lastDate.isEqual(yesterday)) {
+                user.dailyAttendanceCheck();
+                return;
+            }
         }
         user.resetDailyAttendance();
     }
