@@ -44,7 +44,7 @@ public class TrapCheckerScheduler {
      * // 5분 = 300,000ms
      */
     @Async
-    @Scheduled(cron = "17 0 */2 * * *")
+    @Scheduled(cron = "0 30 * * * *")
     @Transactional
     public void checkTrapsForCapture() {
         log.info("--- [Scheduler] 트랩-동료 겹침 확인 시작 ---");
