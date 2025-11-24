@@ -55,7 +55,10 @@ public class GpsRandomDataScheduler {
     @PostConstruct
     public void initialMapGeneration() {
         log.info("--- [Initializer] 서버 시작, 초기 맵 생성 시작 ---");
-        deleteCoworkerDataByPattern();
+        redisTemplate.execute((RedisConnection connection) -> {
+            connection.serverCommands();
+            return null;
+        });
         generateFullMapData(false);
         log.info("--- [Initializer] 초기 맵 생성 완료 ---");
     }
@@ -71,44 +74,7 @@ public class GpsRandomDataScheduler {
         generateFullMapData(false);
         log.info("--- [Scheduler] 3시간 주기 맵 재생성 완료 ---");
     }
-    private void deleteCoworkerDataByPattern() {
-        Set<String> keys = new HashSet<>();
-        String pattern = COWORKER_DATA_PREFIX + "*";
 
-        // 1. Redis Serializer 확보 및 Unchecked Cast 경고 억제
-        @SuppressWarnings("unchecked")
-        RedisSerializer<String> stringSerializer =
-                (RedisSerializer<String>) redisTemplate.getKeySerializer();
-
-        // 2. SCAN 명령 실행 및 Deprecated 경고 억제
-        redisTemplate.execute((RedisConnection connection) -> {
-
-            // ScanOptions Deprecated 경고 억제
-            @SuppressWarnings("deprecation")
-            ScanOptions scanOptions = ScanOptions.scanOptions().match(pattern).count(1000).build();
-
-            try (Cursor<byte[]> cursor = connection.scan(scanOptions)) {
-                while (cursor.hasNext()) {
-                    // 3. 안전한 키 역직렬화 (byte[] -> String)
-                    String key = stringSerializer.deserialize(cursor.next());
-                    if (key != null) {
-                        keys.add(key);
-                    }
-                }
-            } catch (Exception e) {
-                log.error("Error during Redis SCAN operation for pattern: {}", pattern, e);
-            }
-            return null;
-        });
-
-        // 4. 일괄 삭제
-        if (!keys.isEmpty()) {
-            Long deleted = redisTemplate.delete(keys);
-            log.info("Pattern deletion: {} keys matching '{}' deleted.", deleted, pattern);
-        } else {
-            log.info("Pattern deletion: No coworker data keys found to delete.", pattern);
-        }
-    }
     /**
      * 핵심 로직: Redis의 데이터를 삭제하고 새로운 Grid 데이터를 생성합니다.
      *
