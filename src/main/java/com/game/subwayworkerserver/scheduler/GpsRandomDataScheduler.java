@@ -69,8 +69,6 @@ public class GpsRandomDataScheduler {
     public void scheduledMapRegeneration() {
         log.info("--- [Scheduler] 3시간 주기 맵 재생성 시작 ---");
         // Item 생성/삭제를 건너뛰고, 동료와 선물상자만 재생성
-        redisTemplate.delete(RANDOM_GIFT_BOX_KEY);
-
         generateFullMapData(false);
         log.info("--- [Scheduler] 3시간 주기 맵 재생성 완료 ---");
     }
