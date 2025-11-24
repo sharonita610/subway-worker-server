@@ -58,7 +58,7 @@ public class GpsRandomDataScheduler {
         log.info("--- [Initializer] 초기화 완료 ---");
     }
 
-    @Scheduled(fixedRate = 10800000, initialDelay = 300000)
+    @Scheduled(fixedRate = 10800000, initialDelay = 10800000)
     public void scheduledMapRegeneration() {
         log.info("--- [Scheduler] 3시간 주기 맵 재생성 시작 ---");
         generateFullMapData();
