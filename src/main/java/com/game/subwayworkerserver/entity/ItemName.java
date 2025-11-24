@@ -134,6 +134,17 @@ public enum ItemName {
         throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR, "랜덤 아이템 선택 실패.");
     }
 
+    public static Map<String, Integer> getDefaultItems() {
+        return Map.of(
+                PAPER_BOX.name(), 5,
+                BRIEFCASE.name(), 3,
+                BUSINESS_CARRIER.name(), 1,
+                WOOD_SHOVEL.name(), 3,
+                SILVER_SHOVEL.name(), 2,
+                GOLD_SHOVEL.name(), 1
+        );
+    }
+
     public boolean canTrapSucceed() {
         if (this.category != ItemCategory.TRAP) {
             throw new BaseException(ErrorCode.BAD_REQUEST, "'" + this.name + "'은 트랩(Trap) 도구가 아닙니다. TRAP 카테고리만 호출해야 합니다.");
