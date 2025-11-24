@@ -47,58 +47,40 @@ public class GpsRandomDataScheduler {
     private static final double MAX_JITTER = 0.008; // 셀 내에서 흩뿌릴 최대 오프셋
 
 
-    // --- 스케줄링 및 초기화 ---
-
-    /**
-     * 1. 서버 시작 시 초기 맵 생성 (일반 아이템은 이 때 한 번만 생성됩니다.)
-     */
     @PostConstruct
     public void initialMapGeneration() {
-        log.info("--- [Initializer] 서버 시작, 초기 맵 생성 시작 ---");
+        log.info("--- [Initializer] 서버 시작-");
         redisTemplate.execute((RedisConnection connection) -> {
             connection.serverCommands().flushDb();
             return null;
         });
-        generateFullMapData(false);
-        log.info("--- [Initializer] 초기 맵 생성 완료 ---");
+        generateFullMapData();
+        log.info("--- [Initializer] 초기화 완료 ---");
     }
 
-    /**
-     * 2. 30분마다 맵의 동료와 선물 상자 데이터를 재생성합니다.
-     * fixedRate = 1800000ms (30분)
-     */
-    @Scheduled(fixedRate = 10800000)
+    @Scheduled(fixedRate = 10800000, initialDelay = 300000)
     public void scheduledMapRegeneration() {
         log.info("--- [Scheduler] 3시간 주기 맵 재생성 시작 ---");
-        // Item 생성/삭제를 건너뛰고, 동료와 선물상자만 재생성
-        generateFullMapData(false);
+        generateFullMapData();
         log.info("--- [Scheduler] 3시간 주기 맵 재생성 완료 ---");
     }
 
-    /**
-     * 핵심 로직: Redis의 데이터를 삭제하고 새로운 Grid 데이터를 생성합니다.
-     *
-     * @param isScheduledExecution 스케줄링 실행 여부 (true인 경우 Item 생성 건너뛰기)
-     */
-    public void generateFullMapData(boolean isScheduledExecution) {
+    public void generateFullMapData() {
         List<Map<String, String>> allCoworkerHashData = new ArrayList<>();
-        if (!isScheduledExecution) {
-            // 1. 기존 데이터 삭제 (Item_Locations_Key는 제외)
-            redisTemplate.delete(COWORKER_LOCATIONS_KEY);
-            redisTemplate.delete(RANDOM_GIFT_BOX_KEY);
-            log.info("--- 동료/선물상자 기존 데이터 삭제 완료 ---");
-        }
+
+        redisTemplate.delete(COWORKER_LOCATIONS_KEY);
+        redisTemplate.delete(RANDOM_GIFT_BOX_KEY);
+        log.info("--- 동료/선물상자 기존 데이터 삭제 완료 ---");
 
         redisTemplate.executePipelined((RedisConnection connection) -> {
 
-            // 2. 대한민국 Grid 순회 및 데이터 생성
             for (double lat = MIN_LAT; lat < MAX_LAT; lat += LAT_STEP) {
                 for (double lon = MIN_LON; lon < MAX_LON; lon += LON_STEP) {
 
                     double cellCenterLat = lat + (LAT_STEP / 2);
                     double cellCenterLon = lon + (LON_STEP / 2);
 
-                    createItemsInCell(cellCenterLat, cellCenterLon, COWORKER_PER_CELL, COWORKER_LOCATIONS_KEY, "COWORKER",  allCoworkerHashData);
+                    createItemsInCell(cellCenterLat, cellCenterLon, COWORKER_PER_CELL, COWORKER_LOCATIONS_KEY, "COWORKER", allCoworkerHashData);
                     createItemsInCell(cellCenterLat, cellCenterLon, GIFTS_PER_CELL, RANDOM_GIFT_BOX_KEY, "GIFT", allCoworkerHashData);
                 }
             }
@@ -119,8 +101,6 @@ public class GpsRandomDataScheduler {
                 return null;
             });
         }
-
-        log.info("--- [Initializer] 맵 생성 완료 ---");
     }
 
     /**
