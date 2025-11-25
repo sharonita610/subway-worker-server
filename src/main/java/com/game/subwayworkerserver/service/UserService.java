@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -50,7 +51,8 @@ public class UserService {
 
         Gender userGender = Gender.fromString(request.gender());
         UserEntity userEntity = UserEntity.of(
-                request.username(), UUID.randomUUID().toString(), userGender, request.email(), request.realName()
+                request.username(), UUID.randomUUID().toString(), userGender, request.email(), request.realName(),
+                request.tossHash()
         );
         UserEntity savedUser = userRepository.save(userEntity);
 
@@ -152,5 +154,10 @@ public class UserService {
 
     public List<String> getAllUserUuids() {
         return userRepository.getAllUserUuid();
+    }
+
+    public UuidResponse getUuidByHash(final String tossHash) {
+        Optional<String> uuidByTossHash = userRepository.findUuidByTossHash(tossHash);
+        return uuidByTossHash.map(UuidResponse::new).orElseGet(UuidResponse::empty);
     }
 }
