@@ -50,10 +50,10 @@ public class GpsRandomDataScheduler {
     @PostConstruct
     public void initialMapGeneration() {
         log.info("--- [Initializer] 서버 시작-");
-//        redisTemplate.execute((RedisConnection connection) -> {
-//            connection.serverCommands().flushDb();
-//            return null;
-//        });
+        redisTemplate.execute((RedisConnection connection) -> {
+            connection.serverCommands().flushDb();
+            return null;
+        });
         generateFullMapData();
         log.info("--- [Initializer] 초기화 완료 ---");
     }
