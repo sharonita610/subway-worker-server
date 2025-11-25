@@ -21,5 +21,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     @Query("SELECT u.uuid FROM UserEntity u WHERE u.realName = :realName AND u.email = :email")
     Optional<String> findUuidByRealNameAndEmail(@Param("realName") final String realName, @Param("email") final String email);
+
+    @Query("SELECT u.uuid FROM UserEntity u WHERE u.tossHash = :tossHash ")
+    Optional<String> findUuidByTossHash(@Param("tossHash") String tossHash);
 }
 
