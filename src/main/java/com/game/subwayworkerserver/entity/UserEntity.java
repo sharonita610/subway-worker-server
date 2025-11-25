@@ -78,12 +78,14 @@ public class UserEntity extends BaseTimeEntity {
 
     private String realName;
 
+    private String tossHash;
+
     private LocalDate adFreeExpirationDate;
 
     private LocalDate lastAttendanceDate;
 
     public UserEntity(String name, String uuid, int exp, int level, int totalExp, int coin, int vacationTicket,
-                      int gachaTicket, int stage, Gender gender, String email, String realName) {
+                      int gachaTicket, int stage, Gender gender, String email, String realName, String tossHash) {
         this.name = name;
         this.uuid = uuid;
         this.exp = exp;
@@ -96,6 +98,7 @@ public class UserEntity extends BaseTimeEntity {
         this.gender = gender;
         this.email = email;
         this.realName = realName;
+        this.tossHash = tossHash;
     }
     public UserEntity(String name, String uuid, int exp, int level, int totalExp, int coin, int vacationTicket,
                       int gachaTicket, int stage, Gender gender) {
@@ -111,9 +114,23 @@ public class UserEntity extends BaseTimeEntity {
         this.gender = gender;
     }
 
-    public static UserEntity of(final String username, final String uuid, final Gender gender, final String email, final String realName) {
-        if (email != null && realName != null) {
-            return new UserEntity(username, uuid, 0, 1, 0, 0, 0, 0, 0, gender, email, realName);
+    public static UserEntity of(final String username, final String uuid, final Gender gender, final String email,
+                                final String realName, String tossHash) {
+        if (realName != null) {
+            return new UserEntity(
+                    username,
+                    uuid,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    gender,
+                    email != null ? email : "",
+                    realName,
+                    tossHash != null ? tossHash : "");
         }
         return new UserEntity(username, uuid, 0, 1, 0, 0, 0, 0, 0, gender);
     }
