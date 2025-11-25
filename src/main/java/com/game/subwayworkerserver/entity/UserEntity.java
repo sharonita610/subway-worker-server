@@ -128,9 +128,9 @@ public class UserEntity extends BaseTimeEntity {
                     0,
                     0,
                     gender,
-                    email != null ? email : "",
+                    email,
                     realName,
-                    tossHash != null ? tossHash : "");
+                    tossHash);
         }
         return new UserEntity(username, uuid, 0, 1, 0, 0, 0, 0, 0, gender);
     }
