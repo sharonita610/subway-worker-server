@@ -1,5 +1,7 @@
 package com.game.subwayworkerserver.service;
 
+import com.game.subwayworkerserver.controller.request.SystemMailRequest;
+import com.game.subwayworkerserver.controller.request.SystemMailRequest.SystemRewardRequest;
 import com.game.subwayworkerserver.domain.baseinfo.SubscriptionItem;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.repository.MailRepository;
@@ -13,7 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.game.subwayworkerserver.entity.RewardSource.SUBSCRIPTION;
-import static com.game.subwayworkerserver.entity.RewardType.VACATION_TICKET;
+import static com.game.subwayworkerserver.entity.RewardSource.SYSTEM_REWARD;
+import static com.game.subwayworkerserver.entity.RewardType.*;
 
 @Component
 @RequiredArgsConstructor
@@ -27,7 +30,7 @@ public class RewardProcessor {
 
     public void processAttendanceReward(final UserEntity user, final CheckInReward reward, final long rewardDay) {
         long userId = user.getId();
-        long mailId = createMail(userId, String.format("%d일차 보상 지급", rewardDay));
+        long mailId = createMail(userId, String.format("%d일차 보상 지급", rewardDay), REWARD_CONTENT);
 
         List<RewardEntity> rewardsToSave = new ArrayList<>();
 
@@ -83,11 +86,11 @@ public class RewardProcessor {
                 .build();
     }
 
-    private long createMail(long userId, String title) {
+    private long createMail(long userId, String title, String content) {
         MailEntity mailEntity = MailEntity.builder()
                 .userId(userId)
                 .title(title)
-                .content(REWARD_CONTENT)
+                .content(content)
                 .isRead(false)
                 .isClaimed(false)
                 .build();
@@ -99,7 +102,7 @@ public class RewardProcessor {
     @Transactional
     public void sendDailySubscriptionReward(long userId, String mailTitle, int dailyTicket) {
         userRepository.findById(userId).ifPresent(UserEntity::hasMailToCheck);
-        long mailId = createMail(userId, mailTitle);
+        long mailId = createMail(userId, mailTitle, REWARD_CONTENT);
         RewardEntity build = getBuild(userId, VACATION_TICKET, SUBSCRIPTION, dailyTicket, mailId);
         rewardRepository.save(build);
     }
@@ -107,7 +110,7 @@ public class RewardProcessor {
     public void processSubscriptionReward(final UserEntity user, final SubscriptionItem subscriptionItem) {
         long userId = user.getId();
 
-        long mailId = createMail(user.getId(), "Vip 뱃지 구매");
+        long mailId = createMail(user.getId(), "Vip 뱃지 구매", REWARD_CONTENT);
         List<RewardEntity> rewardsToSave = new ArrayList<>();
 
         if (subscriptionItem.getDailyTicket() > 0) {
@@ -120,6 +123,41 @@ public class RewardProcessor {
                     getBuild(userId, VACATION_TICKET, SUBSCRIPTION, subscriptionItem.getInstanceTicket(), mailId)
             );
         }
+        rewardRepository.saveAll(rewardsToSave);
+        user.hasMailToCheck();
+    }
+
+    @Transactional
+    public void sendSystemMail(final SystemMailRequest request) {
+        List<UserEntity> userEntities = userRepository.findAll();
+        userEntities.forEach(userEntity -> {
+            long mailId = createMail(userEntity.getId(), request.title(), request.content());
+            if (!request.rewards().isEmpty()) {
+                processSystemMail(userEntity, mailId, request.rewards());
+            }
+        });
+    }
+
+    private void processSystemMail(
+            final UserEntity user, final long mailId, List<SystemRewardRequest> rewards
+    ) {
+        Long userId = user.getId();
+
+        List<RewardEntity> rewardsToSave = new ArrayList<>();
+        rewards.forEach(reward -> {
+            switch (reward.rewardName()) {
+                case "GACHA_TICKET" -> rewardsToSave.add(
+                        getBuild(userId, GACHA_TICKET, SYSTEM_REWARD, reward.quantity(), mailId)
+                );
+                case "VACATION_TICKET" -> rewardsToSave.add(
+                        getBuild(userId, VACATION_TICKET, SYSTEM_REWARD, reward.quantity(), mailId)
+                );
+                case "COIN" -> rewardsToSave.add(
+                        getBuild(userId, COIN, SYSTEM_REWARD, reward.quantity(), mailId)
+                );
+            }
+
+        });
         rewardRepository.saveAll(rewardsToSave);
         user.hasMailToCheck();
     }
