@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.service;
 
+import com.game.subwayworkerserver.controller.request.SystemMailRequest;
 import com.game.subwayworkerserver.controller.response.CheckInListResponse;
 import com.game.subwayworkerserver.controller.response.LevelUpRewardResponse;
 import com.game.subwayworkerserver.controller.response.SubscribeListResponse;
@@ -195,5 +196,9 @@ public class SystemService {
 
         user.extendAdFreeBenefit(subscriptionItem.getAdSkipDays());
         rewardProcessor.processSubscriptionReward(user, subscriptionItem);
+    }
+
+    public void sendSystemMail(final SystemMailRequest request) {
+        rewardProcessor.sendSystemMail(request);
     }
 }
