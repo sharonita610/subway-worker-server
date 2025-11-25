@@ -129,4 +129,13 @@ public class UserController {
         String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok(skillCardService.getUserSkillCards(uuid));
     }
+
+    @Operation(
+            summary = "토스 해시로 uuid 반환받기"
+    )
+    @GetMapping("/user/toss")
+    public ResponseEntity<UuidResponse> getUUIDByHash(@RequestParam("hash") String tossHash) {
+        return ResponseEntity.ok(userService.getUuidByHash(tossHash));
+    }
+
 }
