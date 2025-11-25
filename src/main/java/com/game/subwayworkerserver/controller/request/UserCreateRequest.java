@@ -18,6 +18,7 @@ public record UserCreateRequest(
         String gender,
 
         String email,
-        String realName
+        String realName,
+        String tossHash
 ) {
 }
