@@ -1,22 +1,21 @@
 package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.SecurityUtils;
+import com.game.subwayworkerserver.controller.request.SystemMailRequest;
 import com.game.subwayworkerserver.controller.response.CheckInListResponse;
 import com.game.subwayworkerserver.controller.response.LevelUpRewardResponse;
 import com.game.subwayworkerserver.controller.response.SubscribeListResponse;
 import com.game.subwayworkerserver.controller.response.UserMailBoxResponse;
 import com.game.subwayworkerserver.service.SystemService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -124,5 +123,11 @@ public class SystemController {
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_PNG)
                 .body(resource);
+    }
+
+    @PostMapping("/system/mail")
+    public ResponseEntity<HttpStatus> sendSystemMail(@Valid @RequestBody SystemMailRequest request) {
+        systemService.sendSystemMail(request);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 }
