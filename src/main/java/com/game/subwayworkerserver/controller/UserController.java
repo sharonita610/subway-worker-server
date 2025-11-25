@@ -135,6 +135,7 @@ public class UserController {
     )
     @GetMapping("/user/toss")
     public ResponseEntity<UuidResponse> getUUIDByHash(@RequestParam("hash") String tossHash) {
+        System.out.println("tossHash = " + tossHash);
         return ResponseEntity.ok(userService.getUuidByHash(tossHash));
     }
 
