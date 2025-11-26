@@ -19,8 +19,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @Query("SELECT u.uuid FROM UserEntity u") // JPQL 사용: UserEntity 테이블에서 UUID 컬럼만 선택
     List<String> getAllUserUuid();
 
-    @Query("SELECT u.uuid FROM UserEntity u WHERE u.realName = :realName AND u.email = :email")
-    Optional<String> findUuidByRealNameAndEmail(@Param("realName") final String realName, @Param("email") final String email);
+    @Query("SELECT u.uuid FROM UserEntity u WHERE u.tossUserKey = :tossUserKey")
+    Optional<String> findUuidByTossUserKey(@Param("tossUserKey") final String tossUserKey);
 
     @Query("SELECT u.uuid FROM UserEntity u WHERE u.tossHash = :tossHash ")
     Optional<String> findUuidByTossHash(@Param("tossHash") String tossHash);
