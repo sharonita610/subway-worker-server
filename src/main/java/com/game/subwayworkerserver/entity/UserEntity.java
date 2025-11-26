@@ -116,7 +116,7 @@ public class UserEntity extends BaseTimeEntity {
 
     public static UserEntity of(final String username, final String uuid, final Gender gender, final String email,
                                 final String realName, String tossHash) {
-        if (realName != null) {
+        if (tossHash != null) {
             return new UserEntity(
                     username,
                     uuid,
@@ -130,7 +130,8 @@ public class UserEntity extends BaseTimeEntity {
                     gender,
                     email,
                     realName,
-                    tossHash);
+                    tossHash
+            );
         }
         return new UserEntity(username, uuid, 0, 1, 0, 0, 0, 0, 0, gender);
     }
