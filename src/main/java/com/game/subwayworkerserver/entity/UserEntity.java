@@ -80,12 +80,16 @@ public class UserEntity extends BaseTimeEntity {
 
     private String tossHash;
 
+    private String tossUserKey;
+
     private LocalDate adFreeExpirationDate;
 
     private LocalDate lastAttendanceDate;
 
     public UserEntity(String name, String uuid, int exp, int level, int totalExp, int coin, int vacationTicket,
-                      int gachaTicket, int stage, Gender gender, String email, String realName, String tossHash) {
+                      int gachaTicket, int stage, Gender gender, String email, String realName, String tossHash,
+                      String tossUserKey
+    ) {
         this.name = name;
         this.uuid = uuid;
         this.exp = exp;
@@ -99,6 +103,7 @@ public class UserEntity extends BaseTimeEntity {
         this.email = email;
         this.realName = realName;
         this.tossHash = tossHash;
+        this.tossUserKey = tossUserKey;
     }
     public UserEntity(String name, String uuid, int exp, int level, int totalExp, int coin, int vacationTicket,
                       int gachaTicket, int stage, Gender gender) {
@@ -115,7 +120,7 @@ public class UserEntity extends BaseTimeEntity {
     }
 
     public static UserEntity of(final String username, final String uuid, final Gender gender, final String email,
-                                final String realName, String tossHash) {
+                                final String realName, String tossHash, String tossUserKey) {
         if (tossHash != null) {
             return new UserEntity(
                     username,
@@ -130,7 +135,8 @@ public class UserEntity extends BaseTimeEntity {
                     gender,
                     email,
                     realName,
-                    tossHash
+                    tossHash,
+                    tossUserKey
             );
         }
         return new UserEntity(username, uuid, 0, 1, 0, 0, 0, 0, 0, gender);
