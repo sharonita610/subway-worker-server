@@ -52,7 +52,7 @@ public class UserService {
         Gender userGender = Gender.fromString(request.gender());
         UserEntity userEntity = UserEntity.of(
                 request.username(), UUID.randomUUID().toString(), userGender, request.email(), request.realName(),
-                request.tossHash()
+                request.tossHash(), request.tossUserKey()
         );
         UserEntity savedUser = userRepository.save(userEntity);
 
