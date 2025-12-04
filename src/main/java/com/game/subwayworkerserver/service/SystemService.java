@@ -127,6 +127,9 @@ public class SystemService {
     public CheckInListResponse getCheckInRewardList(final String uuid) {
         UserEntity user = getUserByUuid(uuid);
         int claimedRewardDayUpTo = user.getClaimedRewardDayUpTo();
+        if(user.isCycleCompleted() && user.getConsecutiveAttendanceDays() == 1 && claimedRewardDayUpTo > 0){
+            claimedRewardDayUpTo = 0;
+        }
         List<CheckInReward> allRewards = CheckInReward.getAllRewards();
         List<UserCheckInReward> userCheckInRewards = UserCheckInReward.toDomain(claimedRewardDayUpTo, allRewards);
         return CheckInListResponse.of(userCheckInRewards);
