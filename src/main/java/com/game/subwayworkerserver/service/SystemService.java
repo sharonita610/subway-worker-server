@@ -143,7 +143,7 @@ public class SystemService {
 
         int currentDayToProcess = claimedRewardDayUpTo + 1;
 
-        if(cycleCompleted && claimedRewardDayUpTo < MAX_CYCLE_DAY) {
+        if(cycleCompleted && claimedRewardDayUpTo > 0 && claimedRewardDayUpTo < MAX_CYCLE_DAY) {
 
             while (currentDayToProcess <= MAX_CYCLE_DAY) {
                 CheckInReward reward = CheckInReward.getRewardByDay(currentDayToProcess);
@@ -151,7 +151,6 @@ public class SystemService {
                 currentDayToProcess++;
             }
             user.updateClaimDailyRewardDone(MAX_CYCLE_DAY);
-            user.resetCycle();
 
             claimedRewardDayUpTo = 0;
         }
