@@ -34,6 +34,8 @@ public class SystemService {
     private final RewardProcessor rewardProcessor;
     private final UserSubscriptionRepository subscriptionRepository;
 
+    private static final int MAX_CYCLE_DAY = 7;
+
     public UserMailBoxResponse getMailBox(final String uuid) {
         UserEntity user = getUserByUuid(uuid);
         List<MailEntity> mailList = mailRepository.findAllByUserIdAndExpiresAtAfter(user.getId(), LocalDate.now());
@@ -133,27 +135,44 @@ public class SystemService {
     @Transactional
     public void claimCheckInReward(final String uuid) {
         UserEntity user = getUserByUuid(uuid);
+        boolean cycleCompleted = user.isCycleCompleted();
         int consecutiveAttendanceDays = user.getConsecutiveAttendanceDays();
         int claimedRewardDayUpTo = user.getClaimedRewardDayUpTo();
 
-        validateClaimDates(consecutiveAttendanceDays, claimedRewardDayUpTo);
+        validateClaimDates(consecutiveAttendanceDays, claimedRewardDayUpTo, cycleCompleted);
 
         int currentDayToProcess = claimedRewardDayUpTo + 1;
-        int finalDayClaimed = claimedRewardDayUpTo;
 
-        while (currentDayToProcess <= consecutiveAttendanceDays) {
+        if(cycleCompleted && claimedRewardDayUpTo < MAX_CYCLE_DAY) {
 
-            CheckInReward reward = CheckInReward.getRewardByDay(currentDayToProcess);
-            rewardProcessor.processAttendanceReward(user, reward, currentDayToProcess);
+            while (currentDayToProcess <= MAX_CYCLE_DAY) {
+                CheckInReward reward = CheckInReward.getRewardByDay(currentDayToProcess);
+                rewardProcessor.processAttendanceReward(user, reward, currentDayToProcess);
+                currentDayToProcess++;
+            }
+            user.updateClaimDailyRewardDone(MAX_CYCLE_DAY);
+            user.resetCycle();
 
-            finalDayClaimed = currentDayToProcess;
-            currentDayToProcess++;
+            claimedRewardDayUpTo = 0;
         }
 
-        user.updateClaimDailyRewardDone(finalDayClaimed);
+        currentDayToProcess = claimedRewardDayUpTo + 1;
+        while (currentDayToProcess <= consecutiveAttendanceDays) {
+            CheckInReward reward = CheckInReward.getRewardByDay(currentDayToProcess);
+            rewardProcessor.processAttendanceReward(user, reward, currentDayToProcess);
+            currentDayToProcess++;
+        }
+        user.updateClaimDailyRewardDone(currentDayToProcess - 1);
     }
 
-    private static void validateClaimDates(int consecutiveAttendanceDays, int claimedRewardDayUpTo) {
+    private static void validateClaimDates(
+            int consecutiveAttendanceDays, int claimedRewardDayUpTo, boolean cycleCompleted
+    ) {
+
+        if(cycleCompleted) {
+            return;
+        }
+
         if (consecutiveAttendanceDays == 0) {
             throw new BaseException(ErrorCode.BAD_REQUEST, "현재 수령 가능한 출석 보상이 없습니다.");
         }
