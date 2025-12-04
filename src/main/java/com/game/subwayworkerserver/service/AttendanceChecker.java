@@ -13,21 +13,15 @@ public class AttendanceChecker {
         LocalDate today = LocalDate.now();
         LocalDate lastDate = user.getLastAttendanceDate();
 
-        if (lastDate != null) {
-            if (lastDate.isEqual(today)) {
-                return;
-            }
-
-            LocalDate yesterday = today.minusDays(1);
-            if (lastDate.isBefore(yesterday)) {
-                user.resetDailyAttendance();
-                return;
-            }
-            if (lastDate.isEqual(yesterday)) {
-                user.dailyAttendanceCheck();
-                return;
-            }
+        if (lastDate != null && lastDate.isEqual(today)) {
+            return;
         }
-        user.resetDailyAttendance();
+
+        LocalDate yesterday = today.minusDays(1);
+        if (lastDate == null || lastDate.isBefore(yesterday)) {
+            user.resetDailyAttendance();
+        }
+
+        user.dailyAttendanceCheck();
     }
 }
