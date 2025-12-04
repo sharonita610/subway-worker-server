@@ -20,6 +20,7 @@ public class AttendanceChecker {
         LocalDate yesterday = today.minusDays(1);
         if (lastDate == null || lastDate.isBefore(yesterday)) {
             user.resetDailyAttendance();
+            return;
         }
 
         user.dailyAttendanceCheck();

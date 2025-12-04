@@ -266,6 +266,9 @@ public class UserEntity extends BaseTimeEntity {
         if (this.consecutiveAttendanceDays == 7) {
             this.consecutiveAttendanceDays = 1;
             this.cycleCompleted = true;
+            if(this.claimedRewardDayUpTo == 7) {
+                this.claimedRewardDayUpTo = 0;
+            }
         } else {
             this.consecutiveAttendanceDays += 1;
         }
@@ -276,6 +279,7 @@ public class UserEntity extends BaseTimeEntity {
         this.hasDailyCheckInReward = true;
         this.consecutiveAttendanceDays = 1;
         this.cycleCompleted = false;
+        this.claimedRewardDayUpTo = 0;
     }
 
     public void extendAdFreeBenefit(final int daysToExtend) {
@@ -301,6 +305,7 @@ public class UserEntity extends BaseTimeEntity {
         this.claimedRewardDayUpTo = dayClaimed;
         this.hasDailyCheckInReward = false;
         this.hasPendingMail = true;
+        this.cycleCompleted = false;
     }
 
     public void hasMailToCheck() {
@@ -332,9 +337,5 @@ public class UserEntity extends BaseTimeEntity {
         } else if (stageRewardInfo.extraReward().name().equals("GACHA_TICKET")) {
             this.gachaTicket += stageRewardInfo.extraReward().quantity();
         }
-    }
-
-    public void resetCycle() {
-        this.cycleCompleted = false;
     }
 }
