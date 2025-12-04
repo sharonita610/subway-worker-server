@@ -74,6 +74,9 @@ public class UserEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private int claimedRewardDayUpTo = 0;
 
+    @Column(nullable = false)
+    private boolean cycleCompleted = false;
+
     private String email;
 
     private String realName;
@@ -105,6 +108,7 @@ public class UserEntity extends BaseTimeEntity {
         this.tossHash = tossHash;
         this.tossUserKey = tossUserKey;
     }
+
     public UserEntity(String name, String uuid, int exp, int level, int totalExp, int coin, int vacationTicket,
                       int gachaTicket, int stage, Gender gender) {
         this.name = name;
@@ -259,13 +263,19 @@ public class UserEntity extends BaseTimeEntity {
     public void dailyAttendanceCheck() {
         this.lastAttendanceDate = LocalDate.now();
         this.hasDailyCheckInReward = true;
-        this.consecutiveAttendanceDays += 1;
+        if (this.consecutiveAttendanceDays == 7) {
+            this.consecutiveAttendanceDays = 1;
+            this.cycleCompleted = true;
+        } else {
+            this.consecutiveAttendanceDays += 1;
+        }
     }
 
     public void resetDailyAttendance() {
         this.lastAttendanceDate = LocalDate.now();
         this.hasDailyCheckInReward = true;
         this.consecutiveAttendanceDays = 1;
+        this.cycleCompleted = false;
     }
 
     public void extendAdFreeBenefit(final int daysToExtend) {
@@ -320,7 +330,11 @@ public class UserEntity extends BaseTimeEntity {
         } else if (stageRewardInfo.coin() != 0) {
             this.coin += stageRewardInfo.coin();
         } else if (stageRewardInfo.extraReward().name().equals("GACHA_TICKET")) {
-           this.gachaTicket += stageRewardInfo.extraReward().quantity();
+            this.gachaTicket += stageRewardInfo.extraReward().quantity();
         }
+    }
+
+    public void resetCycle() {
+        this.cycleCompleted = false;
     }
 }
