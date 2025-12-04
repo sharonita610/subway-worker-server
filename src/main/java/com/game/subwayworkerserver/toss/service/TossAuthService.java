@@ -9,10 +9,12 @@ import com.game.subwayworkerserver.toss.dto.RefreshTokenRequest;
 import com.game.subwayworkerserver.toss.util.DecryptUserInfo;
 import com.game.subwayworkerserver.toss.util.TossAuthConfig;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TossAuthService {
@@ -34,7 +36,7 @@ public class TossAuthService {
         } catch (BaseException e) {
             throw e;
         } catch (Throwable e) {
-            System.err.println(apiName + " API 호출 실패: " + e.getMessage());
+            log.error("{} API 호출 실패: {}", apiName, e.getMessage());
             throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR, apiName + " 처리 중 외부 시스템 오류가 발생했습니다.");
         }
     }
@@ -43,16 +45,14 @@ public class TossAuthService {
     public ApiResponse<Map<String, Object>> getAccessToken(GetAccessTokenRequest request) {
         return handleApiCall(() -> {
             ApiResponse<Map<String, Object>> post = tossApiClient.post("/generate-token", request);
-            System.out.println("Toss API 응답: " + post.data());
+            log.info("Toss API 응답 정상 반환.");
             return post;
         }, "AccessToken 발급");
     }
 
     // AccessToken 재발급
     public ApiResponse<Map<String, Object>> refreshAccessToken(RefreshTokenRequest request) {
-        return handleApiCall(() -> {
-            return tossApiClient.post("/refresh-token", request);
-        }, "AccessToken 재발급");
+        return handleApiCall(() -> tossApiClient.post("/refresh-token", request), "AccessToken 재발급");
     }
 
     // 사용자 정보 조회 (복호화 포함)
