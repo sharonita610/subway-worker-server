@@ -125,6 +125,10 @@ public class SystemController {
                 .body(resource);
     }
 
+    @Operation(
+            summary = "system 메일을 보내는 기능 [완]",
+            description = "사용자에게 system 메일을 보상과 함께 제공하는 기능"
+    )
     @PostMapping("/system/mail")
     public ResponseEntity<HttpStatus> sendSystemMail(@Valid @RequestBody SystemMailRequest request) {
         systemService.sendSystemMail(request);
