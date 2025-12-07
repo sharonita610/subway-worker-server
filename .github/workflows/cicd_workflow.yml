@@ -129,8 +129,8 @@ jobs:
             # 1. ECR 로그인 (EC2에서 ECR에 접근할 권한이 필요함 - IAM Role 권장)
             aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
             
-            RDS_PASSWORD=$(aws ssm get-parameter --name "/config/subway_worker/dev/rds_password" --with-decryption --query "Parameter.Value" --output text --region ${{ env.AWS_REGION }})
-            REDIS_PASSWORD=$(aws ssm get-parameter --name "/config/subway_worker/dev/redis_password" --with-decryption --query "Parameter.Value" --output text --region ${{ env.AWS_REGION }})
+            RDS_PASSWORD=$(aws ssm get-parameter --name "/config/subway_worker/prod/rds_password" --with-decryption --query "Parameter.Value" --output text --region ${{ env.AWS_REGION }})
+            REDIS_PASSWORD=$(aws ssm get-parameter --name "/config/subway_worker/prod/redis_password" --with-decryption --query "Parameter.Value" --output text --region ${{ env.AWS_REGION }})
             
             # 2. 이미지 Pull 및 기존 컨테이너 중지/제거
             ECR_URI="${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/commute_adventure_dev:${{ needs.build-and-push.outputs.tag }}"
@@ -139,8 +139,7 @@ jobs:
             docker rm dev-server || true
             
             # 3. 새로운 컨테이너 실행 (Dev 프로파일 활성화)
-            docker run -d --name dev-server -p 80:8080 -e SPRING_PROFILES_ACTIVE=dev -e RDS_PASSWORD="$RDS_PASSWORD" \ -e REDIS_PASSWORD="$REDIS_PASSWORD" $ECR_URI
-            
+            docker run -d --name dev-server -p 80:8080 -e SPRING_PROFILES_ACTIVE=dev -e RDS_PASSWORD="$RDS_PASSWORD" -e REDIS_PASSWORD="$REDIS_PASSWORD" $ECR_URI             
             docker ps -a
 
   # ===============================================
