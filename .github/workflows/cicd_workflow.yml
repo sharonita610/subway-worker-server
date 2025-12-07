@@ -38,6 +38,11 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      - name: Set dynamic image tag
+        id: set_tag
+        run: echo "IMAGE_TAG=$(date +'%Y-%m-%d-%H%M%S')" >> $GITHUB_ENV
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build JAR for Docker
@@ -110,7 +115,7 @@ jobs:
             aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
             
             # 2. 이미지 Pull 및 기존 컨테이너 중지/제거
-            ECR_URI="${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/commute-adventure-dev:${{ needs.build-and-push.outputs.tag }}"
+            ECR_URI="${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/commute_adventure_dev:${{ needs.build-and-push.outputs.tag }}"
             docker pull $ECR_URI
             docker stop dev-server || true
             docker rm dev-server || true
@@ -159,7 +164,7 @@ jobs:
             aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
             
             # 2. 이미지 Pull 및 기존 컨테이너 중지/제거
-            ECR_URI="${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/commute-adventure-prod:${{ needs.build-and-push.outputs.tag }}"
+            ECR_URI="${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/commute_adventure_prod:${{ needs.build-and-push.outputs.tag }}"
             docker pull $ECR_URI
             docker stop prod-server || true
             docker rm prod-server || true
