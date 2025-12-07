@@ -65,9 +65,9 @@ jobs:
         id: repo_name_setter
         run: |
           if [ "${{ github.ref_name }}" == "main" ]; then
-            echo "ECR_REPOSITORY=commute-adventure-prod" >> $GITHUB_ENV
+            echo "ECR_REPOSITORY=commute_adventure_prod" >> $GITHUB_ENV
           else
-            echo "ECR_REPOSITORY=commute-adventure-dev" >> $GITHUB_ENV
+            echo "ECR_REPOSITORY=commute_adventure_dev" >> $GITHUB_ENV
           fi
 
       # 🌟 Docker 이미지 빌드
