@@ -10,6 +10,7 @@ spring:
     paramstore:
       enable: true
       profile-separator: _
+
   datasource:
     url: jdbc:mysql://subway-worker-db.c7iwywymw7wj.ap-southeast-2.rds.amazonaws.com:3306/subway_dev_db?serverTimezone=UTC&characterEncoding=UTF-8&useSSL=false    # username과 password 변수는 Prod와 동일한 Secret/Parameter Store 키를 사용합니다.
     username: admin
@@ -21,8 +22,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
   data:
     redis:
       host: REDACTED
       port: 6379
-      username: default
