@@ -9,7 +9,7 @@ on:
 env:
   # AWS ECR 설정 (계정 ID 및 리전은 스크린샷 기반으로 고정)
   AWS_REGION: ap-southeast-2
-  AWS_ACCOUNT_ID: REDACTED
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID_SECRET }}
 
   # 이미지 이름 및 태그 (Git SHA를 고유 태그로 사용)
   IMAGE_NAME: subway-worker-server
@@ -133,7 +133,7 @@ jobs:
 
     environment:
       name: Production
-      url: http://commute-adventure.com # 실제 도메인 주소로 수정
+      url: https://commute-adventure.com # 실제 도메인 주소로 수정
 
     runs-on: ubuntu-latest
     steps:
