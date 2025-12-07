@@ -27,6 +27,3 @@ spring:
       host: REDACTED
       port: 6379
       username: default
-      password: ${redis_password}
-      ssl:
-        enabled: true
