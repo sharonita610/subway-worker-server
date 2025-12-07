@@ -93,6 +93,21 @@ jobs:
     if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     steps:
+      - name: Get RDS Password from Parameter Store
+        uses: aws-actions/aws-ssm-parameter-store-action@v1
+        with:
+          parameter-name: /config/subway_worker/prod/rds_password
+          output-variable: RDS_PASSWORD
+          withDecryption: true
+
+      # 🌟 Redis 비밀번호 가져오기
+      - name: Get Redis Password from Parameter Store
+        uses: aws-actions/aws-ssm-parameter-store-action@v1
+        with:
+          parameter-name: /config/subway_worker/prod/redis_password
+          output-variable: REDIS_PASSWORD
+          withDecryption: true
+
       # 🌟 AWS ECR 인증 및 접속 (EC2 SSH에서 Pull하기 위해)
       - name: Configure AWS Credentials for SSH
         uses: aws-actions/configure-aws-credentials@v4
