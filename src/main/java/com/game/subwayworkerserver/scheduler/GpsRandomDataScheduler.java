@@ -38,8 +38,8 @@ public class GpsRandomDataScheduler {
     private static final double MIN_LON = 126.5; // 인천 서해안 일부 포함
     private static final double MAX_LON = 127.0; // 서울 강남/경기 광주 일부 포함
 
-    private static final double LAT_STEP = 0.009;
-    private static final double LON_STEP = 0.009;
+    private static final double LAT_STEP = 0.900;
+    private static final double LON_STEP = 0.900;
 
     // Grid 셀당 생성할 아이템 수
     private static final int COWORKER_PER_CELL = 1;
