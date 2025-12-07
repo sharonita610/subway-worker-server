@@ -119,5 +119,5 @@ jobs:
             docker rm dev-server || true
             
             # 3. 새로운 컨테이너 실행 (Dev 프로파일 활성화)
-            docker run -d --name dev-server -p 80:8080 -e SPRING_PROFILES_ACTIVE=dev -e RDS_PASSWORD="$RDS_PASSWORD" $ECR_URI             
+            docker run -d --name dev-server -p 80:8080 -e SPRING_PROFILES_ACTIVE=dev -e RDS_PASSWORD="$RDS_PASSWORD" --dns 172.31.0.2 $ECR_URI             
             docker ps -a
