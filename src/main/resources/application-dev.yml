@@ -27,3 +27,5 @@ spring:
     redis:
       host: REDACTED
       port: 6379
+      ssl:
+        enabled: true
