@@ -1,0 +1,174 @@
+name: CI/CD Pipeline for Subway Worker Server (Docker)
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+env:
+  # AWS ECR 설정 (계정 ID 및 리전은 스크린샷 기반으로 고정)
+  AWS_REGION: ap-southeast-2
+  AWS_ACCOUNT_ID: REDACTED
+
+  # 이미지 이름 및 태그 (Git SHA를 고유 태그로 사용)
+  IMAGE_NAME: subway-worker-server
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  # ===============================================
+  # 1. BUILD & PUSH JOB (공통)
+  # ===============================================
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # OIDC 인증을 위해 필요
+    outputs:
+      tag: ${{ env.IMAGE_TAG }}
+      branch: ${{ github.ref_name }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 🌟 Dockerfile 빌드를 위해 Gradle로 JAR 파일 생성 (테스트 제외)
+      - name: Set up Java 17 & Build JAR
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build JAR for Docker
+        run: ./gradlew clean build -x test
+
+      # 🌟 AWS ECR 인증 및 접속 (OIDC 사용)
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} # Secret 필요
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # Secret 필요
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # ECR 레포지토리 이름 결정
+      - name: Set ECR Repository Name
+        id: repo_name_setter
+        run: |
+          if [ "${{ github.ref_name }}" == "main" ]; then
+            echo "ECR_REPOSITORY=commute-adventure-prod" >> $GITHUB_ENV
+          else
+            echo "ECR_REPOSITORY=commute-adventure-dev" >> $GITHUB_ENV
+          fi
+
+      # 🌟 Docker 이미지 빌드
+      - name: Build Docker Image
+        run: |
+          docker build \
+            -t ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
+            -f Dockerfile .
+
+      # 🌟 Docker 이미지 태그 및 ECR로 푸시
+      - name: Push Docker Image to ECR
+        run: |
+          ECR_URI=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}
+          docker tag ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} $ECR_URI:${{ env.IMAGE_TAG }}
+          docker push $ECR_URI:${{ env.IMAGE_TAG }}
+
+  # ===============================================
+  # 2. DEV DEPLOYMENT (develop 브랜치 - 자동 배포)
+  # ===============================================
+  deploy-dev:
+    name: DEV Auto Deployment (Docker)
+    needs: build-and-push
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    steps:
+      # 🌟 AWS ECR 인증 및 접속 (EC2 SSH에서 Pull하기 위해)
+      - name: Configure AWS Credentials for SSH
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }} # DEV용 Secret 필요
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }} # DEV용 Secret 필요
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 🌟 Dev EC2에 SSH 접속하여 이미지 Pull 및 실행
+      - name: Pull and Run Docker Container on DEV EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEV_EC2_HOST }}
+          username: ${{ secrets.DEV_EC2_USER }}
+          key: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
+          port: 22
+          timeout: 60s
+          script: |
+            # 1. ECR 로그인 (EC2에서 ECR에 접근할 권한이 필요함 - IAM Role 권장)
+            aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+            
+            # 2. 이미지 Pull 및 기존 컨테이너 중지/제거
+            ECR_URI="${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/commute-adventure-dev:${{ needs.build-and-push.outputs.tag }}"
+            docker pull $ECR_URI
+            docker stop dev-server || true
+            docker rm dev-server || true
+            
+            # 3. 새로운 컨테이너 실행 (Dev 프로파일 활성화)
+            docker run -d --name dev-server \
+              -p 80:8080 \
+              -e SPRING_PROFILES_ACTIVE=dev \
+              $ECR_URI
+            
+            docker ps -a
+
+  # ===============================================
+  # 3. PROD DEPLOYMENT (main 브랜치 - 수동 배포)
+  # ===============================================
+  deploy-prod:
+    name: PROD Manual Deployment (Docker)
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+
+    environment:
+      name: Production
+      url: http://commute-adventure.com # 실제 도메인 주소로 수정
+
+    runs-on: ubuntu-latest
+    steps:
+      # 🌟 AWS ECR 인증 및 접속 (EC2 SSH에서 Pull하기 위해)
+      - name: Configure AWS Credentials for SSH
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} # PROD용 Secret 사용
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # PROD용 Secret 사용
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 🌟 Prod EC2에 SSH 접속하여 이미지 Pull 및 실행
+      - name: Pull and Run Docker Container on PROD EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          timeout: 60s
+          script: |
+            # 1. ECR 로그인
+            aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+            
+            # 2. 이미지 Pull 및 기존 컨테이너 중지/제거
+            ECR_URI="${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/commute-adventure-prod:${{ needs.build-and-push.outputs.tag }}"
+            docker pull $ECR_URI
+            docker stop prod-server || true
+            docker rm prod-server || true
+            
+            # 3. 새로운 컨테이너 실행 (Prod 프로파일 활성화)
+            # -p 443:8080: HTTPS 설정을 위해 443 포트에 연결한다고 가정
+            docker run -d --name prod-server \
+              -p 443:8080 \
+              -e SPRING_PROFILES_ACTIVE=prod \
+              $ECR_URI
+            
+            docker ps -a
