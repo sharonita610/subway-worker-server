@@ -32,18 +32,18 @@ public class GpsRandomDataScheduler {
     private static final String COWORKER_DATA_PREFIX = "coworker:data:";
     private static final long MAP_DATA_TTL_HOURS = 3;
 
-    // 서울/수도권 및 인천/성남/경기 동부 일부 확장 범위
-    private static final double MIN_LAT = 35.0; // 부산 남부 포함
-    private static final double MAX_LAT = 38.5; // 전국 북부 포괄
-    private static final double MIN_LON = 126.0; // 서해안 포괄
-    private static final double MAX_LON = 129.5; // 부산 동부 포괄
+    // 인천 부평구 (대략 37.48N, 126.72E) 및 서울 강서구 (대략 37.56N, 126.82E) 포함
+    private static final double MIN_LAT = 37.3; // 인천 남부(송도/연수) 포함
+    private static final double MAX_LAT = 37.7; // 서울 북부/고양시 일부 포함
+    private static final double MIN_LON = 126.5; // 인천 서해안 일부 포함
+    private static final double MAX_LON = 127.0; // 서울 강남/경기 광주 일부 포함
 
-    private static final double LAT_STEP = 0.018;
-    private static final double LON_STEP = 0.022;
+    private static final double LAT_STEP = 0.009;
+    private static final double LON_STEP = 0.009;
 
     // Grid 셀당 생성할 아이템 수
-    private static final int COWORKER_PER_CELL = 10;
-    private static final int GIFTS_PER_CELL = 4; // 선물상자 수
+    private static final int COWORKER_PER_CELL = 1;
+    private static final int GIFTS_PER_CELL = 1; // 선물상자 수
     private static final double MAX_JITTER = 0.008; // 셀 내에서 흩뿌릴 최대 오프셋
 
 
