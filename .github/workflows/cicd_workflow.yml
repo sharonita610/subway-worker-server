@@ -130,7 +130,6 @@ jobs:
             aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
             
             RDS_PASSWORD=$(aws ssm get-parameter --name "/config/subway_worker/prod/rds_password" --with-decryption --query "Parameter.Value" --output text --region ${{ env.AWS_REGION }})
-#            REDIS_PASSWORD=$(aws ssm get-parameter --name "/config/subway_worker/prod/redis_password" --with-decryption --query "Parameter.Value" --output text --region ${{ env.AWS_REGION }})
             
             # 2. 이미지 Pull 및 기존 컨테이너 중지/제거
             ECR_URI="${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/commute_adventure_dev:${{ needs.build-and-push.outputs.tag }}"
