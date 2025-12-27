@@ -60,7 +60,7 @@ public class SkillCardMarketService {
 
     public SkillOnSaleResponse getMySkillCardOnSale(final String uuid) {
         UserEntity user = findUserByUuid(uuid);
-        List<SkillCardMarketEntity> skillCardOnSale = skillCardMarketRepository.findAllBySellerId(user.getId());
+        List<SkillCardMarketEntity> skillCardOnSale = skillCardMarketRepository.findAllBySellerIdOrderByIdDesc(user.getId());
         List<Long> skillCardIds = getSkillCardIds(skillCardOnSale);
         List<SkillCardEntity> skillCardEntityList = skillCardRepository.findAllByIdIn(skillCardIds);
         List<SkillCardOnSale> coworkerOnSalesDomainList = SkillCardOnSale.toDomain(skillCardOnSale, skillCardEntityList);
