@@ -28,17 +28,27 @@ public class GpsController {
     private final CaptureCoworkerService captureCoworkerService;
     private final TrapService trapService;
 
+//    @Operation(
+//            summary = "요청받은 좌표기준 기준 랜덤 생성된 아이템(기프트박스, 동료) 리스트 조회 [완]",
+//            description = "유저의 좌표 기준 요청한 반경에 깔린 아이템의 리스트를 조회",
+//            responses = {
+//                    @ApiResponse(responseCode = "200", description = "좌표와 아이템을 리스트 조회")
+//            }
+//    )
+//    @PostMapping("/gps/random-items")
+//    public ResponseEntity<RandomGpsResponse> getGpsInfo(@RequestBody @Valid GpsRequest request){
+//        String uuid = SecurityUtils.getCurrentUserUuid();
+//        return ResponseEntity.ok(gpsService.findItemsInArea(request, uuid));
+//    }
+
     @Operation(
-            summary = "요청받은 좌표기준 기준 랜덤 생성된 아이템(기프트박스, 동료) 리스트 조회 [완]",
-            description = "유저의 좌표 기준 요청한 반경에 깔린 아이템의 리스트를 조회",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "좌표와 아이템을 리스트 조회")
-            }
+            summary = "새로운 데이터 생성을 위한 api",
+            description = "유저의 좌표 기준 1키로미터 반경에 아이템을 생성하고 조회하는 기능"
     )
     @PostMapping("/gps/random-items")
-    public ResponseEntity<RandomGpsResponse> getGpsInfo(@RequestBody @Valid GpsRequest request){
+    public ResponseEntity<RandomGpsResponse> createAndGetItems(@RequestBody @Valid GpsRequest request){
         String uuid = SecurityUtils.getCurrentUserUuid();
-        return ResponseEntity.ok(gpsService.findItemsInArea(request, uuid));
+        return ResponseEntity.ok(gpsService.createAndGetItems(request, uuid));
     }
 
     @Operation(
