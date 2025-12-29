@@ -43,7 +43,6 @@ jobs:
             # 4. 컨테이너 실행
             docker run -d --name prod-server -p 8080:8080 \
               -e SPRING_PROFILES_ACTIVE=prod \
-              -e RDS_PASSWORD="$RDS_PASSWORD" \
               $ECR_URI
             
             docker ps
