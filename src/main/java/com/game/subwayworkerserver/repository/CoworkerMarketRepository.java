@@ -10,7 +10,7 @@ public interface CoworkerMarketRepository extends JpaRepository<CoworkerMarketEn
 
     List<CoworkerMarketEntity> findAllByAvailableTrueAndSoldFalseAndSellerIdNot(long userId);
 
-    List<CoworkerMarketEntity> findAllBySellerId(long userId);
+    List<CoworkerMarketEntity> findAllBySellerIdOrderByIdDesc(long userId);
 
     Optional<CoworkerMarketEntity> findByIdAndAvailableTrueAndSoldFalse(final long marketId);
 

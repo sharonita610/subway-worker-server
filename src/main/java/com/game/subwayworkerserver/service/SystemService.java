@@ -38,7 +38,7 @@ public class SystemService {
 
     public UserMailBoxResponse getMailBox(final String uuid) {
         UserEntity user = getUserByUuid(uuid);
-        List<MailEntity> mailList = mailRepository.findAllByUserIdAndExpiresAtAfter(user.getId(), LocalDate.now());
+        List<MailEntity> mailList = mailRepository.findAllByUserIdAndExpiresAtAfterOrderByIdDesc(user.getId(), LocalDate.now());
         List<Long> mailIdList = getMailIdList(mailList);
         List<RewardEntity> allByMailIdIn = rewardRepository.findAllByMailIdIn(mailIdList);
         List<MailReward> domainList = MailReward.toDomain(mailList, allByMailIdIn);
