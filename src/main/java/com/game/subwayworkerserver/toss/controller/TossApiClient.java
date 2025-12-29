@@ -6,11 +6,13 @@ import com.game.subwayworkerserver.toss.service.TossSecretsLoader;
 import com.game.subwayworkerserver.toss.util.TossAuthConfig;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import javax.net.ssl.SSLContext;
 
+@Profile("!dev")
 @Component
 @RequiredArgsConstructor
 public class TossApiClient {

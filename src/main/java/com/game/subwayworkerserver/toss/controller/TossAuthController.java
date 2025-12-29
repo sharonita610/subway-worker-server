@@ -9,12 +9,14 @@ import com.game.subwayworkerserver.toss.service.ApiResponse;
 import com.game.subwayworkerserver.toss.service.TossAuthService;
 import com.game.subwayworkerserver.toss.service.TossUserDataProcessor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Profile("!dev")
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor

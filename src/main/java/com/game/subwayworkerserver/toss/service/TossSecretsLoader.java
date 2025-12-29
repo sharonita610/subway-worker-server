@@ -3,6 +3,7 @@ package com.game.subwayworkerserver.toss.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.game.subwayworkerserver.toss.util.TossAuthConfig;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
  import software.amazon.awssdk.regions.Region;
  import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+@Profile("!dev")
 @Component
 @RequiredArgsConstructor
 public class TossSecretsLoader { // SecretsLoader 대신 구체적인 이름 사용
