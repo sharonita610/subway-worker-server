@@ -1,4 +1,4 @@
-name: CI/CD Pipeline for Subway Worker Server (Docker)
+name: "[DEV] - CI/CD to dev server"
 
 on:
   push:
