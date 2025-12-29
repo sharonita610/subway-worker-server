@@ -27,7 +27,7 @@ public class GpsItemsCreator {
 
     private static final long MAP_DATA_TTL_HOURS = 3;
     private static final double GRID_SIZE = 0.01;
-    private static final int COWORKER_COUNT = 3;
+    private static final int COWORKER_COUNT = 2;
     private static final int GIFTS_COUNT = 1;
     private static final double MAX_JITTER = 0.004;
 
@@ -51,7 +51,6 @@ public class GpsItemsCreator {
                 if (Boolean.TRUE.equals(acquired)) {
                     try {
                         if (Boolean.FALSE.equals(redisTemplate.opsForSet().isMember(VISITED_GRID_KEY, gridId))) {
-                            log.info("--- [New Area] 구역 생성 시작: {} ---", gridId);
                             generateDataWithPipeline(targetLat, targetLon, gridId);
                         }
                     } finally {

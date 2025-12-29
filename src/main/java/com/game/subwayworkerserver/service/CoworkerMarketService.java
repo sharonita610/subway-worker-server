@@ -42,7 +42,7 @@ public class CoworkerMarketService {
     }
 
     private List<CoworkerEntity> findCoworkersOnSaleByCoworkerIds(List<Long> coworkerIds) {
-        return coworkerRepository.findAllByIdInAndOnSale(coworkerIds, true);
+        return coworkerRepository.findAllByIdIn(coworkerIds);
     }
 
     private static List<Long> getCoworkersId(List<CoworkerMarketEntity> marketCoworkers) {
@@ -59,7 +59,7 @@ public class CoworkerMarketService {
 
     public MyCoworkersMarketResponse getMyCoworkerOnSale(final String uuid) {
         UserEntity user = findUserByUuid(uuid);
-        List<CoworkerMarketEntity> coworkersOnSale = coworkerMarketRepository.findAllBySellerId(user.getId());
+        List<CoworkerMarketEntity> coworkersOnSale = coworkerMarketRepository.findAllBySellerIdOrderByIdDesc(user.getId());
         List<Long> coworkersId = getCoworkersId(coworkersOnSale);
         List<CoworkerEntity> coworkersOnSaleByCoworkerIds = findCoworkersOnSaleByCoworkerIds(coworkersId);
         List<CoworkerOnSale> coworkerOnSalesDomainList = CoworkerOnSale.toDomain(coworkersOnSale, coworkersOnSaleByCoworkerIds);

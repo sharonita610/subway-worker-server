@@ -1,0 +1,50 @@
+name: "[PROD] - Deploy image to prod"
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: '배포할 이미지 태그 (예: latest)'
+        required: true
+        default: 'latest'
+
+env:
+  AWS_REGION: ap-southeast-2
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID_SECRET }}
+  ECR_REPOSITORY: commute_adventure_prod
+
+jobs:
+  deploy-prod:
+    name: Production Deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          # dev에서 성공했던 Secret 명칭 그대로 사용
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # 1. ECR 로그인
+            aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID_SECRET }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+            
+            # 2. 8080 포트 강제 해방 (이미 실행 중인 자바나 컨테이너가 있다면 무조건 종료)
+            # fuser 명령어를 사용하여 해당 포트를 점유한 프로세스를 찾아 kill 합니다.
+            sudo fuser -k 8080/tcp || true
+            
+            # 3. 기존 도커 컨테이너 정리
+            docker stop prod-server || true
+            docker rm prod-server || true
+            
+            # 4. 이미지 Pull 및 실행
+            ECR_URI="${{ secrets.AWS_ACCOUNT_ID_SECRET }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.event.inputs.image_tag }}"
+            docker pull $ECR_URI
+            
+            docker run -d --name prod-server -p 8080:8080 \
+              -e SPRING_PROFILES_ACTIVE=prod \
+              -e RDS_PASSWORD="$(aws ssm get-parameter --name "/config/subway_worker/prod/rds_password" --with-decryption --query "Parameter.Value" --output text --region ${{ env.AWS_REGION }})" \
+              $ECR_URI
+            
+            # 5. 확인
+            docker ps

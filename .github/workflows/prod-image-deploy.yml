@@ -1,0 +1,57 @@
+name: "[PROD] - Build & Push prod image"
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: ap-southeast-2
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID_SECRET }}
+  ECR_REPOSITORY: commute_adventure_prod
+  IMAGE_NAME: subway-worker-server
+
+jobs:
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17 & Build JAR
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build JAR
+        run: ./gradlew clean build -x test
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & Push Docker Image
+        run: |
+          ECR_URI=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          UNIQUE_TAG=$(date +'%Y%m%d')-$SHORT_SHA
+          
+          docker build -t ${{ env.IMAGE_NAME }}:latest -f Dockerfile .
+          
+          # 고유 태그와 latest 태그 동시 푸시
+          docker tag ${{ env.IMAGE_NAME }}:latest $ECR_URI:$UNIQUE_TAG
+          docker tag ${{ env.IMAGE_NAME }}:latest $ECR_URI:latest
+          docker push $ECR_URI:$UNIQUE_TAG
+          docker push $ECR_URI:latest

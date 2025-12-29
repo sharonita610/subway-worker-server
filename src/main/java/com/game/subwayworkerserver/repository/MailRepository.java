@@ -10,5 +10,5 @@ public interface MailRepository extends CrudRepository<MailEntity, Long> {
 
     List<MailEntity> findByUserIdAndIsReadFalseAndIsClaimedFalse(final long userId);
 
-    List<MailEntity> findAllByUserIdAndExpiresAtAfter(long userId, LocalDate expiresAt);
+    List<MailEntity> findAllByUserIdAndExpiresAtAfterOrderByIdDesc(long userId, LocalDate expiresAt);
 }

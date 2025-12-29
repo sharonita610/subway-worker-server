@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.MDC;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -11,12 +12,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/**
- * 요청 헤더 "X-User-ID"에서 UUID를 추출하여 Security Context에 저장하는 필터.
- */
 public class UuidHeaderAuthenticationFilter extends OncePerRequestFilter {
 
     public static final String HEADER_USER_ID = "X-User-ID";
+    public static final String MDC_UUID_KEY = "request_id"; // 로그 포맷에서 쓸 키값
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -24,23 +23,26 @@ public class UuidHeaderAuthenticationFilter extends OncePerRequestFilter {
 
         String uuid = request.getHeader(HEADER_USER_ID);
 
-        // 1. UUID가 존재하고, 현재 Security Context에 인증 정보가 없을 경우에만 처리
-        if (uuid != null && !uuid.trim().isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
+        try {
+            if (uuid != null && !uuid.trim().isEmpty()) {
+                MDC.put(MDC_UUID_KEY, uuid);
+            } else {
+                MDC.put(MDC_UUID_KEY, "GUEST"); // ID가 없을 경우 대비
+            }
+            MDC.put("request_uri", request.getRequestURI());
 
-            // UUID를 Principal로 사용하는 Authentication 객체 생성
-            // Principal: UUID (String), Credentials: null, Authorities: null (익명/기본 권한)
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(uuid, null, null);
+            if (uuid != null && !uuid.trim().isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(uuid, null, null);
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // 요청 상세 정보 추가
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            }
 
-            // 2. Security Context에 인증 정보 저장
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            System.out.println("UUID 인증 성공: " + uuid + "이 Security Context에 저장되었습니다.");
+            filterChain.doFilter(request, response);
 
+        } finally {
+            MDC.clear();
         }
-
-        filterChain.doFilter(request, response);
     }
 }

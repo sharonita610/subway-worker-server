@@ -21,18 +21,18 @@ public class CaptureCoworkerProcessor {
             3, 65,
             4, 40,
             5, 20,
-            6, 5,
-            7, 1
+            6, 20,
+            7, 20
     );
 
     private static final Map<Integer, Integer> BASE_ESCAPE_CHANCE_BY_LEVEL = Map.of(
-            1, 10,
-            2, 15,
-            3, 20,
-            4, 30,
-            5, 40,
-            6, 40,
-            7, 40
+            1, 0,
+            2, 5,
+            3, 5,
+            4, 10,
+            5, 15,
+            6, 15,
+            7, 20
     );
 
     public boolean calculateCaptureSucceed(final String itemKoreanName, final int targetLevel) {
