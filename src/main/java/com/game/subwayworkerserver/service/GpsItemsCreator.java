@@ -25,9 +25,9 @@ public class GpsItemsCreator {
     private static final String VISITED_GRID_KEY = "map:visited:grids";
     private static final String GRID_LOCK_PREFIX = "lock:grid:";
 
-    private static final long MAP_DATA_TTL_HOURS = 3;
+    private static final long MAP_DATA_TTL_HOURS = 1;
     private static final double GRID_SIZE = 0.01;
-    private static final int COWORKER_COUNT = 3;
+    private static final int COWORKER_COUNT = 2;
     private static final int GIFTS_COUNT = 2;
     private static final double MAX_JITTER = 0.004;
 
@@ -70,8 +70,14 @@ public class GpsItemsCreator {
         createLocations(lat, lon, GIFTS_COUNT, "GIFT", gifts, null);
 
         redisTemplate.executePipelined((RedisConnection connection) -> {
-            if (!coworkers.isEmpty()) redisTemplate.opsForGeo().add(COWORKER_LOCATIONS_KEY, coworkers);
-            if (!gifts.isEmpty()) redisTemplate.opsForGeo().add(RANDOM_GIFT_BOX_KEY, gifts);
+            if (!coworkers.isEmpty()) {
+                redisTemplate.opsForGeo().add(COWORKER_LOCATIONS_KEY, coworkers);
+                redisTemplate.expire(COWORKER_LOCATIONS_KEY, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
+            }
+            if (!gifts.isEmpty()) {
+                redisTemplate.opsForGeo().add(RANDOM_GIFT_BOX_KEY, gifts);
+                redisTemplate.expire(RANDOM_GIFT_BOX_KEY, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
+            }
 
             for (Map<String, String> data : hashDetails) {
                 String key = COWORKER_DATA_PREFIX + data.get("id");
@@ -81,6 +87,7 @@ public class GpsItemsCreator {
 
             redisTemplate.opsForSet().add(VISITED_GRID_KEY, gridId);
             redisTemplate.expire(VISITED_GRID_KEY, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
+
             return null;
         });
     }
