@@ -25,12 +25,8 @@ spring:
       ddl-auto: update
   data:
     redis:
-      host: REDACTED
+      host: ${redis_host}
       port: 6379
-      username: default
-      password: ${redis_password}
-      ssl:
-        enabled: true
 
   toss:
     auth:
