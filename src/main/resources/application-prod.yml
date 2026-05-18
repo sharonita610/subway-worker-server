@@ -27,6 +27,8 @@ spring:
     redis:
       host: ${redis_host}
       port: 6379
+      ssl:
+        enabled: true
 
   toss:
     auth:
