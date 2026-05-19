@@ -15,6 +15,9 @@ public record StageClearResponse(
         ExtraReward extraReward
 ) {
     public static StageClearResponse of(final StageRewardInfo reward) {
+        ExtraReward extra = reward.extraReward() != null
+                ? ExtraReward.of(reward.extraReward().name(), reward.extraReward().quantity())
+                : null;
         return new StageClearResponse(
                 reward.userExp(),
                 reward.coworkerExp(),
@@ -22,7 +25,7 @@ public record StageClearResponse(
                 reward.gachaTicket(),
                 reward.vacationTicket(),
                 reward.firstClear(),
-                ExtraReward.of(reward.extraReward().name(), reward.extraReward().quantity())
+                extra
         );
     }
 
