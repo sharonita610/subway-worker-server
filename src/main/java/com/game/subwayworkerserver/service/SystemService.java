@@ -27,7 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SystemService {
 
-    private final UserRepository userRepository;
+    private final UserFinder userFinder;
     private final MailRepository mailRepository;
     private final RewardRepository rewardRepository;
     private final CoworkerRepository coworkerRepository;
@@ -37,7 +37,7 @@ public class SystemService {
     private static final int MAX_CYCLE_DAY = 7;
 
     public UserMailBoxResponse getMailBox(final String uuid) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         List<MailEntity> mailList = mailRepository.findAllByUserIdAndExpiresAtAfterOrderByIdDesc(user.getId(), LocalDate.now());
         List<Long> mailIdList = getMailIdList(mailList);
         List<RewardEntity> allByMailIdIn = rewardRepository.findAllByMailIdIn(mailIdList);
@@ -51,15 +51,9 @@ public class SystemService {
                 .toList();
     }
 
-    private UserEntity getUserByUuid(String uuid) {
-        return userRepository.findByUuid(uuid).orElseThrow(
-                () -> new BaseException(ErrorCode.USER_NOT_FOUND)
-        );
-    }
-
     @Transactional
     public LevelUpRewardResponse getLevelUpReward(final String uuid) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         List<RewardEntity> levelUpReward = rewardRepository.findAllByUserIdAndIsClaimedFalseAndSource(
                 user.getId(), RewardSource.LEVEL_UP
         );
@@ -77,7 +71,7 @@ public class SystemService {
 
     @Transactional
     public void claimRewardById(final String uuid, final long mailId) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         long userId = user.getId();
 
         MailEntity mail = getMailById(mailId);
@@ -115,7 +109,7 @@ public class SystemService {
 
     @Transactional
     public void claimAllRewards(final String uuid) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         List<MailEntity> mailList = mailRepository.findByUserIdAndIsReadFalseAndIsClaimedFalse(user.getId());
         List<Long> mailIdList = getMailIdList(mailList);
         List<RewardEntity> rewardList = rewardRepository.findAllByMailIdInAndIsClaimedFalse(mailIdList);
@@ -125,7 +119,7 @@ public class SystemService {
     }
 
     public CheckInListResponse getCheckInRewardList(final String uuid) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         int claimedRewardDayUpTo = user.getClaimedRewardDayUpTo();
         if(user.isCycleCompleted() && user.getConsecutiveAttendanceDays() == 1 && claimedRewardDayUpTo > 0){
             claimedRewardDayUpTo = 0;
@@ -137,7 +131,7 @@ public class SystemService {
 
     @Transactional
     public void claimCheckInReward(final String uuid) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         boolean cycleCompleted = user.isCycleCompleted();
         int consecutiveAttendanceDays = user.getConsecutiveAttendanceDays();
         int claimedRewardDayUpTo = user.getClaimedRewardDayUpTo();
@@ -185,7 +179,7 @@ public class SystemService {
     }
 
     public SubscribeListResponse getSubscribeList(String uuid) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
 
         List<SubscriptionItem> subscriptionItems = SubscriptionItem.getAll();
         List<UserSubscriptionEntity> allSubscriptions =
@@ -197,7 +191,7 @@ public class SystemService {
 
     @Transactional
     public void subscribe(final String uuid, final long subscribeId) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         SubscriptionItem subscriptionItem = SubscriptionItem.getById(subscribeId);
         Optional<UserSubscriptionEntity> existingSubscription =
                 subscriptionRepository.findByUserIdAndTypeAndExpirationDateGreaterThanEqual(

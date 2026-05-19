@@ -15,7 +15,6 @@ import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.SkillCardRepository;
 import com.game.subwayworkerserver.repository.UserGachaRepository;
-import com.game.subwayworkerserver.repository.UserRepository;
 import com.game.subwayworkerserver.service.dto.CoworkerUpgradeVO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,7 @@ import java.util.List;
 public class CoworkerService {
 
     private final CoworkerRepository coworkerRepository;
-    private final UserRepository userRepository;
+    private final UserFinder userFinder;
     private final SkillCardRepository skillCardRepository;
     private final UserGachaRepository gachaRepository;
     private final CoworkerUpgradeProcessor coworkerUpgradeProcessor;
@@ -43,7 +42,7 @@ public class CoworkerService {
     @Transactional
     public void configurePartners(final String uuid, final PartnerConfigureRequest request) {
 
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         long userId = user.getId();
 
         List<Long> requestCoworkerIds = request.coworkerIds();
@@ -69,7 +68,7 @@ public class CoworkerService {
     @Transactional
     public UserUpgradeResponse upgradeCoworker(final String uuid, final UpgradeRequest request) {
 
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
 
         CoworkerEntity target = coworkerRepository.findById(request.targetId())
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND, "대상이 존재하지 않습니다."));
@@ -105,14 +104,8 @@ public class CoworkerService {
         return materials;
     }
 
-    private UserEntity getUserByUuid(String uuid) {
-        return userRepository.findByUuid(uuid).orElseThrow(
-                () -> new BaseException(ErrorCode.USER_NOT_FOUND)
-        );
-    }
-
     public StageCoworkerListResponse getUsingCoworkers(final String uuid) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         List<CoworkerEntity> coworkerEntityList =
                 coworkerRepository.findByUserIdAndOnSaleFalseAndAvailableTrueAndInUseTrue(user.getId());
         List<UserGachaEntity> treasureList = gachaRepository.findAllByUserId(user.getId());

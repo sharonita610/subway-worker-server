@@ -4,18 +4,16 @@ import com.game.subwayworkerserver.controller.request.OpenLuckyGachaRequest;
 import com.game.subwayworkerserver.entity.Gender;
 import com.game.subwayworkerserver.entity.UserEntity;
 import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.UserGachaRepository;
 import com.game.subwayworkerserver.repository.UserItemMapRepository;
-import com.game.subwayworkerserver.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
@@ -26,7 +24,7 @@ class GachaServiceTest {
     @InjectMocks
     private GachaService gachaService;
 
-    @Mock private UserRepository userRepository;
+    @Mock private UserFinder userFinder;
     @Mock private UserGachaRepository gachaRepository;
     @Mock private CoworkerRepository coworkerRepository;
     @Mock private UserItemMapRepository userItemMapRepository;
@@ -41,7 +39,7 @@ class GachaServiceTest {
 
     @Test
     void 존재하지_않는_UUID로_조회시_예외가_발생한다() {
-        when(userRepository.findByUuid("unknown")).thenReturn(Optional.empty());
+        when(userFinder.getByUuid("unknown")).thenThrow(new BaseException(ErrorCode.USER_NOT_FOUND));
 
         assertThatThrownBy(() -> gachaService.getGachaList("unknown"))
                 .isInstanceOf(BaseException.class);
@@ -50,7 +48,7 @@ class GachaServiceTest {
     @Test
     void 가챠티켓이_부족하면_가챠_오픈에_실패한다() {
         UserEntity user = createUser(0, 0); // gachaTicket = 0
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
 
         // GACHA_PULL: currencyType=GACHA_TICKET, price=1
         OpenLuckyGachaRequest request = new OpenLuckyGachaRequest("gachaTicket", 1);
@@ -62,7 +60,7 @@ class GachaServiceTest {
     @Test
     void 휴가티켓이_부족하면_가챠_오픈에_실패한다() {
         UserEntity user = createUser(0, 0); // vacationTicket = 0
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
 
         // SINGLE_PULL: currencyType=VACATION_TICKET, price=60
         OpenLuckyGachaRequest request = new OpenLuckyGachaRequest("vacationTicket", 60);

@@ -4,9 +4,9 @@ import com.game.subwayworkerserver.controller.request.SellingRequest;
 import com.game.subwayworkerserver.domain.skill.SkillCardType;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.SkillCardMarketRepository;
 import com.game.subwayworkerserver.repository.SkillCardRepository;
-import com.game.subwayworkerserver.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,7 +26,7 @@ class SkillCardMarketServiceTest {
     @InjectMocks
     private SkillCardMarketService skillCardMarketService;
 
-    @Mock private UserRepository userRepository;
+    @Mock private UserFinder userFinder;
     @Mock private SkillCardRepository skillCardRepository;
     @Mock private SkillCardMarketRepository skillCardMarketRepository;
     @Mock private SkillCardListFilter skillCardListFilter;
@@ -65,7 +65,7 @@ class SkillCardMarketServiceTest {
 
     @Test
     void 존재하지_않는_UUID로_조회시_예외가_발생한다() {
-        when(userRepository.findByUuid("unknown")).thenReturn(Optional.empty());
+        when(userFinder.getByUuid("unknown")).thenThrow(new BaseException(ErrorCode.USER_NOT_FOUND));
 
         assertThatThrownBy(() -> skillCardMarketService.registerCardOnMarket("unknown", new SellingRequest(20L, 100, 10, 50)))
                 .isInstanceOf(BaseException.class);
@@ -74,7 +74,7 @@ class SkillCardMarketServiceTest {
     @Test
     void 코인이_부족하면_스킬카드_등록에_실패한다() {
         UserEntity user = createUser(0, 0);
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
 
         assertThatThrownBy(() -> skillCardMarketService.registerCardOnMarket(TEST_UUID, new SellingRequest(20L, 100, 10, 500)))
                 .isInstanceOf(BaseException.class);
@@ -84,7 +84,7 @@ class SkillCardMarketServiceTest {
     void 이미_마켓에_등록된_스킬카드는_중복_등록_불가() {
         UserEntity user = createUser(1000, 0);
         SkillCardEntity card = createSkillCard(1L, false);
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(skillCardRepository.findByUserIdAndIdAndInUseFalse(1L, 20L)).thenReturn(Optional.of(card));
         when(skillCardMarketRepository.existsBySkillCardIdAndSellerId(20L, 1L)).thenReturn(true);
 
@@ -96,7 +96,7 @@ class SkillCardMarketServiceTest {
     void 스킬카드_마켓_등록이_정상적으로_동작한다() {
         UserEntity user = createUser(1000, 0);
         SkillCardEntity card = createSkillCard(1L, false);
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(skillCardRepository.findByUserIdAndIdAndInUseFalse(1L, 20L)).thenReturn(Optional.of(card));
         when(skillCardMarketRepository.existsBySkillCardIdAndSellerId(20L, 1L)).thenReturn(false);
 
@@ -110,7 +110,7 @@ class SkillCardMarketServiceTest {
     void 스킬카드_구매시_휴가티켓이_차감된다() {
         UserEntity user = createUser(0, 100);
         SkillCardMarketEntity market = createMarketEntity(99L, 2L, 10, 2); // price=10, commission=2
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(skillCardMarketRepository.findByIdAndAvailableTrueAndSoldFalse(1L)).thenReturn(Optional.of(market));
         when(skillCardRepository.findByIdAndOnSaleTrue(99L)).thenReturn(Optional.empty());
 
@@ -126,7 +126,7 @@ class SkillCardMarketServiceTest {
         SkillCardEntity card = createSkillCard(1L, false);
         ReflectionTestUtils.setField(card, "onSale", true);
         SkillCardMarketEntity market = createMarketEntity(20L, 1L, 100, 10);
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(skillCardMarketRepository.findByIdAndAvailableTrueAndSoldFalse(1L)).thenReturn(Optional.of(market));
         when(skillCardRepository.findByUserIdAndIdAndInUseFalse(1L, 20L)).thenReturn(Optional.of(card));
 

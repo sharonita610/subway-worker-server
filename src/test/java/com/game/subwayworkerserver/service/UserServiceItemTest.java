@@ -4,6 +4,7 @@ import com.game.subwayworkerserver.controller.request.CaptureItemListResponse;
 import com.game.subwayworkerserver.controller.response.TrapItemListResponse;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -26,6 +26,7 @@ class UserServiceItemTest {
     @InjectMocks
     private UserService userService;
 
+    @Mock private UserFinder userFinder;
     @Mock private UserRepository userRepository;
     @Mock private CoworkerRepository coworkerRepository;
     @Mock private UserItemMapRepository userItemMapRepository;
@@ -61,7 +62,7 @@ class UserServiceItemTest {
                 trapItem(ItemName.SILVER_SHOVEL)
         );
 
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(userItemMapRepository.findByUserId(user.getId())).thenReturn(allItems);
 
         CaptureItemListResponse response = userService.getCaptureItemList(TEST_UUID);
@@ -81,7 +82,7 @@ class UserServiceItemTest {
                 trapItem(ItemName.SILVER_SHOVEL)
         );
 
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(userItemMapRepository.findByUserId(user.getId())).thenReturn(allItems);
 
         TrapItemListResponse response = userService.getTrapItemList(TEST_UUID);
@@ -95,7 +96,7 @@ class UserServiceItemTest {
     void 아이템이_없으면_빈_목록을_반환한다() {
         UserEntity user = createUser();
 
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(userItemMapRepository.findByUserId(user.getId())).thenReturn(List.of());
 
         CaptureItemListResponse captureResponse = userService.getCaptureItemList(TEST_UUID);
@@ -107,7 +108,7 @@ class UserServiceItemTest {
 
     @Test
     void 존재하지_않는_UUID로_조회시_예외가_발생한다() {
-        when(userRepository.findByUuid("unknown-uuid")).thenReturn(Optional.empty());
+        when(userFinder.getByUuid("unknown-uuid")).thenThrow(new BaseException(ErrorCode.USER_NOT_FOUND));
 
         assertThatThrownBy(() -> userService.getCaptureItemList("unknown-uuid"))
                 .isInstanceOf(BaseException.class);

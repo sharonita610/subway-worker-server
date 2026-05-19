@@ -16,7 +16,6 @@ import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.DungeonRecordRepository;
 import com.game.subwayworkerserver.repository.StageRecordRepository;
-import com.game.subwayworkerserver.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -31,7 +30,7 @@ import static com.game.subwayworkerserver.exception.ErrorCode.BAD_REQUEST;
 @RequiredArgsConstructor
 public class StageService {
 
-    private final UserRepository userRepository;
+    private final UserFinder userFinder;
     private final CoworkerRepository coworkerRepository;
     private final StageRecordRepository stageRecordRepository;
     private final StageRewardProcessor stageRewardProcessor;
@@ -54,7 +53,7 @@ public class StageService {
 
     @Transactional
     public StageClearResponse recordStage(final String uuid, final StageClearRequest request) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         long userId = user.getId();
         int requestedLevel = request.level();
         boolean success = request.success();
@@ -131,15 +130,9 @@ public class StageService {
 
     }
 
-    private UserEntity getUserByUuid(String uuid) {
-        return userRepository.findByUuid(uuid).orElseThrow(
-                () -> new BaseException(ErrorCode.USER_NOT_FOUND)
-        );
-    }
-
     @Transactional
     public StageClearResponse recordDungeon(final String uuid, final DungeonRequest request) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         long userId = user.getId();
 
         DungeonRecordEntity dungeonRecord = getDungeonByUserIdAnsStationNameAndUuid(
@@ -193,7 +186,7 @@ public class StageService {
 
     @Transactional
     public DungeonResponse checkDungeon(final String uuid, final String stationName) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         Optional<DungeonRecordEntity> dungeon = dungeonRecordRepository.findByUserIdAndStationName(user.getId(), stationName);
 
         if (dungeon.isEmpty()) {

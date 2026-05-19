@@ -6,9 +6,9 @@ import com.game.subwayworkerserver.domain.baseinfo.CoworkerLevel;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerMarketRepository;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
-import com.game.subwayworkerserver.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,7 +28,7 @@ class CoworkerMarketServiceTest {
     @InjectMocks
     private CoworkerMarketService coworkerMarketService;
 
-    @Mock private UserRepository userRepository;
+    @Mock private UserFinder userFinder;
     @Mock private CoworkerRepository coworkerRepository;
     @Mock private CoworkerMarketRepository coworkerMarketRepository;
     @Mock private CoworkerListFilter coworkerListFilter;
@@ -63,7 +63,7 @@ class CoworkerMarketServiceTest {
 
     @Test
     void 존재하지_않는_UUID로_조회시_예외가_발생한다() {
-        when(userRepository.findByUuid("unknown")).thenReturn(Optional.empty());
+        when(userFinder.getByUuid("unknown")).thenThrow(new BaseException(ErrorCode.USER_NOT_FOUND));
 
         assertThatThrownBy(() -> coworkerMarketService.registerCoworkerOnMarket("unknown", new SellingRequest(10L, 100, 10, 50)))
                 .isInstanceOf(BaseException.class);
@@ -72,7 +72,7 @@ class CoworkerMarketServiceTest {
     @Test
     void 코인이_부족하면_마켓_등록에_실패한다() {
         UserEntity user = createUser(0, 0);
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
 
         assertThatThrownBy(() -> coworkerMarketService.registerCoworkerOnMarket(TEST_UUID, new SellingRequest(10L, 100, 10, 500)))
                 .isInstanceOf(BaseException.class);
@@ -82,7 +82,7 @@ class CoworkerMarketServiceTest {
     void 사용중인_동료는_등록할_수_없다() {
         UserEntity user = createUser(1000, 0);
         CoworkerEntity coworker = createCoworker(1L, true, false); // inUse=true
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(coworkerRepository.findByUserIdAndId(1L, 10L)).thenReturn(Optional.of(coworker));
 
         assertThatThrownBy(() -> coworkerMarketService.registerCoworkerOnMarket(TEST_UUID, new SellingRequest(10L, 100, 10, 100)))
@@ -93,7 +93,7 @@ class CoworkerMarketServiceTest {
     void 이미_판매중인_동료는_등록할_수_없다() {
         UserEntity user = createUser(1000, 0);
         CoworkerEntity coworker = createCoworker(1L, false, false);
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(coworkerRepository.findByUserIdAndId(1L, 10L)).thenReturn(Optional.of(coworker));
         when(coworkerMarketRepository.existsByCoworkerIdAndSellerId(10L, 1L)).thenReturn(true);
 
@@ -105,7 +105,7 @@ class CoworkerMarketServiceTest {
     void 동료_마켓_등록이_정상적으로_완료된다() {
         UserEntity user = createUser(1000, 0);
         CoworkerEntity coworker = createCoworker(1L, false, false);
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(coworkerRepository.findByUserIdAndId(1L, 10L)).thenReturn(Optional.of(coworker));
         when(coworkerMarketRepository.existsByCoworkerIdAndSellerId(10L, 1L)).thenReturn(false);
 
@@ -119,7 +119,7 @@ class CoworkerMarketServiceTest {
     void 동료_구매시_휴가티켓이_차감된다() {
         UserEntity user = createUser(0, 100);
         CoworkerMarketEntity market = createMarketEntity(99L, 2L, 10, 2); // price=10, commission=2
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(coworkerMarketRepository.findByIdAndAvailableTrueAndSoldFalse(1L)).thenReturn(Optional.of(market));
         when(coworkerRepository.findByIdAndOnSaleTrue(99L)).thenReturn(Optional.empty());
 
@@ -134,7 +134,7 @@ class CoworkerMarketServiceTest {
         UserEntity user = createUser(0, 0);
         CoworkerEntity coworker = createCoworker(1L, false, true); // onSale=true
         CoworkerMarketEntity market = createMarketEntity(10L, 1L, 100, 10);
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(coworkerMarketRepository.findByIdAndAvailableTrueAndSoldFalse(1L)).thenReturn(Optional.of(market));
         when(coworkerRepository.findByUserIdAndId(1L, 10L)).thenReturn(Optional.of(coworker));
 

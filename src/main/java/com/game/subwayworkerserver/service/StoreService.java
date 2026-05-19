@@ -8,7 +8,6 @@ import com.game.subwayworkerserver.domain.baseinfo.VacationTicket;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.repository.UserItemMapRepository;
-import com.game.subwayworkerserver.repository.UserRepository;
 import com.game.subwayworkerserver.repository.UserStoreMapRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +18,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.game.subwayworkerserver.exception.ErrorCode.BAD_REQUEST;
-import static com.game.subwayworkerserver.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
 public class StoreService {
 
-    private final UserRepository userRepository;
+    private final UserFinder userFinder;
     private final UserStoreMapRepository userStoreMapRepository;
     private final UserItemMapRepository userItemMapRepository;
 
@@ -36,7 +34,7 @@ public class StoreService {
 
     public StoreItemResponse getStoreItems(final String uuid) {
 
-        Long userId = getUserByUuid(uuid).getId();
+        Long userId = userFinder.getByUuid(uuid).getId();
 
         boolean isFirst = userStoreMapRepository.existsByUserIdAndItemName(userId, VACATION);
         int todayRandomTrapPurchase = getTodayPurchaseCount(userId, RANDOM_TRAP);
@@ -53,12 +51,6 @@ public class StoreService {
                 coinList,
                 vacationTicketList,
                 isFirst
-        );
-    }
-
-    private UserEntity getUserByUuid(String uuid) {
-        return userRepository.findByUuid(uuid).orElseThrow(
-                () -> new BaseException(USER_NOT_FOUND)
         );
     }
 
@@ -81,7 +73,7 @@ public class StoreService {
 
     @Transactional
     public void purchaseItemWithCoin(String uuid, PurchaseRequest request) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         String name = request.name();
 
         if(name.contains(RANDOM_TRAP) || name.contains(RANDOM_CAPTURE)) {
@@ -121,7 +113,7 @@ public class StoreService {
 
     @Transactional
     public void purchaseCoinWithVacationTicket(String uuid, PurchaseRequest request) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         String name = request.name();
         Coin coin = Coin.valueOf(request.name());
         int vacationTicketNeeded = coin.getTicketPrice();
@@ -138,7 +130,7 @@ public class StoreService {
 
     @Transactional
     public void buyVacationTicket(String uuid, PurchaseRequest request) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         VacationTicket vacationTicket = VacationTicket.valueOf(request.name());
 
         // 외부 결제 api
@@ -157,7 +149,7 @@ public class StoreService {
 
     @Transactional
     public ItemResponse purchaseRandomItem(String uuid, PurchaseRequest request) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         String name = request.name();
         ItemName itemName = ItemName.getRandomItem(name);
 

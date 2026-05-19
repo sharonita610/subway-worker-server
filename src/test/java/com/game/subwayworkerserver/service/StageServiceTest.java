@@ -5,10 +5,10 @@ import com.game.subwayworkerserver.entity.CoworkerEntity;
 import com.game.subwayworkerserver.entity.Gender;
 import com.game.subwayworkerserver.entity.UserEntity;
 import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.DungeonRecordRepository;
 import com.game.subwayworkerserver.repository.StageRecordRepository;
-import com.game.subwayworkerserver.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,7 +29,7 @@ class StageServiceTest {
     @InjectMocks
     private StageService stageService;
 
-    @Mock private UserRepository userRepository;
+    @Mock private UserFinder userFinder;
     @Mock private CoworkerRepository coworkerRepository;
     @Mock private StageRecordRepository stageRecordRepository;
     @Mock private StageRewardProcessor stageRewardProcessor;
@@ -51,7 +51,7 @@ class StageServiceTest {
 
     @Test
     void 존재하지_않는_UUID로_스테이지_조회시_예외가_발생한다() {
-        when(userRepository.findByUuid("unknown-uuid")).thenReturn(Optional.empty());
+        when(userFinder.getByUuid("unknown-uuid")).thenThrow(new BaseException(ErrorCode.USER_NOT_FOUND));
 
         assertThatThrownBy(() -> stageService.checkDungeon("unknown-uuid", "강남역"))
                 .isInstanceOf(BaseException.class);
@@ -67,7 +67,7 @@ class StageServiceTest {
         // StageRewardInfo(userExp, coworkerExp, coworkersTotalExp, coin, gachaTicket, vacationTicket, firstClear, extraReward)
         StageRewardInfo reward = new StageRewardInfo(100, 50, 100, 1000, 0, 0, false, null);
 
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(coworkerRepository.findByUserIdAndInUseTrue(user.getId())).thenReturn(coworkers);
         when(stageRecordRepository.findByUserId(user.getId())).thenReturn(Optional.empty());
 
@@ -104,7 +104,7 @@ class StageServiceTest {
                         .dungeonUuId("test-uuid")
                         .build();
 
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(coworkerRepository.findByUserIdAndInUseTrue(user.getId())).thenReturn(coworkers);
         when(dungeonRecordRepository.findByUserIdAndStationNameAndDungeonUuId(
                 user.getId(), "강남역", "test-uuid")).thenReturn(Optional.of(dungeonRecord));

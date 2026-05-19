@@ -16,7 +16,6 @@ import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.SkillCardRepository;
-import com.game.subwayworkerserver.repository.UserRepository;
 import com.game.subwayworkerserver.service.UpgradeExecutor.UpgradeResult;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +32,7 @@ import static com.game.subwayworkerserver.domain.skill.SkillCardType.PASSIVE;
 @RequiredArgsConstructor
 public class SkillCardService {
 
-    private final UserRepository userRepository;
+    private final UserFinder userFinder;
     private final CoworkerRepository coworkerRepository;
     private final SkillCardRepository skillCardRepository;
     private final SkillCardListFilter skillCardListFilter;
@@ -43,7 +42,7 @@ public class SkillCardService {
 
     public SkillByCoworkerResponse getSkillListByUserAndCoworker(
             final String uuid, final long coworkerId, final String cardType) {
-        UserEntity user = getUserEntityByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
 
         CoworkerEntity coworkerEntity = getCoworkerEntity(coworkerId, user.getId());
 
@@ -71,14 +70,8 @@ public class SkillCardService {
         );
     }
 
-    private UserEntity getUserEntityByUuid(final String uuid) {
-        return userRepository.findByUuid(uuid).orElseThrow(
-                () -> new BaseException(ErrorCode.USER_NOT_FOUND)
-        );
-    }
-
     public SkillByUserResponse getUserSkillCards(final String uuid) {
-        UserEntity user = getUserEntityByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         List<SkillCardEntity> activeSkillCards
                 = skillCardRepository.findAllByUserIdAndTypeAndAvailableTrueAndOnSaleFalse(user.getId(), ACTIVE);
         List<SkillCardEntity> passiveSkillCards
@@ -91,7 +84,7 @@ public class SkillCardService {
 
     @Transactional
     public void addSkillCardToCoworker(final String uuid, final SkillCardConfigureRequest request) {
-        UserEntity user = getUserEntityByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         SkillCardType skillCardType = SkillCardType.valueOf(request.skillCardType().toUpperCase());
         CoworkerEntity coworker = getCoworkerEntity(request.coworkerId(), user.getId());
         coworker.checkUser(user.getId());
@@ -123,7 +116,7 @@ public class SkillCardService {
 
     @Transactional
     public EarnedSkillCardResponse getRandomSkillCardByType(final String uuid, final OpenSkillCardRequest request) {
-        UserEntity user = getUserEntityByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         CurrencyType currencyType = CurrencyType.confirm(request.payCondition());
         SkillCardType skillCardType = SkillCardType.valueOf(request.skillCardType().toUpperCase());
 
@@ -162,7 +155,7 @@ public class SkillCardService {
     }
 
     public SkillListBySkillIdResponse getSkillsAvailableToUpgrade(final String uuid, final long skillCardId) {
-        UserEntity user = getUserEntityByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         SkillCardEntity skillCard = skillCardRepository.findById(skillCardId).orElseThrow(
                 () -> new BaseException(ErrorCode.NOT_FOUND, "Skill card not found.")
         );
@@ -179,7 +172,7 @@ public class SkillCardService {
     @Transactional
     public UpgradedSkillCardResponse upgradeCard(String uuid, UpgradeRequest request) {
 
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
 
         SkillCardEntity targetCard = getSkillCardEntity(request.targetId());
         targetCard.isMaxLevel();
@@ -234,9 +227,4 @@ public class SkillCardService {
         return materialCards;
     }
 
-    private UserEntity getUserByUuid(String uuid) {
-        return userRepository.findByUuid(uuid).orElseThrow(
-                () -> new BaseException(ErrorCode.USER_NOT_FOUND)
-        );
-    }
 }

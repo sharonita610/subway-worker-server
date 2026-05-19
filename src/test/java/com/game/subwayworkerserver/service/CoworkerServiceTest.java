@@ -8,10 +8,10 @@ import com.game.subwayworkerserver.entity.CoworkerEntity;
 import com.game.subwayworkerserver.entity.Gender;
 import com.game.subwayworkerserver.entity.UserEntity;
 import com.game.subwayworkerserver.exception.BaseException;
+import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.SkillCardRepository;
 import com.game.subwayworkerserver.repository.UserGachaRepository;
-import com.game.subwayworkerserver.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,7 +32,7 @@ class CoworkerServiceTest {
     private CoworkerService coworkerService;
 
     @Mock private CoworkerRepository coworkerRepository;
-    @Mock private UserRepository userRepository;
+    @Mock private UserFinder userFinder;
     @Mock private SkillCardRepository skillCardRepository;
     @Mock private UserGachaRepository gachaRepository;
     @Mock private CoworkerUpgradeProcessor coworkerUpgradeProcessor;
@@ -64,7 +64,7 @@ class CoworkerServiceTest {
 
     @Test
     void 존재하지_않는_UUID로_파트너_설정시_예외가_발생한다() {
-        when(userRepository.findByUuid("unknown")).thenReturn(Optional.empty());
+        when(userFinder.getByUuid("unknown")).thenThrow(new BaseException(ErrorCode.USER_NOT_FOUND));
 
         assertThatThrownBy(() -> coworkerService.configurePartners("unknown", new PartnerConfigureRequest(List.of(10L))))
                 .isInstanceOf(BaseException.class);
@@ -73,7 +73,7 @@ class CoworkerServiceTest {
     @Test
     void 빈_목록으로_파트너_설정시_예외가_발생한다() {
         UserEntity user = createUser();
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
 
         assertThatThrownBy(() -> coworkerService.configurePartners(TEST_UUID, new PartnerConfigureRequest(List.of())))
                 .isInstanceOf(BaseException.class);
@@ -83,7 +83,7 @@ class CoworkerServiceTest {
     void 타인_소유_동료를_파트너로_지정시_예외가_발생한다() {
         UserEntity user = createUser(); // userId = 1L
         CoworkerEntity otherUserCoworker = createCoworker(2L); // 다른 유저 소유
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(coworkerRepository.findByUserIdAndInUseTrue(1L)).thenReturn(List.of());
         when(coworkerRepository.findAllById(List.of(10L))).thenReturn(List.of(otherUserCoworker));
 
@@ -94,7 +94,7 @@ class CoworkerServiceTest {
     @Test
     void 유효하지_않은_재료_ID_포함시_예외가_발생한다() {
         UserEntity user = createUser();
-        when(userRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(user));
+        when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(coworkerRepository.findById(10L)).thenReturn(Optional.of(createCoworker(1L)));
         // 재료 ID 2개 요청했는데 1개만 조회됨
         when(coworkerRepository.findAllById(List.of(20L, 30L))).thenReturn(List.of(createCoworker(1L)));

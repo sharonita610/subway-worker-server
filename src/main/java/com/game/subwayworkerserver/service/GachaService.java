@@ -13,7 +13,6 @@ import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.UserGachaRepository;
 import com.game.subwayworkerserver.repository.UserItemMapRepository;
-import com.game.subwayworkerserver.repository.UserRepository;
 import com.game.subwayworkerserver.service.GachaRandomGiftGenerator.DefaultGift;
 import com.game.subwayworkerserver.service.GachaRandomGiftGenerator.ExtraGift;
 import jakarta.transaction.Transactional;
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GachaService {
 
-    private final UserRepository userRepository;
+    private final UserFinder userFinder;
     private final UserGachaRepository gachaRepository;
     private final CoworkerRepository coworkerRepository;
     private final UserItemMapRepository userItemMapRepository;
@@ -38,20 +37,14 @@ public class GachaService {
     private static final String MATERIAL_COWORKER = "MATERIAL_COWORKER";
 
     public LuckyGachaListResponse getGachaList(final String uuid) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         List<UserGachaEntity> gachaEntityList = gachaRepository.findAllByUserId(user.getId());
         return LuckyGachaListResponse.of(user, gachaEntityList);
     }
 
-    private UserEntity getUserByUuid(String uuid) {
-        return userRepository.findByUuid(uuid).orElseThrow(
-                () -> new BaseException(ErrorCode.USER_NOT_FOUND)
-        );
-    }
-
     @Transactional
     public LuckyGachaEarnResponse openLuckyGacha(final String uuid, final OpenLuckyGachaRequest request) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         CurrencyType currencyType = CurrencyType.confirm(request.payCondition());
         GachaPaymentOption gachaPaymentOption = GachaPaymentOption.confirmCountAndPrice(currencyType, request.price());
 
