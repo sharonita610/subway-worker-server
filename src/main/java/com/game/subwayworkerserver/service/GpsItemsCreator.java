@@ -32,6 +32,9 @@ public class GpsItemsCreator {
     private static final double MAX_JITTER = 0.004;
 
     public void createItemsInArea(final double latitude, final double longitude) {
+        boolean anyCoworkersAdded = false;
+        boolean anyGiftsAdded = false;
+
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 double targetLat = latitude + (i * GRID_SIZE);
@@ -51,7 +54,9 @@ public class GpsItemsCreator {
                 if (Boolean.TRUE.equals(acquired)) {
                     try {
                         if (Boolean.FALSE.equals(redisTemplate.opsForSet().isMember(VISITED_GRID_KEY, gridId))) {
-                            generateDataWithPipeline(targetLat, targetLon, gridId);
+                            boolean[] added = generateDataWithPipeline(targetLat, targetLon, gridId);
+                            anyCoworkersAdded |= added[0];
+                            anyGiftsAdded |= added[1];
                         }
                     } finally {
                         redisTemplate.delete(lockKey);
@@ -59,9 +64,12 @@ public class GpsItemsCreator {
                 }
             }
         }
+
+        if (anyCoworkersAdded) redisTemplate.expire(COWORKER_LOCATIONS_KEY, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
+        if (anyGiftsAdded) redisTemplate.expire(RANDOM_GIFT_BOX_KEY, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
     }
 
-    private void generateDataWithPipeline(double lat, double lon, String gridId) {
+    private boolean[] generateDataWithPipeline(double lat, double lon, String gridId) {
         Map<String, Point> coworkers = new HashMap<>();
         Map<String, Point> gifts = new HashMap<>();
         List<Map<String, String>> hashDetails = new ArrayList<>();
@@ -70,14 +78,8 @@ public class GpsItemsCreator {
         createLocations(lat, lon, GIFTS_COUNT, "GIFT", gifts, null);
 
         redisTemplate.executePipelined((RedisConnection connection) -> {
-            if (!coworkers.isEmpty()) {
-                redisTemplate.opsForGeo().add(COWORKER_LOCATIONS_KEY, coworkers);
-                redisTemplate.expire(COWORKER_LOCATIONS_KEY, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
-            }
-            if (!gifts.isEmpty()) {
-                redisTemplate.opsForGeo().add(RANDOM_GIFT_BOX_KEY, gifts);
-                redisTemplate.expire(RANDOM_GIFT_BOX_KEY, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
-            }
+            addGeoIfNotEmpty(COWORKER_LOCATIONS_KEY, coworkers);
+            addGeoIfNotEmpty(RANDOM_GIFT_BOX_KEY, gifts);
 
             for (Map<String, String> data : hashDetails) {
                 String key = COWORKER_DATA_PREFIX + data.get("id");
@@ -90,6 +92,14 @@ public class GpsItemsCreator {
 
             return null;
         });
+
+        return new boolean[]{!coworkers.isEmpty(), !gifts.isEmpty()};
+    }
+
+    private void addGeoIfNotEmpty(String key, Map<String, Point> locations) {
+        if (!locations.isEmpty()) {
+            redisTemplate.opsForGeo().add(key, locations);
+        }
     }
 
     private void createLocations(double lat, double lon, int count, String prefix,
