@@ -10,7 +10,6 @@ import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.repository.SkillCardMarketRepository;
 import com.game.subwayworkerserver.repository.SkillCardRepository;
-import com.game.subwayworkerserver.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,13 +22,13 @@ import static com.game.subwayworkerserver.exception.ErrorCode.*;
 @RequiredArgsConstructor
 public class SkillCardMarketService {
 
-    private final UserRepository userRepository;
+    private final UserFinder userFinder;
     private final SkillCardRepository skillCardRepository;
     private final SkillCardMarketRepository skillCardMarketRepository;
     private final SkillCardListFilter skillCardListFilter;
 
     public GlobalSkillCardResponse getSkillCardMarket(final String uuid, final SkillCardFilterRequest request) {
-        UserEntity user = findUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         List<SkillCardMarketEntity> marketSkillCardLists = skillCardMarketRepository.findAllByAvailableTrueAndSoldFalseAndSellerIdNot(user.getId());
         List<Long> skillCardIds = getSkillCardIds(marketSkillCardLists);
 
@@ -40,12 +39,6 @@ public class SkillCardMarketService {
         }
         List<SkillCardOnSale> filteredCoworkers = skillCardListFilter.filter(coworkerOnSalesDomainList, request);
         return GlobalSkillCardResponse.of(filteredCoworkers);
-    }
-
-    private UserEntity findUserByUuid(final String uuid) {
-        return userRepository.findByUuid(uuid).orElseThrow(
-                () -> new BaseException(USER_NOT_FOUND)
-        );
     }
 
     private List<SkillCardEntity> findSkillCardOnSaleByCardIds(final List<Long> skillCardIds) {
@@ -59,7 +52,7 @@ public class SkillCardMarketService {
     }
 
     public SkillOnSaleResponse getMySkillCardOnSale(final String uuid) {
-        UserEntity user = findUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         List<SkillCardMarketEntity> skillCardOnSale = skillCardMarketRepository.findAllBySellerIdOrderByIdDesc(user.getId());
         List<Long> skillCardIds = getSkillCardIds(skillCardOnSale);
         List<SkillCardEntity> skillCardEntityList = skillCardRepository.findAllByIdIn(skillCardIds);
@@ -69,8 +62,8 @@ public class SkillCardMarketService {
 
     @Transactional
     public void registerCardOnMarket(final String uuid, final SellingRequest request) {
-        UserEntity user = findUserByUuid(uuid);
-        checkUserCoin(request.registrationFee(), user);
+        UserEntity user = userFinder.getByUuid(uuid);
+        MarketValidator.checkUserCoin(request.registrationFee(), user);
 
         long userId = user.getId();
         long cardId = request.targetId();
@@ -98,16 +91,9 @@ public class SkillCardMarketService {
         );
     }
 
-    private static void checkUserCoin(final int registrationFee, final UserEntity user) {
-        boolean ableToBuy = user.hasCoinMoreThanItemPrice(registrationFee);
-        if (!ableToBuy) {
-            throw new BaseException(BAD_REQUEST, "Not enough coin");
-        }
-    }
-
     @Transactional
     public void cancelSellingMySkillCard(final String uuid, final long marketId) {
-        UserEntity user = findUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         SkillCardMarketEntity skillCardMarket = skillCardMarketRepository.findByIdAndAvailableTrueAndSoldFalse(marketId).orElseThrow(
                 () -> new BaseException(NOT_FOUND, "SkillCard already sold.")
         );
@@ -118,7 +104,7 @@ public class SkillCardMarketService {
 
     @Transactional
     public PaymentSuccessResponse getSkillCardSoldPayment(final String uuid, final long marketId) {
-        UserEntity user = findUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         SkillCardMarketEntity skillCardMarketEntity =
                 skillCardMarketRepository.findByIdAndSellerIdAndSoldTrueAndIsPaidFalseAndAvailableFalse(marketId, user.getId())
                         .orElseThrow(
@@ -141,11 +127,11 @@ public class SkillCardMarketService {
 
     @Transactional
     public void purchaseSkillCard(final String uuid, final long marketId) {
-        UserEntity user = findUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         SkillCardMarketEntity skillCardMarketEntity = skillCardMarketRepository.findByIdAndAvailableTrueAndSoldFalse(marketId).orElseThrow(
                 () -> new BaseException(NOT_FOUND, "방금 판매된 스킬카드예요.")
         );
-        checkUserVacationTicket(user, skillCardMarketEntity.getPrice());
+        MarketValidator.checkUserVacationTicket(user, skillCardMarketEntity.getPrice());
         skillCardMarketEntity.purchase(user.getId());
 
         skillCardRepository.findByIdAndOnSaleTrue(skillCardMarketEntity.getSkillCardId())
@@ -160,10 +146,4 @@ public class SkillCardMarketService {
         user.purchaseWithVacationTickets(skillCardRealPrice);
     }
 
-    private static void checkUserVacationTicket(final UserEntity user, final int price) {
-        boolean ableToBuy = user.hasEnoughVacationTickets(price);
-        if (!ableToBuy) {
-            throw new BaseException(BAD_REQUEST, "휴가티켓이 부족해요!");
-        }
-    }
 }

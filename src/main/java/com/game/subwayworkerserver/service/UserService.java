@@ -15,15 +15,16 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
+    private final UserFinder userFinder;
     private final UserRepository userRepository;
     private final CoworkerRepository coworkerRepository;
     private final UserItemMapRepository userItemMapRepository;
@@ -83,7 +84,7 @@ public class UserService {
     @Transactional
     public UserResponse getUserInfos(final String uuid) {
 
-        UserEntity user = findUserBy(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         attendanceChecker.checkDailyAttendance(user);
 
         List<CoworkerEntity> coworkerInUse = coworkerRepository.findByUserIdAndInUseTrue(user.getId());
@@ -99,52 +100,34 @@ public class UserService {
     }
 
     public CaptureItemListResponse getCaptureItemList(final String uuid) {
-
-        UserEntity user = findUserBy(uuid);
-
-        List<UserItemMapEntity> userItems = userItemMapRepository.findByUserId(user.getId());
-
-        List<CaptureItemInfo> list = userItems.stream()
-                .filter(item -> item.getItemName().getCategory().equals(ItemCategory.CAPTURE)) // 포획 카테고리 필터링
-                .map(item ->
-                        CaptureItemInfo.of(
-                                item.getItemName().getName(),
-                                item.getQuantity()
-                        )).collect(Collectors.toList());
-
+        List<CaptureItemInfo> list = getItemsByCategory(uuid, ItemCategory.CAPTURE).stream()
+                .map(item -> CaptureItemInfo.of(item.getItemName().getName(), item.getQuantity()))
+                .collect(Collectors.toList());
         return CaptureItemListResponse.of(list);
     }
 
-    private UserEntity findUserBy(String uuid) {
-        return userRepository.findByUuid(uuid).orElseThrow(() ->
-                new BaseException(ErrorCode.USER_NOT_FOUND, "User not found with uuid: " + uuid)
-        );
+    public TrapItemListResponse getTrapItemList(final String uuid) {
+        List<TrapItemInfo> list = getItemsByCategory(uuid, ItemCategory.TRAP).stream()
+                .map(item -> TrapItemInfo.of(item.getItemName().getName(), item.getQuantity()))
+                .collect(Collectors.toList());
+        return TrapItemListResponse.of(list);
     }
 
-    public TrapItemListResponse getTrapItemList(final String uuid) {
-
-        UserEntity user = findUserBy(uuid);
-        List<UserItemMapEntity> userItems = userItemMapRepository.findByUserId(user.getId());
-
-        List<TrapItemInfo> list = userItems.stream()
-                .filter(item -> item.getItemName().getCategory().equals(ItemCategory.TRAP))
-                .map(item ->
-                        TrapItemInfo.of(
-                                item.getItemName().getName(),
-                                item.getQuantity()
-                        )).collect(Collectors.toList());
-
-        return TrapItemListResponse.of(list);
+    private List<UserItemMapEntity> getItemsByCategory(String uuid, ItemCategory category) {
+        long userId = userFinder.getByUuid(uuid).getId();
+        return userItemMapRepository.findByUserId(userId).stream()
+                .filter(item -> item.getItemName().getCategory().equals(category))
+                .collect(Collectors.toList());
     }
 
     @Transactional
     public void deleteUser(final String uuid) {
-        UserEntity user = findUserBy(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         userRepository.delete(user);
     }
 
     public CoworkerListResponse getCoworkerListByUser(final String uuid) {
-        UserEntity user = findUserBy(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         List<CoworkerEntity> coworkerEntityList = coworkerRepository.findByUserIdAndOnSaleFalseAndAvailableTrue(user.getId());
         List<CoworkerEntity> sortedCoworkerList = coworkerListFilter.sort(coworkerEntityList);
         List<UserGachaEntity> treasureList = gachaRepository.findAllByUserId(user.getId());

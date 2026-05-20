@@ -10,7 +10,6 @@ import com.game.subwayworkerserver.entity.UserItemMapEntity;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.UserItemMapRepository;
-import com.game.subwayworkerserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.geo.*;
 import org.springframework.data.redis.connection.RedisGeoCommands;
@@ -31,7 +30,7 @@ public class GiftBoxService {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    private final UserRepository userRepository;
+    private final UserFinder userFinder;
     private final UserItemMapRepository userItemMapRepository;
     private final UserLevelProcessor userLevelProcessor;
 
@@ -80,9 +79,7 @@ public class GiftBoxService {
     }
 
     private void updateUserRewardsAndItems(String userUuid, List<DefaultGift> defaultGifts, List<ExtraGift> bonusGifts) {
-        UserEntity user = userRepository.findByUuid(userUuid).orElseThrow(
-                () -> new BaseException(ErrorCode.USER_NOT_FOUND)
-        );
+        UserEntity user = userFinder.getByUuid(userUuid);
 
         // 2. 기본 재화 합산
         int totalCoins = 0;

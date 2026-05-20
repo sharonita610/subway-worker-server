@@ -16,7 +16,6 @@ import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.DungeonRecordRepository;
 import com.game.subwayworkerserver.repository.StageRecordRepository;
-import com.game.subwayworkerserver.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -31,7 +30,7 @@ import static com.game.subwayworkerserver.exception.ErrorCode.BAD_REQUEST;
 @RequiredArgsConstructor
 public class StageService {
 
-    private final UserRepository userRepository;
+    private final UserFinder userFinder;
     private final CoworkerRepository coworkerRepository;
     private final StageRecordRepository stageRecordRepository;
     private final StageRewardProcessor stageRewardProcessor;
@@ -54,7 +53,7 @@ public class StageService {
 
     @Transactional
     public StageClearResponse recordStage(final String uuid, final StageClearRequest request) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         long userId = user.getId();
         int requestedLevel = request.level();
         boolean success = request.success();
@@ -119,27 +118,14 @@ public class StageService {
     }
 
     private void updateReward(List<CoworkerEntity> usingCoworkers, StageRewardInfo stageRewardInfo, UserEntity user) {
-        usingCoworkers.forEach(coworker ->
-                coworkerLevelProcessor.processCoworkerExpAndLevelUp(coworker, stageRewardInfo.coworkerExp())
-        );
-        userLevelProcessor.processExpGainAndLevelUp(user, stageRewardInfo.userExp());
+        applyExpRewards(usingCoworkers, stageRewardInfo.coworkerExp(), user, stageRewardInfo.userExp());
         user.increaseCoin(stageRewardInfo.coin());
         user.processReward(stageRewardInfo);
     }
 
-    private void processReward(final UserEntity user, final StageRewardInfo stageRewardInfo) {
-
-    }
-
-    private UserEntity getUserByUuid(String uuid) {
-        return userRepository.findByUuid(uuid).orElseThrow(
-                () -> new BaseException(ErrorCode.USER_NOT_FOUND)
-        );
-    }
-
     @Transactional
     public StageClearResponse recordDungeon(final String uuid, final DungeonRequest request) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         long userId = user.getId();
 
         DungeonRecordEntity dungeonRecord = getDungeonByUserIdAnsStationNameAndUuid(
@@ -184,16 +170,18 @@ public class StageService {
     private void updateDungeonReward(
             final List<CoworkerEntity> usingCoworkers, final DungeonReward successReward, final UserEntity user
     ) {
-        usingCoworkers.forEach(coworker ->
-                coworkerLevelProcessor.processCoworkerExpAndLevelUp(coworker, successReward.getCoworkerExp())
-        );
-        userLevelProcessor.processExpGainAndLevelUp(user, successReward.getUserExp());
+        applyExpRewards(usingCoworkers, successReward.getCoworkerExp(), user, successReward.getUserExp());
         user.updateDungeonReward(successReward.getCoin(), successReward.getGacha(), successReward.getVacation());
+    }
+
+    private void applyExpRewards(List<CoworkerEntity> coworkers, int coworkerExp, UserEntity user, int userExp) {
+        coworkers.forEach(coworker -> coworkerLevelProcessor.processCoworkerExpAndLevelUp(coworker, coworkerExp));
+        userLevelProcessor.processExpGainAndLevelUp(user, userExp);
     }
 
     @Transactional
     public DungeonResponse checkDungeon(final String uuid, final String stationName) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         Optional<DungeonRecordEntity> dungeon = dungeonRecordRepository.findByUserIdAndStationName(user.getId(), stationName);
 
         if (dungeon.isEmpty()) {

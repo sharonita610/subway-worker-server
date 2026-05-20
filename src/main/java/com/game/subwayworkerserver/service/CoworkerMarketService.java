@@ -12,7 +12,6 @@ import com.game.subwayworkerserver.entity.UserEntity;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.repository.CoworkerMarketRepository;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
-import com.game.subwayworkerserver.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,13 +24,13 @@ import static com.game.subwayworkerserver.exception.ErrorCode.*;
 @RequiredArgsConstructor
 public class CoworkerMarketService {
 
-    private final UserRepository userRepository;
+    private final UserFinder userFinder;
     private final CoworkerRepository coworkerRepository;
     private final CoworkerMarketRepository coworkerMarketRepository;
     private final CoworkerListFilter coworkerListFilter;
 
     public GlobalCoworkerResponse getCoworkerMarket(final String uuid, CoworkerFilterRequest request) {
-        UserEntity user = findUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         List<CoworkerMarketEntity> marketCoworkers = coworkerMarketRepository.findAllByAvailableTrueAndSoldFalseAndSellerIdNot(user.getId());
         List<Long> coworkersId = getCoworkersId(marketCoworkers);
 
@@ -51,14 +50,8 @@ public class CoworkerMarketService {
                 .toList();
     }
 
-    private UserEntity findUserByUuid(String uuid) {
-        return userRepository.findByUuid(uuid).orElseThrow(
-                () -> new BaseException(USER_NOT_FOUND)
-        );
-    }
-
     public MyCoworkersMarketResponse getMyCoworkerOnSale(final String uuid) {
-        UserEntity user = findUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         List<CoworkerMarketEntity> coworkersOnSale = coworkerMarketRepository.findAllBySellerIdOrderByIdDesc(user.getId());
         List<Long> coworkersId = getCoworkersId(coworkersOnSale);
         List<CoworkerEntity> coworkersOnSaleByCoworkerIds = findCoworkersOnSaleByCoworkerIds(coworkersId);
@@ -68,9 +61,9 @@ public class CoworkerMarketService {
 
     @Transactional
     public void registerCoworkerOnMarket(final String uuid, final SellingRequest request) {
-        UserEntity user = findUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         Long userId = user.getId();
-        checkUserCoin(request.registrationFee(), user);
+        MarketValidator.checkUserCoin(request.registrationFee(), user);
 
         CoworkerEntity coworkerEntity = coworkerRepository.findByUserIdAndId(userId, request.targetId()).orElseThrow(
                 () -> new BaseException(NOT_FOUND, "CoworkerId not found.")
@@ -90,16 +83,9 @@ public class CoworkerMarketService {
         user.purchaseWithCoin(request.registrationFee());
     }
 
-    private static void checkUserCoin(final int registrationFee, final UserEntity user) {
-        boolean ableToBuy = user.hasCoinMoreThanItemPrice(registrationFee);
-        if (!ableToBuy) {
-            throw new BaseException(BAD_REQUEST, "Not enough coin");
-        }
-    }
-
     @Transactional
     public void cancelSellingMyCoworker(final String uuid, final long marketId) {
-        UserEntity user = findUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         CoworkerMarketEntity coworkerMarketEntity = coworkerMarketRepository.findByIdAndAvailableTrueAndSoldFalse(marketId).orElseThrow(
                 () -> new BaseException(NOT_FOUND, "Coworker already sold.")
         );
@@ -112,7 +98,7 @@ public class CoworkerMarketService {
 
     @Transactional
     public PaymentSuccessResponse getCoworkerSoldPayment(final String uuid, final long marketId) {
-        UserEntity user = findUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         CoworkerMarketEntity coworkerMarketEntity =
                 coworkerMarketRepository.findByIdAndSellerIdAndSoldTrueAndIsPaidFalseAndAvailableFalse(marketId, user.getId())
                         .orElseThrow(
@@ -131,12 +117,12 @@ public class CoworkerMarketService {
 
     @Transactional
     public void purchaseCoworker(final String uuid, final long marketId) {
-        UserEntity user = findUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         CoworkerMarketEntity coworkerMarketEntity = coworkerMarketRepository.findByIdAndAvailableTrueAndSoldFalse(marketId)
                 .orElseThrow(
                         () -> new BaseException(NOT_FOUND, "방금 판매된 동료에요.")
                 );
-        checkUserVacationTicket(user, coworkerMarketEntity.getPrice());
+        MarketValidator.checkUserVacationTicket(user, coworkerMarketEntity.getPrice());
         coworkerMarketEntity.purchase(user.getId());
 
         coworkerRepository.findByIdAndOnSaleTrue(coworkerMarketEntity.getCoworkerId())
@@ -151,10 +137,4 @@ public class CoworkerMarketService {
         user.purchaseWithVacationTickets(coworkerRealPrice);
     }
 
-    private static void checkUserVacationTicket(final UserEntity user, final int price) {
-        boolean ableToBuy = user.hasEnoughVacationTickets(price);
-        if (!ableToBuy) {
-            throw new BaseException(BAD_REQUEST, "휴가티켓이 부족해요!");
-        }
-    }
 }

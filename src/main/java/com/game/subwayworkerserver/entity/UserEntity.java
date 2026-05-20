@@ -334,7 +334,7 @@ public class UserEntity extends BaseTimeEntity {
             this.vacationTicket += stageRewardInfo.vacationTicket();
         } else if (stageRewardInfo.coin() != 0) {
             this.coin += stageRewardInfo.coin();
-        } else if (stageRewardInfo.extraReward().name().equals("GACHA_TICKET")) {
+        } else if (stageRewardInfo.extraReward() != null && stageRewardInfo.extraReward().name().equals("GACHA_TICKET")) {
             this.gachaTicket += stageRewardInfo.extraReward().quantity();
         }
     }

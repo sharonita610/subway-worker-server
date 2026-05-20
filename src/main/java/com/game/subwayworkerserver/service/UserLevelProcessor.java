@@ -96,7 +96,7 @@ public class UserLevelProcessor {
                     .userId(userId)
                     .type(RewardType.GACHA_TICKET)
                     .source(RewardSource.LEVEL_UP)
-                    .quantity(reward.vacationTicket())
+                    .quantity(reward.gachaTicket())
                     .isClaimed(false)
                     .mailId(0L)
                     .build());

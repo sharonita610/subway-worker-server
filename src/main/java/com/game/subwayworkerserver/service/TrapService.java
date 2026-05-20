@@ -8,7 +8,6 @@ import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
-import com.game.subwayworkerserver.repository.UserRepository;
 import com.game.subwayworkerserver.repository.UserItemMapRepository;
 import com.game.subwayworkerserver.repository.UserTrapMapRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class TrapService {
 
-    private final UserRepository userRepository;
+    private final UserFinder userFinder;
     private final UserItemMapRepository userItemMapRepository;
     private final UserTrapMapRepository userTrapMapRepository;
     private final CoworkerRepository coworkerRepository;
@@ -48,7 +47,7 @@ public class TrapService {
     public void setTrap(String uuid, GpsAddTrapRequest request) {
 
         // 1. 유저 정보 조회
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         long userId = user.getId();
 
         // 2. 트랩 아이템 정보 조회 (Enum)
@@ -90,21 +89,15 @@ public class TrapService {
     }
 
     public UserTrapListResponse findTrapByUser(final String uuid) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         List<UserTrapMapEntity> userTrapMapList =
                 userTrapMapRepository.findByUserIdAndExpiresAtAfterAndIsTrappedFalse(user.getId(), LocalDateTime.now());
         return UserTrapListResponse.of(userTrapMapList);
     }
 
-    private UserEntity getUserByUuid(final String uuid) {
-        return userRepository.findByUuid(uuid).orElseThrow(
-                () -> new BaseException(ErrorCode.USER_NOT_FOUND)
-        );
-    }
-
     @Transactional
     public CoworkerListResponse getTrapSuccessReward(final String uuid) {
-        UserEntity user = getUserByUuid(uuid);
+        UserEntity user = userFinder.getByUuid(uuid);
         List<UserTrapMapEntity> userTrapMapList = userTrapMapRepository.findByUserIdAndIsTrappedTrue(user.getId());
         List<CoworkerEntity> coworkerEntityList = saveUserTrapIfSuccess(userTrapMapList);
         user.updateTrapDone();

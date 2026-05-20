@@ -9,7 +9,6 @@ import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CaptureRecordRepository;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.UserItemMapRepository;
-import com.game.subwayworkerserver.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -25,7 +24,7 @@ public class CaptureCoworkerService {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    private final UserRepository userRepository;
+    private final UserFinder userFinder;
     private final CaptureRecordRepository captureRecordRepository;
     private final UserItemMapRepository userItemMapRepository;
     private final CoworkerRepository coworkerRepository;
@@ -58,9 +57,7 @@ public class CaptureCoworkerService {
         }
 
         // user 정보 조회
-        UserEntity user = userRepository.findByUuid(uuid).orElseThrow(
-                () -> new BaseException(ErrorCode.USER_NOT_FOUND)
-        );
+        UserEntity user = userFinder.getByUuid(uuid);
         long userId = user.getId();
 
         // user item map 에서 도구 조회
