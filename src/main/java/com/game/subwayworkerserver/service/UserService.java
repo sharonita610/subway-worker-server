@@ -15,10 +15,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -100,37 +100,24 @@ public class UserService {
     }
 
     public CaptureItemListResponse getCaptureItemList(final String uuid) {
-
-        UserEntity user = userFinder.getByUuid(uuid);
-
-        List<UserItemMapEntity> userItems = userItemMapRepository.findByUserId(user.getId());
-
-        List<CaptureItemInfo> list = userItems.stream()
-                .filter(item -> item.getItemName().getCategory().equals(ItemCategory.CAPTURE)) // 포획 카테고리 필터링
-                .map(item ->
-                        CaptureItemInfo.of(
-                                item.getItemName().getName(),
-                                item.getQuantity()
-                        )).collect(Collectors.toList());
-
+        List<CaptureItemInfo> list = getItemsByCategory(uuid, ItemCategory.CAPTURE).stream()
+                .map(item -> CaptureItemInfo.of(item.getItemName().getName(), item.getQuantity()))
+                .collect(Collectors.toList());
         return CaptureItemListResponse.of(list);
     }
 
-
     public TrapItemListResponse getTrapItemList(final String uuid) {
-
-        UserEntity user = userFinder.getByUuid(uuid);
-        List<UserItemMapEntity> userItems = userItemMapRepository.findByUserId(user.getId());
-
-        List<TrapItemInfo> list = userItems.stream()
-                .filter(item -> item.getItemName().getCategory().equals(ItemCategory.TRAP))
-                .map(item ->
-                        TrapItemInfo.of(
-                                item.getItemName().getName(),
-                                item.getQuantity()
-                        )).collect(Collectors.toList());
-
+        List<TrapItemInfo> list = getItemsByCategory(uuid, ItemCategory.TRAP).stream()
+                .map(item -> TrapItemInfo.of(item.getItemName().getName(), item.getQuantity()))
+                .collect(Collectors.toList());
         return TrapItemListResponse.of(list);
+    }
+
+    private List<UserItemMapEntity> getItemsByCategory(String uuid, ItemCategory category) {
+        long userId = userFinder.getByUuid(uuid).getId();
+        return userItemMapRepository.findByUserId(userId).stream()
+                .filter(item -> item.getItemName().getCategory().equals(category))
+                .collect(Collectors.toList());
     }
 
     @Transactional
