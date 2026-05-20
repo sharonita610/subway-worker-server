@@ -118,16 +118,9 @@ public class StageService {
     }
 
     private void updateReward(List<CoworkerEntity> usingCoworkers, StageRewardInfo stageRewardInfo, UserEntity user) {
-        usingCoworkers.forEach(coworker ->
-                coworkerLevelProcessor.processCoworkerExpAndLevelUp(coworker, stageRewardInfo.coworkerExp())
-        );
-        userLevelProcessor.processExpGainAndLevelUp(user, stageRewardInfo.userExp());
+        applyExpRewards(usingCoworkers, stageRewardInfo.coworkerExp(), user, stageRewardInfo.userExp());
         user.increaseCoin(stageRewardInfo.coin());
         user.processReward(stageRewardInfo);
-    }
-
-    private void processReward(final UserEntity user, final StageRewardInfo stageRewardInfo) {
-
     }
 
     @Transactional
@@ -177,11 +170,13 @@ public class StageService {
     private void updateDungeonReward(
             final List<CoworkerEntity> usingCoworkers, final DungeonReward successReward, final UserEntity user
     ) {
-        usingCoworkers.forEach(coworker ->
-                coworkerLevelProcessor.processCoworkerExpAndLevelUp(coworker, successReward.getCoworkerExp())
-        );
-        userLevelProcessor.processExpGainAndLevelUp(user, successReward.getUserExp());
+        applyExpRewards(usingCoworkers, successReward.getCoworkerExp(), user, successReward.getUserExp());
         user.updateDungeonReward(successReward.getCoin(), successReward.getGacha(), successReward.getVacation());
+    }
+
+    private void applyExpRewards(List<CoworkerEntity> coworkers, int coworkerExp, UserEntity user, int userExp) {
+        coworkers.forEach(coworker -> coworkerLevelProcessor.processCoworkerExpAndLevelUp(coworker, coworkerExp));
+        userLevelProcessor.processExpGainAndLevelUp(user, userExp);
     }
 
     @Transactional
