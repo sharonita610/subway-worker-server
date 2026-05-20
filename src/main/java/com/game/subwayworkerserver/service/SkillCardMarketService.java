@@ -63,7 +63,7 @@ public class SkillCardMarketService {
     @Transactional
     public void registerCardOnMarket(final String uuid, final SellingRequest request) {
         UserEntity user = userFinder.getByUuid(uuid);
-        checkUserCoin(request.registrationFee(), user);
+        MarketValidator.checkUserCoin(request.registrationFee(), user);
 
         long userId = user.getId();
         long cardId = request.targetId();
@@ -89,13 +89,6 @@ public class SkillCardMarketService {
         return skillCardRepository.findByUserIdAndIdAndInUseFalse(userId, skillCardId).orElseThrow(
                 () -> new BaseException(NOT_FOUND, "Skill card not found or is already in use")
         );
-    }
-
-    private static void checkUserCoin(final int registrationFee, final UserEntity user) {
-        boolean ableToBuy = user.hasCoinMoreThanItemPrice(registrationFee);
-        if (!ableToBuy) {
-            throw new BaseException(BAD_REQUEST, "Not enough coin");
-        }
     }
 
     @Transactional
@@ -138,7 +131,7 @@ public class SkillCardMarketService {
         SkillCardMarketEntity skillCardMarketEntity = skillCardMarketRepository.findByIdAndAvailableTrueAndSoldFalse(marketId).orElseThrow(
                 () -> new BaseException(NOT_FOUND, "방금 판매된 스킬카드예요.")
         );
-        checkUserVacationTicket(user, skillCardMarketEntity.getPrice());
+        MarketValidator.checkUserVacationTicket(user, skillCardMarketEntity.getPrice());
         skillCardMarketEntity.purchase(user.getId());
 
         skillCardRepository.findByIdAndOnSaleTrue(skillCardMarketEntity.getSkillCardId())
@@ -153,10 +146,4 @@ public class SkillCardMarketService {
         user.purchaseWithVacationTickets(skillCardRealPrice);
     }
 
-    private static void checkUserVacationTicket(final UserEntity user, final int price) {
-        boolean ableToBuy = user.hasEnoughVacationTickets(price);
-        if (!ableToBuy) {
-            throw new BaseException(BAD_REQUEST, "휴가티켓이 부족해요!");
-        }
-    }
 }

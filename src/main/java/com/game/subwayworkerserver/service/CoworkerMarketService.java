@@ -63,7 +63,7 @@ public class CoworkerMarketService {
     public void registerCoworkerOnMarket(final String uuid, final SellingRequest request) {
         UserEntity user = userFinder.getByUuid(uuid);
         Long userId = user.getId();
-        checkUserCoin(request.registrationFee(), user);
+        MarketValidator.checkUserCoin(request.registrationFee(), user);
 
         CoworkerEntity coworkerEntity = coworkerRepository.findByUserIdAndId(userId, request.targetId()).orElseThrow(
                 () -> new BaseException(NOT_FOUND, "CoworkerId not found.")
@@ -81,13 +81,6 @@ public class CoworkerMarketService {
         CoworkerMarketEntity coworkerMarketEntity = CoworkerMarketEntity.of(userId, request);
         coworkerMarketRepository.save(coworkerMarketEntity);
         user.purchaseWithCoin(request.registrationFee());
-    }
-
-    private static void checkUserCoin(final int registrationFee, final UserEntity user) {
-        boolean ableToBuy = user.hasCoinMoreThanItemPrice(registrationFee);
-        if (!ableToBuy) {
-            throw new BaseException(BAD_REQUEST, "Not enough coin");
-        }
     }
 
     @Transactional
@@ -129,7 +122,7 @@ public class CoworkerMarketService {
                 .orElseThrow(
                         () -> new BaseException(NOT_FOUND, "방금 판매된 동료에요.")
                 );
-        checkUserVacationTicket(user, coworkerMarketEntity.getPrice());
+        MarketValidator.checkUserVacationTicket(user, coworkerMarketEntity.getPrice());
         coworkerMarketEntity.purchase(user.getId());
 
         coworkerRepository.findByIdAndOnSaleTrue(coworkerMarketEntity.getCoworkerId())
@@ -144,10 +137,4 @@ public class CoworkerMarketService {
         user.purchaseWithVacationTickets(coworkerRealPrice);
     }
 
-    private static void checkUserVacationTicket(final UserEntity user, final int price) {
-        boolean ableToBuy = user.hasEnoughVacationTickets(price);
-        if (!ableToBuy) {
-            throw new BaseException(BAD_REQUEST, "휴가티켓이 부족해요!");
-        }
-    }
 }
