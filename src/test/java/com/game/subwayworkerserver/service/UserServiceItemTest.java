@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.service;
 
-import com.game.subwayworkerserver.controller.request.CaptureItemListResponse;
-import com.game.subwayworkerserver.controller.response.TrapItemListResponse;
+import com.game.subwayworkerserver.controller.response.item.CaptureItemListResponse;
+import com.game.subwayworkerserver.controller.response.item.TrapItemListResponse;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;

@@ -31,9 +31,9 @@ public class CaptureCoworkerService {
     private final UserLevelProcessor userLevelProcessor;
     private final CaptureCoworkerProcessor captureCoworkerProcessor;
 
-    private static final String COWORKER_LOCATIONS_KEY = "coworker:locations";
-    private static final String USER_ACQUIRED_PREFIX = "user:acquired:";
-    private static final String COWORKER_DATA_PREFIX = "coworker:data:";
+    private static final String COWORKER_LOCATIONS_KEY = GpsRedisKeys.COWORKER_LOCATIONS_KEY;
+    private static final String USER_ACQUIRED_PREFIX = GpsRedisKeys.USER_ACQUIRED_PREFIX;
+    private static final String COWORKER_DATA_PREFIX = GpsRedisKeys.COWORKER_DATA_PREFIX;
 
     private static final long ACQUIRED_KEY_TTL_HOURS = 4;
 
