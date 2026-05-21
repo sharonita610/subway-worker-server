@@ -47,14 +47,4 @@ public class SkillRandomizer {
         return skillList.subList(0, count);
     }
 
-    // --- 예시 사용 ---
-    public static void main(String[] args) {
-        System.out.println("--- 랜덤 패시브 스킬 2개 ---");
-        List<PassiveSkillCard> passiveSkills = getRandomPassiveSkills(2);
-        passiveSkills.forEach(skill -> System.out.println("ID:" + skill.getId() + ", 이름: " + skill.getKoreanName()));
-
-        System.out.println("\n--- 랜덤 액티브 스킬 2개 ---");
-        List<ActiveSkillCard> activeSkills = getRandomActiveSkills(2);
-        activeSkills.forEach(skill -> System.out.println("ID:" + skill.getId() + ", 이름: " + skill.getKoreanName()));
-    }
 }

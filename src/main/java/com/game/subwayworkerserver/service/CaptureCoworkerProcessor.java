@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.service;
 
-import com.game.subwayworkerserver.controller.response.CaptureResponse;
+import com.game.subwayworkerserver.controller.response.coworker.CaptureResponse;
 import com.game.subwayworkerserver.entity.ItemCategory;
 import com.game.subwayworkerserver.entity.ItemName;
 import com.game.subwayworkerserver.exception.BaseException;

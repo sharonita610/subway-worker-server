@@ -3,7 +3,7 @@ package com.game.subwayworkerserver.service;
 import com.game.subwayworkerserver.controller.request.OpenSkillCardRequest;
 import com.game.subwayworkerserver.controller.request.SkillCardConfigureRequest;
 import com.game.subwayworkerserver.controller.request.UpgradeRequest;
-import com.game.subwayworkerserver.controller.response.*;
+import com.game.subwayworkerserver.controller.response.skill.*;
 import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.SkillCardPaymentOption;

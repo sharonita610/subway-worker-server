@@ -2,7 +2,8 @@ package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.*;
-import com.game.subwayworkerserver.controller.response.*;
+import com.game.subwayworkerserver.controller.response.coworker.*;
+import com.game.subwayworkerserver.controller.response.gps.*;
 import com.game.subwayworkerserver.service.CaptureCoworkerService;
 import com.game.subwayworkerserver.service.GiftBoxService;
 import com.game.subwayworkerserver.service.GpsService;

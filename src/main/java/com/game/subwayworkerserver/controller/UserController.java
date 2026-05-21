@@ -1,9 +1,11 @@
 package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.SecurityUtils;
-import com.game.subwayworkerserver.controller.request.CaptureItemListResponse;
 import com.game.subwayworkerserver.controller.request.UserCreateRequest;
-import com.game.subwayworkerserver.controller.response.*;
+import com.game.subwayworkerserver.controller.response.coworker.*;
+import com.game.subwayworkerserver.controller.response.item.*;
+import com.game.subwayworkerserver.controller.response.skill.*;
+import com.game.subwayworkerserver.controller.response.user.*;
 import com.game.subwayworkerserver.profanity.ProfanityCheck;
 import com.game.subwayworkerserver.service.SkillCardService;
 import com.game.subwayworkerserver.service.UserService;
@@ -14,10 +16,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @Validated
 @Tag(name = "User API", description = "사용자 정보 및 프로필 관리 API")
 @RestController
@@ -135,7 +139,7 @@ public class UserController {
     )
     @GetMapping("/user/toss")
     public ResponseEntity<UuidResponse> getUUIDByHash(@RequestParam("hash") String tossHash) {
-        System.out.println("tossHash = " + tossHash);
+        log.debug("tossHash = {}", tossHash);
         return ResponseEntity.ok(userService.getUuidByHash(tossHash));
     }
 

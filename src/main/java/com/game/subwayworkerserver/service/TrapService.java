@@ -1,8 +1,8 @@
 package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.GpsAddTrapRequest;
-import com.game.subwayworkerserver.controller.response.CoworkerListResponse;
-import com.game.subwayworkerserver.controller.response.UserTrapListResponse;
+import com.game.subwayworkerserver.controller.response.coworker.CoworkerListResponse;
+import com.game.subwayworkerserver.controller.response.gps.UserTrapListResponse;
 import com.game.subwayworkerserver.domain.reward.BaseReward;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;

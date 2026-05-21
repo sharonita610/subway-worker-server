@@ -1,8 +1,8 @@
 package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.OpenLuckyGachaRequest;
-import com.game.subwayworkerserver.controller.response.LuckyGachaEarnResponse;
-import com.game.subwayworkerserver.controller.response.LuckyGachaListResponse;
+import com.game.subwayworkerserver.controller.response.gacha.LuckyGachaEarnResponse;
+import com.game.subwayworkerserver.controller.response.gacha.LuckyGachaListResponse;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerLevel;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.domain.baseinfo.GachaPaymentOption;

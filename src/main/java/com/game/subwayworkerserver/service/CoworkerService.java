@@ -2,9 +2,9 @@ package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.PartnerConfigureRequest;
 import com.game.subwayworkerserver.controller.request.UpgradeRequest;
-import com.game.subwayworkerserver.controller.response.CoworkerTypesResponse;
-import com.game.subwayworkerserver.controller.response.StageCoworkerListResponse;
-import com.game.subwayworkerserver.controller.response.UserUpgradeResponse;
+import com.game.subwayworkerserver.controller.response.coworker.CoworkerTypesResponse;
+import com.game.subwayworkerserver.controller.response.coworker.StageCoworkerListResponse;
+import com.game.subwayworkerserver.controller.response.coworker.UserUpgradeResponse;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
 import com.game.subwayworkerserver.entity.SkillCardEntity;

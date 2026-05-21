@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.CaptureCoworkerRequest;
-import com.game.subwayworkerserver.controller.response.CaptureResponse;
+import com.game.subwayworkerserver.controller.response.coworker.CaptureResponse;
 import com.game.subwayworkerserver.domain.reward.BaseReward;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;

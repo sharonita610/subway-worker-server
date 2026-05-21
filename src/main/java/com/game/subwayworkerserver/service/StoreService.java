@@ -1,8 +1,8 @@
 package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.PurchaseRequest;
-import com.game.subwayworkerserver.controller.response.ItemResponse;
-import com.game.subwayworkerserver.controller.response.StoreItemResponse;
+import com.game.subwayworkerserver.controller.response.item.ItemResponse;
+import com.game.subwayworkerserver.controller.response.item.StoreItemResponse;
 import com.game.subwayworkerserver.domain.baseinfo.Coin;
 import com.game.subwayworkerserver.domain.baseinfo.VacationTicket;
 import com.game.subwayworkerserver.entity.*;
