@@ -92,13 +92,4 @@ public class CharacterGenerator {
     public static CharacterGenerator.CharacterStats getRandomCoworkerStat(CoworkerType coworkerType, int level) {
         return generateStats(coworkerType, level);
     }
-        // --- 예시 사용 ---
-    public static void main(String[] args) {
-        CharacterStats tanker = generateStats(CoworkerType.MOONGSHIL, 1);
-        CharacterStats defenseTanker = generateStats(CoworkerType.POOBY, 7);
-
-        System.out.println("--- 랜덤 스탯 생성 결과 ---");
-        System.out.println(tanker);
-        System.out.println(defenseTanker);
-    }
 }

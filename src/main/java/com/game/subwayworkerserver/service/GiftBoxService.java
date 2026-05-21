@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.GpsRandomGiftRequest;
-import com.game.subwayworkerserver.controller.response.GpsRandomGiftResponse;
+import com.game.subwayworkerserver.controller.response.gps.GpsRandomGiftResponse;
 import com.game.subwayworkerserver.domain.reward.RandomBoxReward.DefaultGift;
 import com.game.subwayworkerserver.domain.reward.RandomBoxReward.ExtraGift;
 import com.game.subwayworkerserver.entity.ItemName;

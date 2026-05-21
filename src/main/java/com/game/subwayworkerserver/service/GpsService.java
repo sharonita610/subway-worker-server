@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.GpsRequest;
-import com.game.subwayworkerserver.controller.response.RandomGpsResponse;
+import com.game.subwayworkerserver.controller.response.gps.RandomGpsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.geo.*;

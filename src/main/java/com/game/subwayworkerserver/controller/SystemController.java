@@ -2,10 +2,10 @@ package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.SystemMailRequest;
-import com.game.subwayworkerserver.controller.response.CheckInListResponse;
-import com.game.subwayworkerserver.controller.response.LevelUpRewardResponse;
-import com.game.subwayworkerserver.controller.response.SubscribeListResponse;
-import com.game.subwayworkerserver.controller.response.UserMailBoxResponse;
+import com.game.subwayworkerserver.controller.response.user.CheckInListResponse;
+import com.game.subwayworkerserver.controller.response.user.LevelUpRewardResponse;
+import com.game.subwayworkerserver.controller.response.subscription.SubscribeListResponse;
+import com.game.subwayworkerserver.controller.response.user.UserMailBoxResponse;
 import com.game.subwayworkerserver.service.SystemService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;

@@ -1,10 +1,10 @@
 package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.SystemMailRequest;
-import com.game.subwayworkerserver.controller.response.CheckInListResponse;
-import com.game.subwayworkerserver.controller.response.LevelUpRewardResponse;
-import com.game.subwayworkerserver.controller.response.SubscribeListResponse;
-import com.game.subwayworkerserver.controller.response.UserMailBoxResponse;
+import com.game.subwayworkerserver.controller.response.user.CheckInListResponse;
+import com.game.subwayworkerserver.controller.response.user.LevelUpRewardResponse;
+import com.game.subwayworkerserver.controller.response.subscription.SubscribeListResponse;
+import com.game.subwayworkerserver.controller.response.user.UserMailBoxResponse;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerLevel;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.domain.baseinfo.SubscriptionItem;
