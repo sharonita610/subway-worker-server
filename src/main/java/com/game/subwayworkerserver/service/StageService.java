@@ -40,15 +40,9 @@ public class StageService {
 
     public List<MonsterSampleData.MonsterType> getStageMonsters(int num) {
         MonsterSampleData.initializeData();
-        List<MonsterSampleData.MonsterType> selectedMonsters = null;
-
-        if (num == 1) {
-            selectedMonsters = MonsterSampleData.sampleMonster1;
-        } else if (num == 2) {
-            selectedMonsters = MonsterSampleData.sampleMonster2;
-        }
-
-        return selectedMonsters;
+        if (num == 1) return MonsterSampleData.sampleMonster1;
+        if (num == 2) return MonsterSampleData.sampleMonster2;
+        throw new BaseException(BAD_REQUEST, "Invalid stage number: " + num);
     }
 
     @Transactional

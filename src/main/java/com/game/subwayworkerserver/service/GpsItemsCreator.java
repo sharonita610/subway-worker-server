@@ -19,9 +19,9 @@ public class GpsItemsCreator {
     private final CoworkerDataCreator coworkerDataCreator;
     private final RedisTemplate<String, String> redisTemplate;
 
-    private static final String COWORKER_LOCATIONS_KEY = "coworker:locations";
-    private static final String RANDOM_GIFT_BOX_KEY = "giftbox:locations";
-    private static final String COWORKER_DATA_PREFIX = "coworker:data:";
+    private static final String COWORKER_LOCATIONS_KEY = GpsRedisKeys.COWORKER_LOCATIONS_KEY;
+    private static final String RANDOM_GIFT_BOX_KEY = GpsRedisKeys.RANDOM_GIFT_BOX_KEY;
+    private static final String COWORKER_DATA_PREFIX = GpsRedisKeys.COWORKER_DATA_PREFIX;
     private static final String VISITED_GRID_KEY = "map:visited:grids";
     private static final String GRID_LOCK_PREFIX = "lock:grid:";
 

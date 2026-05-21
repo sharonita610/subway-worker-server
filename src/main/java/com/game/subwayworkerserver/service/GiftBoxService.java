@@ -34,8 +34,8 @@ public class GiftBoxService {
     private final UserItemMapRepository userItemMapRepository;
     private final UserLevelProcessor userLevelProcessor;
 
-    private static final String RANDOM_GIFT_BOX_KEY = "giftbox:locations";
-    private static final String USER_ACQUIRED_PREFIX = "user:acquired:";
+    private static final String RANDOM_GIFT_BOX_KEY = GpsRedisKeys.RANDOM_GIFT_BOX_KEY;
+    private static final String USER_ACQUIRED_PREFIX = GpsRedisKeys.USER_ACQUIRED_PREFIX;
     private static final double SEARCH_RADIUS_METER = 50.0;
 
     private static final int BASE_EXP = 20;
