@@ -22,7 +22,6 @@ import static com.game.subwayworkerserver.util.SkillRandomizer.getRandomPassiveS
 public class CoworkerEntity extends BaseTimeEntity {
 
     private static final int DEFAULT = 0;
-    private static final int ZERO = 0;
     private static final int ONE = 1;
 
     @Id
@@ -145,9 +144,9 @@ public class CoworkerEntity extends BaseTimeEntity {
                 .onSale(false)
                 .inUse(true)
                 .available(true)
-                .activeSkill1(randomActiveSkills.get(ZERO).getId())
+                .activeSkill1(randomActiveSkills.get(0).getId())
                 .activeSkill2(randomActiveSkills.get(ONE).getId())
-                .passiveSkill1(randomPassiveSkills.get(ZERO).getId())
+                .passiveSkill1(randomPassiveSkills.get(0).getId())
                 .passiveSkill2(randomPassiveSkills.get(ONE).getId())
                 .coworkerElement(stats.attribute())
                 .build();
@@ -183,9 +182,9 @@ public class CoworkerEntity extends BaseTimeEntity {
                 .onSale(false)
                 .inUse(false)
                 .available(true)
-                .activeSkill1(randomActiveSkills.get(ZERO).getId())
+                .activeSkill1(randomActiveSkills.get(0).getId())
                 .activeSkill2(randomActiveSkills.get(ONE).getId())
-                .passiveSkill1(randomPassiveSkills.get(ZERO).getId())
+                .passiveSkill1(randomPassiveSkills.get(0).getId())
                 .passiveSkill2(randomPassiveSkills.get(ONE).getId())
                 .coworkerElement(stats.attribute())
                 .build();

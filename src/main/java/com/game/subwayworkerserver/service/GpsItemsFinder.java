@@ -20,10 +20,10 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class GpsItemsFinder {
 
-    private static final String COWORKER_LOCATIONS_KEY = "coworker:locations";
-    private static final String RANDOM_GIFT_BOX_KEY = "giftbox:locations";
-    private static final String USER_ACQUIRED_PREFIX = "user:acquired:";
-    private static final String COWORKER_DATA_PREFIX = "coworker:data:";
+    private static final String COWORKER_LOCATIONS_KEY = GpsRedisKeys.COWORKER_LOCATIONS_KEY;
+    private static final String RANDOM_GIFT_BOX_KEY = GpsRedisKeys.RANDOM_GIFT_BOX_KEY;
+    private static final String USER_ACQUIRED_PREFIX = GpsRedisKeys.USER_ACQUIRED_PREFIX;
+    private static final String COWORKER_DATA_PREFIX = GpsRedisKeys.COWORKER_DATA_PREFIX;
 
     private final RedisTemplate<String, String> redisTemplate;
 
