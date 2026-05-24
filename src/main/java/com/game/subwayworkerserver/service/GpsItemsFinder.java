@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 @Slf4j
@@ -38,13 +39,15 @@ public class GpsItemsFinder {
                 .includeCoordinates()
                 .sort(Sort.Direction.ASC);
 
-        List<RandomGpsResponse.RandomCoworkerLocationResponse> coworkers =
-                findAndFilter(COWORKER_LOCATIONS_KEY, searchArea, args, userUuid, this::mapToCoworkerResponse);
+        CompletableFuture<List<RandomGpsResponse.RandomCoworkerLocationResponse>> coworkersFuture =
+                CompletableFuture.supplyAsync(() ->
+                        findAndFilter(COWORKER_LOCATIONS_KEY, searchArea, args, userUuid, this::mapToCoworkerResponse));
 
-        List<RandomGpsResponse.ItemLocationResponse> giftBoxes =
-                findAndFilter(RANDOM_GIFT_BOX_KEY, searchArea, args, userUuid, this::mapToItemResponse);
+        CompletableFuture<List<RandomGpsResponse.ItemLocationResponse>> giftBoxesFuture =
+                CompletableFuture.supplyAsync(() ->
+                        findAndFilter(RANDOM_GIFT_BOX_KEY, searchArea, args, userUuid, this::mapToItemResponse));
 
-        return new RandomGpsResponse(coworkers, giftBoxes);
+        return new RandomGpsResponse(coworkersFuture.join(), giftBoxesFuture.join());
     }
 
     private <T> List<T> findAndFilter(
