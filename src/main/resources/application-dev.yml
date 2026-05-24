@@ -4,16 +4,15 @@ cloud:
       static: ap-southeast-2
 spring:
   config:
-    # 1. AWS Parameter Store 경로를 DEV 환경으로 변경합니다.
-    import: "optional:aws-parameterstore:/config/subway_worker/dev/"
+    import: "optional:aws-parameterstore:${AWS_PARAM_PATH:/config/subway_worker/dev/}"
   aws:
     paramstore:
       enable: true
       profile-separator: _
 
   datasource:
-    url: jdbc:mysql://subway-worker-db.c7iwywymw7wj.ap-southeast-2.rds.amazonaws.com:3306/subway_dev_db?serverTimezone=UTC&characterEncoding=UTF-8&useSSL=false    # username과 password 변수는 Prod와 동일한 Secret/Parameter Store 키를 사용합니다.
-    username: admin
+    url: ${RDS_URL}
+    username: ${RDS_USERNAME}
     password: ${rds_password}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
