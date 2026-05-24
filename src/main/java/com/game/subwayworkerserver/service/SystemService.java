@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.service;
 
+import com.game.subwayworkerserver.config.CacheConfig;
 import com.game.subwayworkerserver.controller.request.SystemMailRequest;
 import com.game.subwayworkerserver.controller.response.user.CheckInListResponse;
 import com.game.subwayworkerserver.controller.response.user.LevelUpRewardResponse;
@@ -17,6 +18,7 @@ import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -69,6 +71,7 @@ public class SystemService {
         return LevelUpRewardResponse.of(levelUpReward);
     }
 
+    @CacheEvict(value = CacheConfig.USER_INFO_CACHE, key = "#uuid")
     @Transactional
     public void claimRewardById(final String uuid, final long mailId) {
         UserEntity user = userFinder.getByUuid(uuid);
@@ -107,6 +110,7 @@ public class SystemService {
         );
     }
 
+    @CacheEvict(value = CacheConfig.USER_INFO_CACHE, key = "#uuid")
     @Transactional
     public void claimAllRewards(final String uuid) {
         UserEntity user = userFinder.getByUuid(uuid);
@@ -129,6 +133,7 @@ public class SystemService {
         return CheckInListResponse.of(userCheckInRewards);
     }
 
+    @CacheEvict(value = CacheConfig.USER_INFO_CACHE, key = "#uuid")
     @Transactional
     public void claimCheckInReward(final String uuid) {
         UserEntity user = userFinder.getByUuid(uuid);
