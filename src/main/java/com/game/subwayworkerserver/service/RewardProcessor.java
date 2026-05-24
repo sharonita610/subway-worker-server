@@ -11,6 +11,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import org.springframework.data.domain.PageRequest;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,15 +129,21 @@ public class RewardProcessor {
         user.hasMailToCheck();
     }
 
+    private static final int SYSTEM_MAIL_BATCH_SIZE = 500;
+
     @Transactional
     public void sendSystemMail(final SystemMailRequest request) {
-        List<UserEntity> userEntities = userRepository.findAll();
-        userEntities.forEach(userEntity -> {
-            long mailId = createMail(userEntity.getId(), request.title(), request.content());
-            if (!request.rewards().isEmpty()) {
-                processSystemMail(userEntity, mailId, request.rewards());
-            }
-        });
+        int page = 0;
+        List<UserEntity> batch;
+        do {
+            batch = userRepository.findAll(PageRequest.of(page++, SYSTEM_MAIL_BATCH_SIZE)).getContent();
+            batch.forEach(userEntity -> {
+                long mailId = createMail(userEntity.getId(), request.title(), request.content());
+                if (!request.rewards().isEmpty()) {
+                    processSystemMail(userEntity, mailId, request.rewards());
+                }
+            });
+        } while (batch.size() == SYSTEM_MAIL_BATCH_SIZE);
     }
 
     private void processSystemMail(

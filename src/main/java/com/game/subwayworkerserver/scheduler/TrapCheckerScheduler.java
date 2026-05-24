@@ -3,6 +3,7 @@ package com.game.subwayworkerserver.scheduler;
 import com.game.subwayworkerserver.entity.UserTrapMapEntity;
 import com.game.subwayworkerserver.repository.UserRepository;
 import com.game.subwayworkerserver.repository.UserTrapMapRepository;
+import com.game.subwayworkerserver.service.GpsRedisKeys;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,11 +32,10 @@ public class TrapCheckerScheduler {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    private static final String COWORKER_LOCATIONS_KEY = "coworker:locations";
-    private static final String USER_ACQUIRED_PREFIX = "user:acquired:";
+    private static final String COWORKER_LOCATIONS_KEY = GpsRedisKeys.COWORKER_LOCATIONS_KEY;
+    private static final String USER_ACQUIRED_PREFIX = GpsRedisKeys.USER_ACQUIRED_PREFIX;
+    private static final String COWORKER_DATA_PREFIX = GpsRedisKeys.COWORKER_DATA_PREFIX;
     private static final double TRAP_CAPTURE_RADIUS_METER = 25.0;
-
-    private static final String COWORKER_DATA_PREFIX = "coworker:data:";
     private static final String TRAPPED_COWORKER_DATA_PREFIX = "trapped:coworker:data:";
     private static final long TRAPPED_DATA_TTL_DAYS = 7;
 
@@ -100,13 +100,9 @@ public class TrapCheckerScheduler {
                 // a) UserSetTrapEntity에 성공 기록
                 trap.markSuccess(coworkerId);
 
-                // b) UserEntity에 성공 플래그 설정 (로그인 시 알림용)
+                // b) UserEntity에 성공 플래그 설정 (로그인 시 알림용) + 획득 목록 등록
                 userRepository.findById(trap.getUserId()).ifPresent(user -> {
                     user.updateTrapSuccess();
-                    userRepository.save(user);
-                });
-
-                userRepository.findById(trap.getUserId()).ifPresent(user -> {
                     final String acquiredKey = USER_ACQUIRED_PREFIX + user.getUuid() + ":" + COWORKER_LOCATIONS_KEY;
                     redisTemplate.opsForSet().add(acquiredKey, coworkerId);
                 });

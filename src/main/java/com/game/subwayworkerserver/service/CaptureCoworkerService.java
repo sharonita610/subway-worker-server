@@ -71,16 +71,9 @@ public class CaptureCoworkerService {
         userItemMapEntity.decreaseQuantity();
 
         //  포획 기록
-        captureRecordRepository.findByUserId(userId).ifPresentOrElse(
-                CaptureRecordEntity::increaseTryCount,
-                () -> {
-                    CaptureRecordEntity captureRecordEntity = CaptureRecordEntity.of(userId);
-                    captureRecordRepository.save(captureRecordEntity);
-                }
-        );
-
         CaptureRecordEntity captureRecord = captureRecordRepository.findByUserId(userId)
-                .orElseThrow(() -> new BaseException(ErrorCode.INTERNAL_SERVER_ERROR));
+                .orElseGet(() -> captureRecordRepository.save(CaptureRecordEntity.of(userId)));
+        captureRecord.increaseTryCount();
 
         int captureAttemptCount = Integer.parseInt((String) hashData.get("captureAttemptCount"));
         int coworkerLevel = Integer.parseInt((String) hashData.get("coworkerLevel"));

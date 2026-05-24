@@ -10,8 +10,11 @@ import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.*;
+import com.game.subwayworkerserver.config.CacheConfig;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -82,6 +85,7 @@ public class UserService {
         }
     }
 
+    @Cacheable(value = CacheConfig.USER_INFO_CACHE, key = "#uuid")
     @Transactional
     public UserResponse getUserInfos(final String uuid) {
 
@@ -121,6 +125,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    @CacheEvict(value = CacheConfig.USER_INFO_CACHE, key = "#uuid")
     @Transactional
     public void deleteUser(final String uuid) {
         UserEntity user = userFinder.getByUuid(uuid);
