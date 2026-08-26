@@ -1,8 +1,19 @@
+cloud:
+  aws:
+    region:
+      static: ap-southeast-2
 spring:
+  config:
+    import: "optional:aws-parameterstore:${AWS_PARAM_PATH:/config/subway_worker/dev/}"
+  aws:
+    paramstore:
+      enable: true
+      profile-separator: _
+
   datasource:
     url: ${RDS_URL}
     username: ${RDS_USERNAME}
-    password: ${RDS_PASSWORD}
+    password: ${rds_password}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 20
@@ -18,5 +29,5 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
+      host: localhost
+      port: 6379
