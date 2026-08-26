@@ -7,7 +7,7 @@ WORKDIR /app
 # 빌드된 JAR 파일 복사
 # Gradle 빌드 경로는 build/libs/*.jar 입니다.
 # (Build Job에서 빌드가 먼저 수행됨)
-COPY build/libs/*.jar app.jar
+COPY build/libs/*-SNAPSHOT.jar app.jar
 
 # 실행 포트 노출
 EXPOSE 8080
