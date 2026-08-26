@@ -41,7 +41,7 @@ jobs:
             ECR_URI="${{ secrets.AWS_ACCOUNT_ID_SECRET }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.event.inputs.image_tag }}"
             docker pull $ECR_URI
             
-            docker run -d --name prod-server -p 8080:8080 \
+            docker run -d --name prod-server --restart unless-stopped -p 8080:8080 \
               -e SPRING_PROFILES_ACTIVE=prod \
               -e RDS_PASSWORD="$(aws ssm get-parameter --name "/config/subway_worker/prod/rds_password" --with-decryption --query "Parameter.Value" --output text --region ${{ env.AWS_REGION }})" \
               $ECR_URI
