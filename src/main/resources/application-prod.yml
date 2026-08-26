@@ -5,7 +5,7 @@ cloud:
       static: ap-southeast-2
 spring:
   config:
-    import: "optional:aws-parameterstore:${AWS_PARAM_PATH:/config/subway_worker/prod/}"
+    import: "optional:aws-parameterstore:/config/subway_worker/prod/"
   aws:
     paramstore:
       enable : true
@@ -13,8 +13,8 @@ spring:
 #      prefix: /config/subway_worker/prod/
 
   datasource:
-    url: ${RDS_URL}
-    username: ${RDS_USERNAME}
+    url: jdbc:mysql://subway-worker-db.c7iwywymw7wj.ap-southeast-2.rds.amazonaws.com:3306/subway_db?serverTimezone=UTC&characterEncoding=UTF-8&useSSL=false
+    username: admin
     password: ${rds_password}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
@@ -37,9 +37,9 @@ spring:
 
   toss:
     auth:
-      secret-name: ${TOSS_SECRET_NAME}
+      secret-name: toss-partner-mtls-certs
       aad-string: ${toss_aad_string}
       decryption-key-base64: ${toss_decryption_key}
-      auth-api-base: ${TOSS_AUTH_API_BASE}
+      auth-api-base: https://apps-in-toss-api.toss.im/api-partner/v1/apps-in-toss/user/oauth2
 
       port: 4000
