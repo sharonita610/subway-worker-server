@@ -32,7 +32,7 @@ public class UserController {
     private final SkillCardService skillCardService;
 
     @Operation(
-            summary = "사용자 이름 중복 체크 [완]",
+            summary = "사용자 이름 중복 체크",
             description = "유저이름 중복 체크",
             responses = {
                     @ApiResponse(responseCode = "200", description = "boolean")
@@ -44,7 +44,7 @@ public class UserController {
     }
 
     @Operation(
-            summary = "최초 사용자 등록 [완]",
+            summary = "최초 사용자 등록",
             description = "유저이름과 유저가 선택한 동료 속성을 받아 저장합니다.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "등록 성공")
@@ -56,7 +56,7 @@ public class UserController {
     }
 
     @Operation(
-            summary = "home 에서 사용되는 사용자 정보 조회 [완]",
+            summary = "home 에서 사용되는 사용자 정보 조회",
             description = "익명 ID (UUID)를 기반으로 사용자 기본 정보를 조회합니다.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "성공적인 정보 조회"),
@@ -70,7 +70,7 @@ public class UserController {
     }
 
     @Operation(
-            summary = "포획도구리스트 조회 [완]",
+            summary = "포획도구리스트 조회",
             description = "유저 uuid 로 사용 가능한 포획도구 리스트 조회",
             responses = {
                     @ApiResponse(responseCode = "200", description = "포획도구 리스트")
@@ -82,7 +82,7 @@ public class UserController {
     }
 
     @Operation(
-            summary = "트랩 도구리스트 조회 [완]",
+            summary = "트랩 도구리스트 조회",
             description = "유저 uuid 로 사용 가능한 트랩 리스트 조회",
             responses = {
                     @ApiResponse(responseCode = "200", description = "트랩 리스트")
@@ -94,7 +94,7 @@ public class UserController {
     }
 
     @Operation(
-            summary = "동료 리스트 조회 [완]",
+            summary = "동료 리스트 조회",
             description = "동료 리스트를 조회",
             responses = {
                     @ApiResponse(responseCode = "200", description = "동료 리스트")
@@ -106,7 +106,7 @@ public class UserController {
     }
 
     @Operation(
-            summary = "유저 삭제 [완]",
+            summary = "유저 삭제",
             description = "유저 삭제 기능",
             responses = {
                     @ApiResponse(responseCode = "200", description = "유저 삭제 완료")
@@ -119,7 +119,7 @@ public class UserController {
     }
 
     @Operation(
-            summary = "유저가 가지고 있는 스킬 카드 전체 조회 [완]",
+            summary = "유저가 가지고 있는 스킬 카드 전체 조회",
             description = "유저의 모든 스킬 리스트를 조회"
     )
     @GetMapping("/user/skillCards")

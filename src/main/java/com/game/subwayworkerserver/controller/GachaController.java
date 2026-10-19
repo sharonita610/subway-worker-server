@@ -24,7 +24,7 @@ public class GachaController {
     private final SkillCardService skillCardService;
 
     @Operation(
-            summary = "가챠 리스트 조회 기능 [완]",
+            summary = "가챠 리스트 조회 기능",
             description = "사용자의 가챠 리스트와 티켓을 조회하는 기능"
     )
     @GetMapping("/lucky-gacha")
@@ -33,7 +33,7 @@ public class GachaController {
     }
 
     @Operation(
-            summary = "가챠 뽑기 [완]",
+            summary = "가챠 뽑기",
             description = "사용자의 가챠 리스트와 티켓을 조회하는 기능"
     )
     @PostMapping("/lucky-gacha")
@@ -42,7 +42,7 @@ public class GachaController {
     }
 
     @Operation(
-            summary = "원하는 타입의 스킬 카드 뽑기 [완]",
+            summary = "원하는 타입의 스킬 카드 뽑기",
             description = "스킬 카드 뽑기"
     )
     @PostMapping("/lucky-skill-card")

@@ -42,10 +42,11 @@ public class StageService {
     private final DungeonRecordRepository dungeonRecordRepository;
 
     public List<StageMonsterData.MonsterType> getStageMonsters(int num) {
-        StageMonsterData.initializeData();
-        if (num == 1) return StageMonsterData.sampleMonster1;
-        if (num == 2) return StageMonsterData.sampleMonster2;
-        throw new BaseException(BAD_REQUEST, "Invalid stage number: " + num);
+        List<StageMonsterData.MonsterType> monsters = StageMonsterData.forStage(num);
+        if (monsters.isEmpty()) {
+            throw new BaseException(BAD_REQUEST, "Invalid stage number: " + num);
+        }
+        return monsters;
     }
 
     @Transactional

@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,6 +17,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     /**
@@ -63,8 +65,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorResponse> handleException(Exception e, WebRequest request) {
 
-        // 로그 기록 (e.printStackTrace() 또는 로거 사용)
-        e.printStackTrace();
+        log.error("Unhandled exception on {}: {}", ((ServletWebRequest) request).getRequest().getRequestURI(), e.getMessage(), e);
 
         ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
 
@@ -89,7 +90,7 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
 
         String detailMessage = "데이터베이스 제약 조건(Not Null, Unique 등)을 위반했습니다. 입력 값을 확인해주세요.";
-        e.printStackTrace();
+        log.warn("Data integrity violation: {}", e.getMostSpecificCause().getMessage());
 
         ErrorResponse response = ErrorResponse.builder()
                 .status(errorCode.getStatus().value())

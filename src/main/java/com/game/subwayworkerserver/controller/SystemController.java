@@ -25,7 +25,7 @@ public class SystemController {
     private final ResourceLoader resourceLoader;
 
     @Operation(
-            summary = "우편함 조회 [완]",
+            summary = "우편함 조회",
             description = "동료 리스트를 조회"
     )
     @GetMapping("/mail-box")
@@ -34,7 +34,7 @@ public class SystemController {
     }
 
     @Operation(
-            summary = "단일 보상 받기 [완]",
+            summary = "단일 보상 받기",
             description = "mailId 로 단일 보상을 받는 기능"
     )
     @PostMapping("/mail-box")
@@ -44,7 +44,7 @@ public class SystemController {
     }
 
     @Operation(
-            summary = "전체 보상 받기 [완]",
+            summary = "전체 보상 받기",
             description = "우편함에 있는 모든 보상 받기"
     )
     @PostMapping("/mail-box/all")
@@ -54,7 +54,7 @@ public class SystemController {
     }
 
     @Operation(
-            summary = "레벨 업 보상 받기 [완]",
+            summary = "레벨 업 보상 받기",
             description = "사용자의 레벨 상승 보상받기"
     )
     @GetMapping("/level-up-reward")
@@ -63,7 +63,7 @@ public class SystemController {
     }
 
     @Operation(
-            summary = "출근부 조회 [완]",
+            summary = "출근부 조회",
             description = "연속 출석부 조회 및 현재까지 받은 보상조회"
     )
     @GetMapping("/check-in-list")
@@ -72,7 +72,7 @@ public class SystemController {
     }
 
     @Operation(
-            summary = "출석 보상 받기 [완]",
+            summary = "출석 보상 받기",
             description = "아직 받지 못한 출석 보상 받기"
     )
     @PostMapping("/check-in")
@@ -82,7 +82,7 @@ public class SystemController {
     }
 
     @Operation(
-            summary = "구독 리스트 조회 [완]",
+            summary = "구독 리스트 조회",
             description = "현재 구독 상태가 포함된 구독 리스트 조회"
     )
     @GetMapping("/subscribe-list")
@@ -91,7 +91,7 @@ public class SystemController {
     }
 
     @Operation(
-            summary = "구독하기 [완]",
+            summary = "구독하기",
             description = "구독하기"
     )
     @PostMapping("/subscribe")
@@ -101,7 +101,7 @@ public class SystemController {
     }
 
     @Operation(
-            summary = "logo 조회 api [완]",
+            summary = "logo 조회 api",
             description = "로고를 조회하는 api"
     )
     @GetMapping("/logo")
@@ -118,7 +118,7 @@ public class SystemController {
     }
 
     @Operation(
-            summary = "system 메일을 보내는 기능 [완]",
+            summary = "system 메일을 보내는 기능",
             description = "사용자에게 system 메일을 보상과 함께 제공하는 기능"
     )
     @PostMapping("/system/mail")

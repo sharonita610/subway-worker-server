@@ -25,7 +25,7 @@ public class MarketController {
     private final SkillCardMarketService skillCardMarketService;
 
     @Operation(
-            summary = "영입 가능한 동료 리스트 조회 [완]",
+            summary = "영입 가능한 동료 리스트 조회",
             description = "장터에 올라온 모든 동료의 리스트를 필터링 기능을 포함하여 조회"
     )
     @PostMapping("/market/global/coworker")
@@ -34,7 +34,7 @@ public class MarketController {
     }
 
     @Operation(
-            summary = "내가 판매 중인 동료 리스트 조회 [완]",
+            summary = "내가 판매 중인 동료 리스트 조회",
             description = "내가 판매 중인 동료의 리스트를 포함하여 조회"
     )
     @PostMapping("/market/coworker/selling-list")
@@ -43,7 +43,7 @@ public class MarketController {
     }
 
     @Operation(
-            summary = "장터에서 동료 영입하기 [완]",
+            summary = "장터에서 동료 영입하기",
             description = "장터에 올라온 동료를 영입하기"
     )
     @PostMapping("/market/global/buy-coworker")
@@ -53,7 +53,7 @@ public class MarketController {
     }
 
     @Operation(
-            summary = "나의 동료 장터에 내놓기 [완]",
+            summary = "나의 동료 장터에 내놓기",
             description = "나의 동료를 장터에 내놓기 위한 기능"
     )
     @PostMapping("/market/coworker/sell")
@@ -63,7 +63,7 @@ public class MarketController {
     }
 
     @Operation(
-            summary = "장터에 내놓은 동료 철회 [완]",
+            summary = "장터에 내놓은 동료 철회",
             description = "장터에 내놓았던 동료를 철회하는 기능"
     )
     @PostMapping("/market/coworker/cancel")
@@ -73,7 +73,7 @@ public class MarketController {
     }
 
     @Operation(
-            summary = "판매 완료된 동료 정산 [완]",
+            summary = "판매 완료된 동료 정산",
             description = "장터에 내놓았던 동료가 판매되어 정산 요청"
     )
     @GetMapping("/market/coworker/get-paid")
@@ -82,7 +82,7 @@ public class MarketController {
     }
 
     @Operation(
-            summary = "구매 가능한 스킬카드 리스트 조회 [완]",
+            summary = "구매 가능한 스킬카드 리스트 조회",
             description = "장터에 올라온 모든 스킬 카드의 리스트를 필터링 기능을 포함하여 조회"
     )
     @PostMapping("/market/global/skill")
@@ -93,7 +93,7 @@ public class MarketController {
     }
 
     @Operation(
-            summary = "내가 판매 중인 스킬카드 리스트 조회 [완]",
+            summary = "내가 판매 중인 스킬카드 리스트 조회",
             description = "내가 판매 중인 스킬카드 리스트를 조회"
     )
     @PostMapping("/market/skill/selling-list")
@@ -102,7 +102,7 @@ public class MarketController {
     }
 
     @Operation(
-            summary = "장터에서 스킬카드 구매하기 [완]",
+            summary = "장터에서 스킬카드 구매하기",
             description = "장터에 올라온 스킬카드를 구매하기"
     )
     @PostMapping("/market/global/buy-skill")
@@ -112,7 +112,7 @@ public class MarketController {
     }
 
     @Operation(
-            summary = "나의 스킬카드 장터에 내놓기 [완]",
+            summary = "나의 스킬카드 장터에 내놓기",
             description = "나의 스킬카드 장터에 내놓기 위한 기능"
     )
     @PostMapping("/market/skill/sell")
@@ -122,7 +122,7 @@ public class MarketController {
     }
 
     @Operation(
-            summary = "장터에 내놓은 스킬카드 판매 철회 [완]",
+            summary = "장터에 내놓은 스킬카드 판매 철회",
             description = "장터에 내놓았던 스킬카드를 철회하는 기능"
     )
     @PostMapping("/market/skill/cancel")
@@ -132,7 +132,7 @@ public class MarketController {
     }
 
     @Operation(
-            summary = "판매 완료된 스킬카드 정산 [완]",
+            summary = "판매 완료된 스킬카드 정산",
             description = "장터에 내놓았던 스킬카드가 판매되어 정산 요청"
     )
     @GetMapping("/market/skill/get-paid")

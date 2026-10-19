@@ -23,7 +23,7 @@ public class StoreController {
     private final StoreService storeService;
 
     @Operation(
-            summary = "store 조회 [완]",
+            summary = "store 조회",
             description = "store에서 구매 가능한 모든 아이템의 리스트를 조회",
             responses = {
                     @ApiResponse(responseCode = "200", description = "성공적인 정보 조회")
@@ -35,7 +35,7 @@ public class StoreController {
     }
 
     @Operation(
-            summary = "아이템 구매 [완]",
+            summary = "아이템 구매",
             description = "구매하고자 포획 또는 덫의 정보를 받아 코인으로 구매",
             responses = {
                     @ApiResponse(responseCode = "200", description = "성공")
@@ -48,7 +48,7 @@ public class StoreController {
     }
 
     @Operation(
-            summary = "광고를 보고 아이템 구매 하기 [외부 광고 api 제외 완]",
+            summary = "광고를 보고 아이템 구매 하기 (외부 광고 API 제외)",
             description = "광고를 보고 랜덤 아이템을 얻는 기능",
             responses = {
                     @ApiResponse(responseCode = "200", description = "성공")
@@ -60,7 +60,7 @@ public class StoreController {
     }
 
     @Operation(
-            summary = "코인 구매 [완]",
+            summary = "코인 구매",
             description = "휴가 티켓으로 코인을 구매한다",
             responses = {
                     @ApiResponse(responseCode = "200", description = "성공")
@@ -73,7 +73,7 @@ public class StoreController {
     }
 
     @Operation(
-            summary = "휴가 티켓 구매 [실제 결제 제외 완]",
+            summary = "휴가 티켓 구매 (실제 결제 제외)",
             description = "현금으로 휴가 티켓을 구매한다",
             responses = {
                     @ApiResponse(responseCode = "200", description = "성공"),

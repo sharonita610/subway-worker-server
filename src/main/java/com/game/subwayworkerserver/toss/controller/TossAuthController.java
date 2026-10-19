@@ -1,5 +1,7 @@
 package com.game.subwayworkerserver.toss.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.toss.dto.GetAccessTokenRequest;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @Profile("!dev")
+@Tag(name = "Toss Auth", description = "토스 로그인 연동 API")
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -29,18 +32,21 @@ public class TossAuthController {
     private static final int BEARER_PREFIX_LENGTH = 7;
 
     // Access Token 발급
+    @Operation(summary = "토스 액세스 토큰 발급", description = "토스 로그인 인가 코드로 액세스 토큰과 리프레시 토큰을 발급받습니다.")
     @PostMapping("/get-access-token")
     public ResponseEntity<?> getAccessToken(@RequestBody GetAccessTokenRequest request) {
         return ResponseEntity.ok(authService.getAccessToken(request));
     }
 
     // Access Token 재발급
+    @Operation(summary = "토스 액세스 토큰 갱신", description = "리프레시 토큰으로 액세스 토큰을 재발급합니다.")
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
         return ResponseEntity.ok(authService.refreshAccessToken(request));
     }
 
     // 사용자 정보 조회
+    @Operation(summary = "토스 사용자 정보 조회", description = "Authorization 헤더의 토스 액세스 토큰으로 암호화된 사용자 정보를 받아 복호화해 돌려줍니다.")
     @GetMapping("/get-user-info")
     public ResponseEntity<?> getUserInfo(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         String accessToken = extractAccessToken(authorizationHeader);
@@ -49,6 +55,7 @@ public class TossAuthController {
     }
 
     // AccessToken으로 로그아웃
+    @Operation(summary = "토스 로그아웃 (액세스 토큰)", description = "Authorization 헤더의 액세스 토큰으로 토스 세션을 종료합니다.")
     @PostMapping("/logout-by-access-token")
     public ResponseEntity<?> logoutByAccessToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         String accessToken = extractAccessToken(authorizationHeader); // ⭐️ 헬퍼 메서드 사용
@@ -56,6 +63,7 @@ public class TossAuthController {
     }
 
     // UserKey로 로그아웃
+    @Operation(summary = "토스 로그아웃 (사용자 키)", description = "토스 사용자 키로 해당 사용자의 토스 세션을 종료합니다.")
     @PostMapping("/logout-by-user-key")
     public ResponseEntity<?> logoutByUserKey(@RequestBody LogoutByUserKeyRequest request) {
         return ResponseEntity.ok(authService.logoutByUserKey(request));
