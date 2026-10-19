@@ -1,17 +1,23 @@
 package com.game.subwayworkerserver.service.gps;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.geo.Point;
-import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
-@Slf4j
+/**
+ * 사용자 주변 3x3 grid에 동료와 선물상자 위치를 생성한다.
+ * grid 단위로 방문 여부를 기록하고, Redis 락으로 동시 요청의 중복 생성을 막는다.
+ */
 @Component
 @RequiredArgsConstructor
 public class GpsItemsCreator {
@@ -19,17 +25,15 @@ public class GpsItemsCreator {
     private final CoworkerDataCreator coworkerDataCreator;
     private final RedisTemplate<String, String> redisTemplate;
 
-    private static final String COWORKER_LOCATIONS_KEY = GpsRedisKeys.COWORKER_LOCATIONS_KEY;
-    private static final String RANDOM_GIFT_BOX_KEY = GpsRedisKeys.RANDOM_GIFT_BOX_KEY;
-    private static final String COWORKER_DATA_PREFIX = GpsRedisKeys.COWORKER_DATA_PREFIX;
-    private static final String VISITED_GRID_KEY = "map:visited:grids";
-    private static final String GRID_LOCK_PREFIX = "lock:grid:";
-
     private static final long MAP_DATA_TTL_HOURS = 1;
+    private static final long GRID_LOCK_TTL_SECONDS = 10;
     private static final double GRID_SIZE = 0.01;
     private static final int COWORKER_COUNT = 2;
     private static final int GIFTS_COUNT = 2;
     private static final double MAX_JITTER = 0.004;
+
+    private record Created(boolean coworkers, boolean gifts) {
+    }
 
     public void createItemsInArea(final double latitude, final double longitude) {
         boolean anyCoworkersAdded = false;
@@ -39,61 +43,71 @@ public class GpsItemsCreator {
             for (int j = -1; j <= 1; j++) {
                 double targetLat = latitude + (i * GRID_SIZE);
                 double targetLon = longitude + (j * GRID_SIZE);
+                String gridId = toGridId(targetLat, targetLon);
 
-                String gridId = String.format("%.2f:%.2f",
-                        Math.floor(targetLat / GRID_SIZE) * GRID_SIZE,
-                        Math.floor(targetLon / GRID_SIZE) * GRID_SIZE);
-
-                if (Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(VISITED_GRID_KEY, gridId))) {
+                if (isVisited(gridId)) {
                     continue;
                 }
 
-                String lockKey = GRID_LOCK_PREFIX + gridId;
-                Boolean acquired = redisTemplate.opsForValue().setIfAbsent(lockKey, "LOCKED", 10, TimeUnit.SECONDS);
+                String lockKey = GpsRedisKeys.GRID_LOCK_PREFIX + gridId;
+                Boolean acquired = redisTemplate.opsForValue()
+                        .setIfAbsent(lockKey, "LOCKED", GRID_LOCK_TTL_SECONDS, TimeUnit.SECONDS);
+                if (!Boolean.TRUE.equals(acquired)) {
+                    continue;
+                }
 
-                if (Boolean.TRUE.equals(acquired)) {
-                    try {
-                        if (Boolean.FALSE.equals(redisTemplate.opsForSet().isMember(VISITED_GRID_KEY, gridId))) {
-                            boolean[] added = generateDataWithPipeline(targetLat, targetLon, gridId);
-                            anyCoworkersAdded |= added[0];
-                            anyGiftsAdded |= added[1];
-                        }
-                    } finally {
-                        redisTemplate.delete(lockKey);
+                try {
+                    if (isVisited(gridId)) {
+                        continue;
                     }
+                    Created created = createGridItems(targetLat, targetLon, gridId);
+                    anyCoworkersAdded |= created.coworkers();
+                    anyGiftsAdded |= created.gifts();
+                } finally {
+                    redisTemplate.delete(lockKey);
                 }
             }
         }
 
-        if (anyCoworkersAdded) redisTemplate.expire(COWORKER_LOCATIONS_KEY, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
-        if (anyGiftsAdded) redisTemplate.expire(RANDOM_GIFT_BOX_KEY, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
+        if (anyCoworkersAdded) {
+            redisTemplate.expire(GpsRedisKeys.COWORKER_LOCATIONS_KEY, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
+        }
+        if (anyGiftsAdded) {
+            redisTemplate.expire(GpsRedisKeys.RANDOM_GIFT_BOX_KEY, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
+        }
     }
 
-    private boolean[] generateDataWithPipeline(double lat, double lon, String gridId) {
+    private Created createGridItems(double lat, double lon, String gridId) {
         Map<String, Point> coworkers = new HashMap<>();
         Map<String, Point> gifts = new HashMap<>();
-        List<Map<String, String>> hashDetails = new ArrayList<>();
+        List<Map<String, String>> coworkerDetails = new ArrayList<>();
 
-        createLocations(lat, lon, COWORKER_COUNT, "COWORKER", coworkers, hashDetails);
+        createLocations(lat, lon, COWORKER_COUNT, "COWORKER", coworkers, coworkerDetails);
         createLocations(lat, lon, GIFTS_COUNT, "GIFT", gifts, null);
 
-        redisTemplate.executePipelined((RedisConnection connection) -> {
-            addGeoIfNotEmpty(COWORKER_LOCATIONS_KEY, coworkers);
-            addGeoIfNotEmpty(RANDOM_GIFT_BOX_KEY, gifts);
+        addGeoIfNotEmpty(GpsRedisKeys.COWORKER_LOCATIONS_KEY, coworkers);
+        addGeoIfNotEmpty(GpsRedisKeys.RANDOM_GIFT_BOX_KEY, gifts);
 
-            for (Map<String, String> data : hashDetails) {
-                String key = COWORKER_DATA_PREFIX + data.get("id");
-                redisTemplate.opsForHash().putAll(key, data);
-                redisTemplate.expire(key, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
-            }
+        for (Map<String, String> data : coworkerDetails) {
+            String key = GpsRedisKeys.COWORKER_DATA_PREFIX + data.get("id");
+            redisTemplate.opsForHash().putAll(key, data);
+            redisTemplate.expire(key, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
+        }
 
-            redisTemplate.opsForSet().add(VISITED_GRID_KEY, gridId);
-            redisTemplate.expire(VISITED_GRID_KEY, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
+        redisTemplate.opsForSet().add(GpsRedisKeys.VISITED_GRID_KEY, gridId);
+        redisTemplate.expire(GpsRedisKeys.VISITED_GRID_KEY, MAP_DATA_TTL_HOURS, TimeUnit.HOURS);
 
-            return null;
-        });
+        return new Created(!coworkers.isEmpty(), !gifts.isEmpty());
+    }
 
-        return new boolean[]{!coworkers.isEmpty(), !gifts.isEmpty()};
+    private boolean isVisited(String gridId) {
+        return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(GpsRedisKeys.VISITED_GRID_KEY, gridId));
+    }
+
+    private static String toGridId(double lat, double lon) {
+        return String.format(Locale.ROOT, "%.2f:%.2f",
+                Math.floor(lat / GRID_SIZE) * GRID_SIZE,
+                Math.floor(lon / GRID_SIZE) * GRID_SIZE);
     }
 
     private void addGeoIfNotEmpty(String key, Map<String, Point> locations) {

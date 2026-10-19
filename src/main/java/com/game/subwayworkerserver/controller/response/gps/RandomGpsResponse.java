@@ -20,8 +20,6 @@ public record RandomGpsResponse(
             Double distanceKm
     ) {
 
-        private final static String EMPTY = "empty";
-
         public static RandomCoworkerLocationResponse of(
                 final String coworkerId,
                 final String coworkerKorName,
@@ -41,10 +39,6 @@ public record RandomGpsResponse(
                     longitude,
                     distance
             );
-        }
-
-        public static RandomCoworkerLocationResponse empty() {
-            return new RandomCoworkerLocationResponse(EMPTY, EMPTY, EMPTY, 0, EMPTY, 0.0, 0.0,0.0);
         }
     }
 
