@@ -2,10 +2,14 @@ package com.game.subwayworkerserver.service.gps;
 
 import com.game.subwayworkerserver.domain.item.ItemName;
 import com.game.subwayworkerserver.domain.user.Gender;
+import com.game.subwayworkerserver.entity.CoworkerEntity;
 import com.game.subwayworkerserver.entity.UserEntity;
 import com.game.subwayworkerserver.entity.UserTrapMapEntity;
+import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.UserRepository;
 import com.game.subwayworkerserver.repository.UserTrapMapRepository;
+import com.game.subwayworkerserver.service.common.UserFinder;
+import com.game.subwayworkerserver.service.common.UserLevelProcessor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -49,6 +54,9 @@ class TrapServiceTest {
     @Mock private GeoOperations<String, String> geoOperations;
     @Mock private HashOperations<String, Object, Object> hashOperations;
     @Mock private SetOperations<String, String> setOperations;
+    @Mock private UserFinder userFinder;
+    @Mock private CoworkerRepository coworkerRepository;
+    @Mock private UserLevelProcessor userLevelProcessor;
 
     private static final long USER_ID = 1L;
     private static final String USER_UUID = "user-uuid-1";
@@ -130,5 +138,51 @@ class TrapServiceTest {
         assertThat(trap.isTrapped()).isFalse();
         verify(hashOperations, never()).putAll(anyString(), any());
         verify(userRepository, never()).findById(any());
+    }
+
+    // ---- 보상 수령: 트랩 도구 확률 판정 (리팩터링 전 동작 고정) ----
+
+    private UserTrapMapEntity successfulTrap(ItemName tool) {
+        UserTrapMapEntity trap = new UserTrapMapEntity(USER_ID, tool, 37.5, 127.0, LocalDateTime.now().plusHours(1));
+        trap.markSuccess(COWORKER_ID);
+        return trap;
+    }
+
+    @Test
+    void 금삽_트랩은_보상_수령_시_항상_동료가_되고_보상을_준다() {
+        UserEntity user = user();
+        UserTrapMapEntity trap = successfulTrap(ItemName.GOLD_SHOVEL);
+        when(userFinder.getByUuid(USER_UUID)).thenReturn(user);
+        when(userTrapMapRepository.findByUserIdAndIsTrappedTrue(USER_ID)).thenReturn(List.of(trap));
+        when(redisTemplate.opsForHash()).thenReturn(hashOperations);
+        when(hashOperations.entries(GpsRedisKeys.TRAPPED_COWORKER_DATA_PREFIX + COWORKER_ID))
+                .thenReturn(Map.of("coworkerName", "뭉실", "coworkerLevel", "3"));
+        when(coworkerRepository.save(any(CoworkerEntity.class))).thenAnswer(inv -> {
+            CoworkerEntity saved = inv.getArgument(0);
+            ReflectionTestUtils.setField(saved, "id", 100L);
+            return saved;
+        });
+
+        trapService.getTrapSuccessReward(USER_UUID);
+
+        assertThat(trap.isSuccessful()).isTrue();
+        assertThat(user.getCoin()).isEqualTo(5000);
+        verify(userLevelProcessor).processExpGainAndLevelUp(user, 50);
+        verify(redisTemplate).delete(GpsRedisKeys.TRAPPED_COWORKER_DATA_PREFIX + COWORKER_ID);
+    }
+
+    @Test
+    void 랜덤트랩은_확률이_0이라_보상_수령_시_항상_실패_처리된다() {
+        UserEntity user = user();
+        UserTrapMapEntity trap = successfulTrap(ItemName.RANDOM_TRAP);
+        when(userFinder.getByUuid(USER_UUID)).thenReturn(user);
+        when(userTrapMapRepository.findByUserIdAndIsTrappedTrue(USER_ID)).thenReturn(List.of(trap));
+
+        trapService.getTrapSuccessReward(USER_UUID);
+
+        assertThat(trap.isSuccessful()).isFalse();
+        assertThat(user.getCoin()).isZero();
+        verify(coworkerRepository, never()).save(any());
+        verify(userLevelProcessor, never()).processExpGainAndLevelUp(any(), anyInt());
     }
 }
