@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.controller;
 
-import com.game.subwayworkerserver.config.SecurityUtils;
+import com.game.subwayworkerserver.config.CurrentUuid;
 import com.game.subwayworkerserver.controller.request.system.SystemMailRequest;
 import com.game.subwayworkerserver.controller.response.user.CheckInListResponse;
 import com.game.subwayworkerserver.controller.response.user.LevelUpRewardResponse;
@@ -29,8 +29,7 @@ public class SystemController {
             description = "동료 리스트를 조회"
     )
     @GetMapping("/mail-box")
-    public ResponseEntity<UserMailBoxResponse> mailBox() {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<UserMailBoxResponse> mailBox(@CurrentUuid String uuid) {
         return ResponseEntity.ok(systemService.getMailBox(uuid));
     }
 
@@ -39,8 +38,7 @@ public class SystemController {
             description = "mailId 로 단일 보상을 받는 기능"
     )
     @PostMapping("/mail-box")
-    public ResponseEntity<HttpStatus> claimRewardById(@RequestParam("id") long mailId) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<HttpStatus> claimRewardById(@CurrentUuid String uuid, @RequestParam("id") long mailId) {
         systemService.claimRewardById(uuid, mailId);
         return ResponseEntity.ok(HttpStatus.OK);
     }
@@ -50,8 +48,7 @@ public class SystemController {
             description = "우편함에 있는 모든 보상 받기"
     )
     @PostMapping("/mail-box/all")
-    public ResponseEntity<HttpStatus> claimAllRewards() {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<HttpStatus> claimAllRewards(@CurrentUuid String uuid) {
         systemService.claimAllRewards(uuid);
         return ResponseEntity.ok(HttpStatus.OK);
     }
@@ -61,8 +58,7 @@ public class SystemController {
             description = "사용자의 레벨 상승 보상받기"
     )
     @GetMapping("/level-up-reward")
-    public ResponseEntity<LevelUpRewardResponse> getLevelUpReward() {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<LevelUpRewardResponse> getLevelUpReward(@CurrentUuid String uuid) {
         return ResponseEntity.ok(systemService.getLevelUpReward(uuid));
     }
 
@@ -71,8 +67,7 @@ public class SystemController {
             description = "연속 출석부 조회 및 현재까지 받은 보상조회"
     )
     @GetMapping("/check-in-list")
-    public ResponseEntity<CheckInListResponse> getCheckInRewardList() {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<CheckInListResponse> getCheckInRewardList(@CurrentUuid String uuid) {
         return ResponseEntity.ok(systemService.getCheckInRewardList(uuid));
     }
 
@@ -81,8 +76,7 @@ public class SystemController {
             description = "아직 받지 못한 출석 보상 받기"
     )
     @PostMapping("/check-in")
-    public ResponseEntity<HttpStatus> claimCheckInReward() {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<HttpStatus> claimCheckInReward(@CurrentUuid String uuid) {
         systemService.claimCheckInReward(uuid);
         return ResponseEntity.ok(HttpStatus.OK);
     }
@@ -92,8 +86,7 @@ public class SystemController {
             description = "현재 구독 상태가 포함된 구독 리스트 조회"
     )
     @GetMapping("/subscribe-list")
-    public ResponseEntity<SubscribeListResponse> getSubscribeList() {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<SubscribeListResponse> getSubscribeList(@CurrentUuid String uuid) {
         return ResponseEntity.ok(systemService.getSubscribeList(uuid));
     }
 
@@ -102,8 +95,7 @@ public class SystemController {
             description = "구독하기"
     )
     @PostMapping("/subscribe")
-    public ResponseEntity<HttpStatus> subscribe(@RequestParam("id") long subscribeId) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<HttpStatus> subscribe(@CurrentUuid String uuid, @RequestParam("id") long subscribeId) {
         systemService.subscribe(uuid, subscribeId);
         return ResponseEntity.ok(HttpStatus.OK);
     }

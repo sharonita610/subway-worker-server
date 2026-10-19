@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.controller;
 
-import com.game.subwayworkerserver.config.SecurityUtils;
+import com.game.subwayworkerserver.config.CurrentUuid;
 import com.game.subwayworkerserver.controller.request.coworker.PartnerConfigureRequest;
 import com.game.subwayworkerserver.controller.request.coworker.SkillCardConfigureRequest;
 import com.game.subwayworkerserver.controller.request.coworker.UpgradeRequest;
@@ -42,8 +42,7 @@ public class CoworkerController {
             description = "동료의 id 리스트를 통해 파트너로 지정한다."
     )
     @PostMapping("/coworker/partners")
-    public ResponseEntity<HttpStatus> addCoworkerAsAPartner(@Valid @RequestBody PartnerConfigureRequest request) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<HttpStatus> addCoworkerAsAPartner(@CurrentUuid String uuid, @Valid @RequestBody PartnerConfigureRequest request) {
         coworkerService.configurePartners(uuid, request);
         return ResponseEntity.ok(HttpStatus.NO_CONTENT);
     }
@@ -53,10 +52,9 @@ public class CoworkerController {
             description = "스킬 리스트 조회 현재 선택 된 동료 id 가 포함 된 리스트"
     )
     @GetMapping("/coworker/skills")
-    public ResponseEntity<SkillByCoworkerResponse> getSkillListByUserAndCoworker(
+    public ResponseEntity<SkillByCoworkerResponse> getSkillListByUserAndCoworker(@CurrentUuid String uuid,
             @RequestParam("id") long coworkerId, @RequestParam("type")  String type
     ) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok(skillCardService.getSkillListByUserAndCoworker(uuid, coworkerId, type));
     }
 
@@ -65,8 +63,7 @@ public class CoworkerController {
             description = "강화가 가능한 동일한 카드만 조회하는 기능"
     )
     @GetMapping("/skills/upgrade")
-    public ResponseEntity<SkillListBySkillIdResponse> getSkillsAvailableToUpgrade(@RequestParam("id") long skillCardId) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<SkillListBySkillIdResponse> getSkillsAvailableToUpgrade(@CurrentUuid String uuid, @RequestParam("id") long skillCardId) {
         return ResponseEntity.ok(skillCardService.getSkillsAvailableToUpgrade(uuid, skillCardId));
     }
 
@@ -75,8 +72,7 @@ public class CoworkerController {
             description = "강화가 가능한 동일한 카드만 조회하는 기능"
     )
     @PostMapping("/skills/upgrade")
-    public ResponseEntity<UpgradedSkillCardResponse> upgradeCard(@RequestBody UpgradeRequest request) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<UpgradedSkillCardResponse> upgradeCard(@CurrentUuid String uuid, @RequestBody UpgradeRequest request) {
         return ResponseEntity.ok(skillCardService.upgradeCard(uuid, request));
     }
 
@@ -85,8 +81,7 @@ public class CoworkerController {
             description = "스킬카드를 파트너에게 장착한다."
     )
     @PostMapping("/coworker/skill-card")
-    public ResponseEntity<HttpStatus> addSkillCardToCoworker(@Valid @RequestBody SkillCardConfigureRequest request) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<HttpStatus> addSkillCardToCoworker(@CurrentUuid String uuid, @Valid @RequestBody SkillCardConfigureRequest request) {
         skillCardService.addSkillCardToCoworker(uuid, request);
         return ResponseEntity.ok(HttpStatus.NO_CONTENT);
     }
@@ -96,8 +91,7 @@ public class CoworkerController {
             description = "유저를 강화하기 위한 요청을 한다."
     )
     @PostMapping("/coworker/upgrade")
-    public ResponseEntity<UserUpgradeResponse> upgradeCoworker(@Valid @RequestBody UpgradeRequest request) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<UserUpgradeResponse> upgradeCoworker(@CurrentUuid String uuid, @Valid @RequestBody UpgradeRequest request) {
         return ResponseEntity.ok(coworkerService.upgradeCoworker(uuid, request));
     }
 }

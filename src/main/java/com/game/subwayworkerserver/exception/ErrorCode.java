@@ -16,6 +16,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found."),
     NOT_FOUND(HttpStatus.NOT_FOUND,"Not Found."),
 
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Authentication required."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error."),
     ;
 

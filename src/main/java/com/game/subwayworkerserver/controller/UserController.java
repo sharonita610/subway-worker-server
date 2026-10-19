@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.controller;
 
-import com.game.subwayworkerserver.config.SecurityUtils;
+import com.game.subwayworkerserver.config.CurrentUuid;
 import com.game.subwayworkerserver.controller.request.user.UserCreateRequest;
 import com.game.subwayworkerserver.controller.response.coworker.*;
 import com.game.subwayworkerserver.controller.response.item.*;
@@ -60,14 +60,12 @@ public class UserController {
             description = "익명 ID (UUID)를 기반으로 사용자 기본 정보를 조회합니다.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "성공적인 정보 조회"),
-                    @ApiResponse(responseCode = "400", description = "필수 헤더(X-User-ID) 누락 또는 유효하지 않은 ID",
+                    @ApiResponse(responseCode = "401", description = "필수 헤더(X-User-ID) 누락",
                             content = @Content(schema = @Schema(implementation = String.class)))
             }
     )
     @GetMapping("/user")
-    public ResponseEntity<UserResponse> getUserInfo(
-    ) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<UserResponse> getUserInfo(@CurrentUuid String uuid) {
         return ResponseEntity.ok(userService.getUserInfos(uuid));
     }
 
@@ -79,8 +77,7 @@ public class UserController {
             }
     )
     @GetMapping("/user/capture-item-list")
-    public ResponseEntity<CaptureItemListResponse> getCaptureListByUser() {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<CaptureItemListResponse> getCaptureListByUser(@CurrentUuid String uuid) {
         return ResponseEntity.ok(userService.getCaptureItemList(uuid));
     }
 
@@ -92,8 +89,7 @@ public class UserController {
             }
     )
     @GetMapping("/user/trap-item-list")
-    public ResponseEntity<TrapItemListResponse> getTrapListByUser() {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<TrapItemListResponse> getTrapListByUser(@CurrentUuid String uuid) {
         return ResponseEntity.ok(userService.getTrapItemList(uuid));
     }
 
@@ -105,8 +101,7 @@ public class UserController {
             }
     )
     @GetMapping("/user/coworkers")
-    public ResponseEntity<CoworkerListResponse> getCoworkersListByUser() {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<CoworkerListResponse> getCoworkersListByUser(@CurrentUuid String uuid) {
         return ResponseEntity.ok(userService.getCoworkerListByUser(uuid));
     }
 
@@ -118,8 +113,7 @@ public class UserController {
             }
     )
     @DeleteMapping("/user")
-    public ResponseEntity<Void> deleteUser() {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<Void> deleteUser(@CurrentUuid String uuid) {
         userService.deleteUser(uuid);
         return ResponseEntity.ok().build();
     }
@@ -129,8 +123,7 @@ public class UserController {
             description = "유저의 모든 스킬 리스트를 조회"
     )
     @GetMapping("/user/skillCards")
-    public ResponseEntity<SkillByUserResponse> getUserSkillCards() {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<SkillByUserResponse> getUserSkillCards(@CurrentUuid String uuid) {
         return ResponseEntity.ok(skillCardService.getUserSkillCards(uuid));
     }
 

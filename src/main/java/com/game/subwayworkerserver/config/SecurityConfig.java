@@ -1,7 +1,10 @@
 package com.game.subwayworkerserver.config;
 
+import jakarta.servlet.DispatcherType;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -17,12 +20,17 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Bean
-    public UuidHeaderAuthenticationFilter uuidHeaderAuthenticationFilter() {
-        return new UuidHeaderAuthenticationFilter();
-    }
+    /** X-User-ID 없이 접근할 수 있는 경로. 여기 없는 경로는 전부 헤더가 있어야 하고, 없으면 401. */
+    private static final String[] PUBLIC_GET = {"/user/toss", "/logo", "/stage/monsters", "/coworker-types"};
+    private static final String[] PUBLIC_POST = {"/user", "/verify", "/system/mail"};
+    private static final String[] PUBLIC_ANY = {
+            "/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/swagger-resources/**"
+    };
+
+    private final JsonAuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -30,16 +38,17 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-resources/**"
-                        ).permitAll()
-                        .anyRequest().permitAll()
-                )
                 .formLogin(AbstractHttpConfigurer::disable)
-                .addFilterBefore(uuidHeaderAuthenticationFilter(), AnonymousAuthenticationFilter.class);
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+                        .requestMatchers(HttpMethod.GET, PUBLIC_GET).permitAll()
+                        .requestMatchers(HttpMethod.POST, PUBLIC_POST).permitAll()
+                        .requestMatchers(PUBLIC_ANY).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
+                .addFilterBefore(new UuidHeaderAuthenticationFilter(), AnonymousAuthenticationFilter.class);
         return http.build();
     }
 

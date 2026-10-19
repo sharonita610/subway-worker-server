@@ -4,7 +4,7 @@ import com.game.subwayworkerserver.controller.request.gps.GpsRequest;
 import com.game.subwayworkerserver.controller.request.gps.GpsAddTrapRequest;
 import com.game.subwayworkerserver.controller.request.gps.GpsRandomGiftRequest;
 import com.game.subwayworkerserver.controller.request.gps.CaptureCoworkerRequest;
-import com.game.subwayworkerserver.config.SecurityUtils;
+import com.game.subwayworkerserver.config.CurrentUuid;
 import com.game.subwayworkerserver.controller.response.coworker.*;
 import com.game.subwayworkerserver.controller.response.gps.*;
 import com.game.subwayworkerserver.service.gps.CaptureCoworkerService;
@@ -37,8 +37,7 @@ public class GpsController {
             description = "유저의 좌표 기준 1키로미터 반경에 아이템을 생성하고 조회하는 기능"
     )
     @PostMapping("/gps/random-items")
-    public ResponseEntity<RandomGpsResponse> createAndGetItems(@RequestBody @Valid GpsRequest request){
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<RandomGpsResponse> createAndGetItems(@CurrentUuid String uuid, @RequestBody @Valid GpsRequest request){
         return ResponseEntity.ok(gpsService.createAndGetItems(request, uuid));
     }
 
@@ -51,8 +50,7 @@ public class GpsController {
             }
     )
     @PostMapping("/gps/open-random-gift")
-    public ResponseEntity<GpsRandomGiftResponse> getRandomGift(@RequestBody GpsRandomGiftRequest request){
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<GpsRandomGiftResponse> getRandomGift(@CurrentUuid String uuid, @RequestBody GpsRandomGiftRequest request){
         return ResponseEntity.ok(giftBoxService.getRandomGift(request, uuid));
     }
 
@@ -61,8 +59,7 @@ public class GpsController {
             description = "랜덤으로 생성되는 동료를 잡기위한 덫을 설정한다."
     )
     @PostMapping("/gps/trap")
-    public ResponseEntity<Void> addTrap(@RequestBody GpsAddTrapRequest request){
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<Void> addTrap(@CurrentUuid String uuid, @RequestBody GpsAddTrapRequest request){
         trapService.setTrap(uuid, request);
         return ResponseEntity.ok().build();
     }
@@ -72,8 +69,7 @@ public class GpsController {
             description = "덫을 깔아 5분마다 덫에 걸린 동료가 있는지 확인하는 스케줄러를 작동한다."
     )
     @GetMapping("/gps/trap")
-    public ResponseEntity<UserTrapListResponse> findTrapByUser(){
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<UserTrapListResponse> findTrapByUser(@CurrentUuid String uuid){
         return ResponseEntity.ok(trapService.findTrapByUser(uuid));
     }
 
@@ -86,8 +82,7 @@ public class GpsController {
             }
     )
     @PostMapping("/gps/capture")
-    public ResponseEntity<CaptureResponse> captureCoworker(@RequestBody CaptureCoworkerRequest request) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<CaptureResponse> captureCoworker(@CurrentUuid String uuid, @RequestBody CaptureCoworkerRequest request) {
         return ResponseEntity.ok(captureCoworkerService.tryToCapture(uuid,request));
     }
 
@@ -96,8 +91,7 @@ public class GpsController {
             description = "덫으로 포획 성공 시, 포획한 동료의 정보 리스트를, 아니라면 빈 배열을 반환한다."
     )
     @GetMapping("/gps/trap-success-reward")
-    public ResponseEntity<CoworkerListResponse> getTrapSuccessReward(){
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<CoworkerListResponse> getTrapSuccessReward(@CurrentUuid String uuid){
         return ResponseEntity.ok(trapService.getTrapSuccessReward(uuid));
     }
 

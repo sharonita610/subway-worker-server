@@ -11,38 +11,37 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
+/**
+ * X-User-ID 헤더의 UUID를 현재 요청의 principal로 등록하고, 로그 MDC에 user_id로 남긴다.
+ * 헤더가 없으면 인증을 설정하지 않으므로 보호된 경로는 SecurityConfig에서 401로 거절된다.
+ */
 public class UuidHeaderAuthenticationFilter extends OncePerRequestFilter {
 
     public static final String HEADER_USER_ID = "X-User-ID";
-    public static final String MDC_UUID_KEY = "request_id"; // 로그 포맷에서 쓸 키값
+    public static final String MDC_USER_ID_KEY = "user_id";
+    static final String MDC_GUEST = "GUEST";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
         String uuid = request.getHeader(HEADER_USER_ID);
+        boolean hasUuid = uuid != null && !uuid.isBlank();
 
         try {
-            if (uuid != null && !uuid.trim().isEmpty()) {
-                MDC.put(MDC_UUID_KEY, uuid);
-            } else {
-                MDC.put(MDC_UUID_KEY, "GUEST"); // ID가 없을 경우 대비
-            }
-            MDC.put("request_uri", request.getRequestURI());
+            MDC.put(MDC_USER_ID_KEY, hasUuid ? uuid : MDC_GUEST);
 
-            if (uuid != null && !uuid.trim().isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (hasUuid && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(uuid, null, null);
+                        new UsernamePasswordAuthenticationToken(uuid, null, List.of());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-
             }
 
             filterChain.doFilter(request, response);
-
         } finally {
-            MDC.clear();
+            MDC.remove(MDC_USER_ID_KEY);
         }
     }
 }

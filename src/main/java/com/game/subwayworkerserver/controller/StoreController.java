@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.controller;
 
-import com.game.subwayworkerserver.config.SecurityUtils;
+import com.game.subwayworkerserver.config.CurrentUuid;
 import com.game.subwayworkerserver.controller.request.store.PurchaseRequest;
 import com.game.subwayworkerserver.controller.response.item.ItemResponse;
 import com.game.subwayworkerserver.controller.response.item.StoreItemResponse;
@@ -30,8 +30,7 @@ public class StoreController {
             }
     )
     @GetMapping("/store")
-    public ResponseEntity<StoreItemResponse> getStoreItems() {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<StoreItemResponse> getStoreItems(@CurrentUuid String uuid) {
         return ResponseEntity.ok(storeService.getStoreItems(uuid));
     }
 
@@ -43,8 +42,7 @@ public class StoreController {
             }
     )
     @PostMapping("/store/item")
-    public ResponseEntity<Void> buyTrapItem(@RequestBody PurchaseRequest request) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<Void> buyTrapItem(@CurrentUuid String uuid, @RequestBody PurchaseRequest request) {
         storeService.purchaseItemWithCoin(uuid, request);
         return ResponseEntity.ok().build();
     }
@@ -57,8 +55,7 @@ public class StoreController {
             }
     )
     @PostMapping("/store/random-item")
-    public ResponseEntity<ItemResponse> buyRandomItem(@RequestBody PurchaseRequest request) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<ItemResponse> buyRandomItem(@CurrentUuid String uuid, @RequestBody PurchaseRequest request) {
         return ResponseEntity.ok(storeService.purchaseRandomItem(uuid, request));
     }
 
@@ -70,8 +67,7 @@ public class StoreController {
             }
     )
     @PostMapping("/store/coin")
-    public ResponseEntity<Void> buyCoin(@RequestBody PurchaseRequest request) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<Void> buyCoin(@CurrentUuid String uuid, @RequestBody PurchaseRequest request) {
         storeService.purchaseCoinWithVacationTicket(uuid, request);
         return ResponseEntity.ok().build();
     }
@@ -84,8 +80,7 @@ public class StoreController {
             }
     )
     @PostMapping("/store/vacation-ticket")
-    public ResponseEntity<Void> buyTicket(@RequestBody PurchaseRequest request) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<Void> buyTicket(@CurrentUuid String uuid, @RequestBody PurchaseRequest request) {
         storeService.buyVacationTicket(uuid, request);
         return ResponseEntity.ok().build();
     }

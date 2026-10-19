@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.controller;
 
 
-import com.game.subwayworkerserver.config.SecurityUtils;
+import com.game.subwayworkerserver.config.CurrentUuid;
 import com.game.subwayworkerserver.controller.request.market.CoworkerFilterRequest;
 import com.game.subwayworkerserver.controller.request.market.SellingRequest;
 import com.game.subwayworkerserver.controller.request.market.SkillCardFilterRequest;
@@ -29,8 +29,7 @@ public class MarketController {
             description = "장터에 올라온 모든 동료의 리스트를 필터링 기능을 포함하여 조회"
     )
     @PostMapping("/market/global/coworker")
-    public ResponseEntity<GlobalCoworkerResponse> getCoworkersOnSale(@Nullable @RequestBody CoworkerFilterRequest request) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<GlobalCoworkerResponse> getCoworkersOnSale(@CurrentUuid String uuid, @Nullable @RequestBody CoworkerFilterRequest request) {
         return ResponseEntity.ok(coworkerMarketService.getCoworkerMarket(uuid, request));
     }
 
@@ -39,8 +38,7 @@ public class MarketController {
             description = "내가 판매 중인 동료의 리스트를 포함하여 조회"
     )
     @PostMapping("/market/coworker/selling-list")
-    public ResponseEntity<MyCoworkersMarketResponse> getMyCoworkerSellingList(){
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<MyCoworkersMarketResponse> getMyCoworkerSellingList(@CurrentUuid String uuid){
         return ResponseEntity.ok(coworkerMarketService.getMyCoworkerOnSale(uuid));
     }
 
@@ -49,8 +47,7 @@ public class MarketController {
             description = "장터에 올라온 동료를 영입하기"
     )
     @PostMapping("/market/global/buy-coworker")
-    public ResponseEntity<Void> buyCoworker(@RequestParam("id") long marketId){
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<Void> buyCoworker(@CurrentUuid String uuid, @RequestParam("id") long marketId){
         coworkerMarketService.purchaseCoworker(uuid, marketId);
         return ResponseEntity.ok().build();
     }
@@ -60,8 +57,7 @@ public class MarketController {
             description = "나의 동료를 장터에 내놓기 위한 기능"
     )
     @PostMapping("/market/coworker/sell")
-    public ResponseEntity<HttpStatus> sellCoworker(@RequestBody SellingRequest request){
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<HttpStatus> sellCoworker(@CurrentUuid String uuid, @RequestBody SellingRequest request){
         coworkerMarketService.registerCoworkerOnMarket(uuid, request);
         return ResponseEntity.ok(HttpStatus.NO_CONTENT);
     }
@@ -71,8 +67,7 @@ public class MarketController {
             description = "장터에 내놓았던 동료를 철회하는 기능"
     )
     @PostMapping("/market/coworker/cancel")
-    public ResponseEntity<Void> cancelSellingCoworker(@RequestParam("id") long marketId){
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<Void> cancelSellingCoworker(@CurrentUuid String uuid, @RequestParam("id") long marketId){
         coworkerMarketService.cancelSellingMyCoworker(uuid, marketId);
         return ResponseEntity.ok().build();
     }
@@ -82,8 +77,7 @@ public class MarketController {
             description = "장터에 내놓았던 동료가 판매되어 정산 요청"
     )
     @GetMapping("/market/coworker/get-paid")
-    public ResponseEntity<PaymentSuccessResponse> getCoworkerPaid(@RequestParam("id") long marketId){
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<PaymentSuccessResponse> getCoworkerPaid(@CurrentUuid String uuid, @RequestParam("id") long marketId){
         return ResponseEntity.ok(coworkerMarketService.getCoworkerSoldPayment(uuid, marketId));
     }
 
@@ -92,10 +86,9 @@ public class MarketController {
             description = "장터에 올라온 모든 스킬 카드의 리스트를 필터링 기능을 포함하여 조회"
     )
     @PostMapping("/market/global/skill")
-    public ResponseEntity<GlobalSkillCardResponse> getGlobalSkillCardOnSale(
+    public ResponseEntity<GlobalSkillCardResponse> getGlobalSkillCardOnSale(@CurrentUuid String uuid,
             @Nullable @RequestBody SkillCardFilterRequest request
     ){
-        String uuid = SecurityUtils.getCurrentUserUuid();
         return ResponseEntity.ok(skillCardMarketService.getSkillCardMarket(uuid, request));
     }
 
@@ -104,8 +97,7 @@ public class MarketController {
             description = "내가 판매 중인 스킬카드 리스트를 조회"
     )
     @PostMapping("/market/skill/selling-list")
-    public ResponseEntity<SkillOnSaleResponse> getMySkillSellingList(){
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<SkillOnSaleResponse> getMySkillSellingList(@CurrentUuid String uuid){
         return ResponseEntity.ok(skillCardMarketService.getMySkillCardOnSale(uuid));
     }
 
@@ -114,8 +106,7 @@ public class MarketController {
             description = "장터에 올라온 스킬카드를 구매하기"
     )
     @PostMapping("/market/global/buy-skill")
-    public ResponseEntity<Void> buySkillCard(@RequestParam("id") long marketId){
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<Void> buySkillCard(@CurrentUuid String uuid, @RequestParam("id") long marketId){
         skillCardMarketService.purchaseSkillCard(uuid, marketId);
         return ResponseEntity.ok().build();
     }
@@ -125,8 +116,7 @@ public class MarketController {
             description = "나의 스킬카드 장터에 내놓기 위한 기능"
     )
     @PostMapping("/market/skill/sell")
-    public ResponseEntity<HttpStatus> sellSkillCard(@RequestBody SellingRequest request){
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<HttpStatus> sellSkillCard(@CurrentUuid String uuid, @RequestBody SellingRequest request){
         skillCardMarketService.registerCardOnMarket(uuid, request);
         return ResponseEntity.ok(HttpStatus.NO_CONTENT);
     }
@@ -136,8 +126,7 @@ public class MarketController {
             description = "장터에 내놓았던 스킬카드를 철회하는 기능"
     )
     @PostMapping("/market/skill/cancel")
-    public ResponseEntity<HttpStatus> cancelSellingSkill(@RequestParam("id") long marketId){
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<HttpStatus> cancelSellingSkill(@CurrentUuid String uuid, @RequestParam("id") long marketId){
         skillCardMarketService.cancelSellingMySkillCard(uuid, marketId);
         return ResponseEntity.ok().build();
     }
@@ -147,8 +136,7 @@ public class MarketController {
             description = "장터에 내놓았던 스킬카드가 판매되어 정산 요청"
     )
     @GetMapping("/market/skill/get-paid")
-    public ResponseEntity<PaymentSuccessResponse> getSillPaid(@RequestParam("id") long marketId){
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<PaymentSuccessResponse> getSillPaid(@CurrentUuid String uuid, @RequestParam("id") long marketId){
         return ResponseEntity.ok(skillCardMarketService.getSkillCardSoldPayment(uuid, marketId));
     }
 }

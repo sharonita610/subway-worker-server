@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.controller;
 
-import com.game.subwayworkerserver.config.SecurityUtils;
+import com.game.subwayworkerserver.config.CurrentUuid;
 import com.game.subwayworkerserver.controller.request.gacha.OpenLuckyGachaRequest;
 import com.game.subwayworkerserver.controller.request.gacha.OpenSkillCardRequest;
 import com.game.subwayworkerserver.controller.response.skill.EarnedSkillCardResponse;
@@ -28,8 +28,7 @@ public class GachaController {
             description = "사용자의 가챠 리스트와 티켓을 조회하는 기능"
     )
     @GetMapping("/lucky-gacha")
-    public ResponseEntity<LuckyGachaListResponse> luckyGacha() {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<LuckyGachaListResponse> luckyGacha(@CurrentUuid String uuid) {
         return ResponseEntity.ok(gachaService.getGachaList(uuid));
     }
 
@@ -38,8 +37,7 @@ public class GachaController {
             description = "사용자의 가챠 리스트와 티켓을 조회하는 기능"
     )
     @PostMapping("/lucky-gacha")
-    public ResponseEntity<LuckyGachaEarnResponse> openLuckyGacha(@RequestBody OpenLuckyGachaRequest request) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<LuckyGachaEarnResponse> openLuckyGacha(@CurrentUuid String uuid, @RequestBody OpenLuckyGachaRequest request) {
         return ResponseEntity.ok(gachaService.openLuckyGacha(uuid, request));
     }
 
@@ -48,8 +46,7 @@ public class GachaController {
             description = "스킬 카드 뽑기"
     )
     @PostMapping("/lucky-skill-card")
-    public ResponseEntity<EarnedSkillCardResponse> getRandomSkillCardByType(@RequestBody OpenSkillCardRequest request) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<EarnedSkillCardResponse> getRandomSkillCardByType(@CurrentUuid String uuid, @RequestBody OpenSkillCardRequest request) {
         return ResponseEntity.ok(skillCardService.getRandomSkillCardByType(uuid, request));
     }
 

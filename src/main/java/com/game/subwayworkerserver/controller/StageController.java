@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.controller;
 
 
-import com.game.subwayworkerserver.config.SecurityUtils;
+import com.game.subwayworkerserver.config.CurrentUuid;
 import com.game.subwayworkerserver.controller.request.stage.DungeonRequest;
 import com.game.subwayworkerserver.controller.request.stage.StageClearRequest;
 import com.game.subwayworkerserver.controller.response.stage.DungeonResponse;
@@ -32,8 +32,7 @@ public class StageController {
             description = "유저가 장착중인 동료, 그리고 그 동료의 능력을 조회"
     )
     @GetMapping("/stage/coworkers")
-    public ResponseEntity<StageCoworkerListResponse> getStageCoworkers() {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<StageCoworkerListResponse> getStageCoworkers(@CurrentUuid String uuid) {
         return ResponseEntity.ok(coworkerService.getUsingCoworkers(uuid));
     }
 
@@ -59,8 +58,7 @@ public class StageController {
             description = "완료한 스테이지를 기록하고 보상을 받는 기능"
     )
     @PostMapping("/stage/record")
-    public ResponseEntity<StageClearResponse> recordStage(@RequestBody StageClearRequest request) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<StageClearResponse> recordStage(@CurrentUuid String uuid, @RequestBody StageClearRequest request) {
         return ResponseEntity.ok(stageService.recordStage(uuid, request));
     }
 
@@ -69,8 +67,7 @@ public class StageController {
             description = "사용자가 방문한 던전을 기록하고 보상을 받는 기능"
     )
     @PostMapping("/dungeon/record")
-    public ResponseEntity<StageClearResponse> recordDungeon(@RequestBody DungeonRequest request) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<StageClearResponse> recordDungeon(@CurrentUuid String uuid, @RequestBody DungeonRequest request) {
         return ResponseEntity.ok(stageService.recordDungeon(uuid, request));
     }
 
@@ -79,8 +76,7 @@ public class StageController {
             description = "사용자가 8시간 안에 방문한적이 있는지 조회하고 없으면 던전 uuid 받기"
     )
     @GetMapping("/dungeon/record")
-    public ResponseEntity<DungeonResponse> checkDungeon(@RequestParam("stationName") String stationName) {
-        String uuid = SecurityUtils.getCurrentUserUuid();
+    public ResponseEntity<DungeonResponse> checkDungeon(@CurrentUuid String uuid, @RequestParam("stationName") String stationName) {
         return ResponseEntity.ok(stageService.checkDungeon(uuid, stationName));
     }
 
