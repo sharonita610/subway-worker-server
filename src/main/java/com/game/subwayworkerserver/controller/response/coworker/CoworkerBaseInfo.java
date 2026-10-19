@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
 public record CoworkerBaseInfo(
         long id,
         String engName,
@@ -36,9 +37,6 @@ public record CoworkerBaseInfo(
         List<SkillCard> selectedSkills
 
 ) {
-    @Builder
-    public CoworkerBaseInfo {
-    }
 
     public static CoworkerBaseInfo fromDomain(CoworkerOnSale coworkerOnSale) {
         return CoworkerBaseInfo.builder()

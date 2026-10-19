@@ -9,6 +9,7 @@ import lombok.Builder;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
 public record SkillCard(
         long id,
         String engName,
@@ -25,10 +26,6 @@ public record SkillCard(
         String cardType
 
 ) {
-
-    @Builder
-    public SkillCard {
-    }
 
     public static List<SkillCard> of(final List<SkillCardEntity> skillCardEntityList) {
 

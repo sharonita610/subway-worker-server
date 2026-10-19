@@ -34,6 +34,7 @@ public record GlobalSkillCardInfo(
         );
     }
 
+    @Builder
     private record SkillCardBaseInfo(
             long id,
             String korName,
@@ -51,8 +52,5 @@ public record GlobalSkillCardInfo(
             boolean available
     ) {
 
-        @Builder
-        private SkillCardBaseInfo {
-        }
     }
 }

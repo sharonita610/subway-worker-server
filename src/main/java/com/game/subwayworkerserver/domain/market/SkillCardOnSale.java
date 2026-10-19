@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Builder
 public record SkillCardOnSale(
         long marketId,
         long cardId,
@@ -28,9 +29,6 @@ public record SkillCardOnSale(
         String cardType
 
 ) {
-    @Builder
-    public SkillCardOnSale {
-    }
 
     public static List<SkillCardOnSale> toDomain(
             final List<SkillCardMarketEntity> marketSkillCardLists,

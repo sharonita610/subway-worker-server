@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
 public record SkillBaseInfo(
         long id,
         String engName,
@@ -18,10 +19,6 @@ public record SkillBaseInfo(
         String description,
         int level
 ) {
-
-    @Builder
-    public SkillBaseInfo {
-    }
 
     private static SkillBaseInfo toBaseInfo(long id, String engName, String korName, String description) {
         return SkillBaseInfo.builder()

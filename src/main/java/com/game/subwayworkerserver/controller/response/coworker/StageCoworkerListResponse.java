@@ -29,6 +29,7 @@ public record StageCoworkerListResponse(
         return new StageCoworkerListResponse(list);
     }
 
+    @Builder
     private record StageCoworkerInfo(
             long id,
             String engName,
@@ -45,9 +46,6 @@ public record StageCoworkerListResponse(
             StageActiveSkill activeSkill,
             ResurrectionInfo resurrection
     ) {
-        @Builder
-        private StageCoworkerInfo {
-        }
 
         public static StageCoworkerInfo of(
                 CoworkerEntity coworker, List<UserGachaEntity> treasureList, List<SkillCardEntity> skillCardList

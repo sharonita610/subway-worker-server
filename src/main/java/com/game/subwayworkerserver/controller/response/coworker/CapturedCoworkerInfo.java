@@ -7,6 +7,7 @@ import lombok.Builder;
 
 import java.util.List;
 
+@Builder
 public record CapturedCoworkerInfo(
         String coworkerName,
         String position,
@@ -27,10 +28,6 @@ public record CapturedCoworkerInfo(
         String engElementName,
         String korElementName
 ) {
-
-    @Builder
-    public CapturedCoworkerInfo {
-    }
 
     public static CapturedCoworkerInfo of(final CoworkerEntity coworker, String position) {
         CoworkerType type = coworker.getCoworkerType();
