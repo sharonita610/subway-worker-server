@@ -1,9 +1,7 @@
 name: "[PROD] - Build & Push prod image"
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 env:
   AWS_REGION: ap-southeast-2

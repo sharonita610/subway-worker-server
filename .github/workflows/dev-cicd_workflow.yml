@@ -1,9 +1,7 @@
 name: "[DEV] - CI/CD to dev server"
 
 on:
-  push:
-    branches:
-      - develop
+  workflow_dispatch:
 
 env:
   # AWS ECR 설정 (계정 ID 및 리전은 스크린샷 기반으로 고정)

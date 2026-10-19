@@ -13,7 +13,7 @@ spring:
 #      prefix: /config/subway_worker/prod/
 
   datasource:
-    url: jdbc:mysql://subway-worker-db.c7iwywymw7wj.ap-southeast-2.rds.amazonaws.com:3306/subway_db?serverTimezone=UTC&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://${rds_host}:3306/subway_db?serverTimezone=UTC&characterEncoding=UTF-8&useSSL=false
     username: admin
     password: ${rds_password}
     driver-class-name: com.mysql.cj.jdbc.Driver
