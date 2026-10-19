@@ -51,6 +51,7 @@ class GpsItemsFinderTest {
                 new Distance(0.2, RedisGeoCommands.DistanceUnit.KILOMETERS));
     }
 
+    @SafeVarargs
     private void stubRadius(String key, GeoResult<GeoLocation<String>>... results) {
         when(geoOperations.radius(eq(key), any(Circle.class), any(GeoRadiusCommandArgs.class)))
                 .thenReturn(new GeoResults<>(List.of(results)));

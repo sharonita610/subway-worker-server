@@ -1,6 +1,5 @@
 package com.game.subwayworkerserver.domain.reward;
 
-import com.game.subwayworkerserver.domain.reward.CheckInReward;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

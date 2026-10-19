@@ -4,7 +4,6 @@ import com.game.subwayworkerserver.controller.request.gps.GpsRequest;
 import com.game.subwayworkerserver.controller.response.gps.RandomGpsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.geo.*;
 import org.springframework.stereotype.Service;
 
 @Slf4j

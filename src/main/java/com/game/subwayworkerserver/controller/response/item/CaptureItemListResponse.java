@@ -1,6 +1,5 @@
 package com.game.subwayworkerserver.controller.response.item;
 
-import com.game.subwayworkerserver.controller.response.item.CaptureItemInfo;
 
 import java.util.Comparator;
 import java.util.List;

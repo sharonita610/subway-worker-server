@@ -1,6 +1,5 @@
 package com.game.subwayworkerserver.domain.baseinfo;
 
-import com.game.subwayworkerserver.domain.baseinfo.CurrencyType;
 import com.game.subwayworkerserver.exception.BaseException;
 import lombok.Getter;
 

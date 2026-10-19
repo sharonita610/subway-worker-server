@@ -1,7 +1,5 @@
 package com.game.subwayworkerserver.service.stage;
 
-import com.game.subwayworkerserver.controller.request.stage.StageClearRequest;
-import com.game.subwayworkerserver.controller.request.stage.DungeonRequest;
 import com.game.subwayworkerserver.service.common.UserFinder;
 import com.game.subwayworkerserver.service.common.UserLevelProcessor;
 import com.game.subwayworkerserver.service.coworker.CoworkerLevelProcessor;

@@ -1,6 +1,5 @@
 package com.game.subwayworkerserver.service.coworker;
 
-import com.game.subwayworkerserver.controller.request.coworker.UpgradeRequest;
 import com.game.subwayworkerserver.service.common.UserFinder;
 import com.game.subwayworkerserver.controller.request.coworker.PartnerConfigureRequest;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerElement;
