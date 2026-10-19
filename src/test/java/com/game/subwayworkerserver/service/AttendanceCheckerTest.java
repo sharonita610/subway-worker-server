@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.service;
 
-import com.game.subwayworkerserver.entity.Gender;
+import com.game.subwayworkerserver.domain.user.Gender;
 import com.game.subwayworkerserver.entity.UserEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;

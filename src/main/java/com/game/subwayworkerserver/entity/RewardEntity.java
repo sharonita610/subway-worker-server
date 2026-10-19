@@ -1,5 +1,7 @@
 package com.game.subwayworkerserver.entity;
 
+import com.game.subwayworkerserver.domain.reward.RewardType;
+import com.game.subwayworkerserver.domain.reward.RewardSource;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

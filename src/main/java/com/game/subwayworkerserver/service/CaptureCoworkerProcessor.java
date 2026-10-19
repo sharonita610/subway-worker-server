@@ -1,8 +1,8 @@
 package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.response.coworker.CaptureResponse;
-import com.game.subwayworkerserver.entity.ItemCategory;
-import com.game.subwayworkerserver.entity.ItemName;
+import com.game.subwayworkerserver.domain.item.ItemCategory;
+import com.game.subwayworkerserver.domain.item.ItemName;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.controller.request.OpenLuckyGachaRequest;
-import com.game.subwayworkerserver.entity.Gender;
+import com.game.subwayworkerserver.domain.user.Gender;
 import com.game.subwayworkerserver.entity.UserEntity;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;

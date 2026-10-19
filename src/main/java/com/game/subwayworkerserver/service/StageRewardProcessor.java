@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.service; // 패키지 변경 가정
 
-import com.game.subwayworkerserver.domain.StageRewardInfo;
-import com.game.subwayworkerserver.domain.StageRewardInfo.ExtraReward;
+import com.game.subwayworkerserver.domain.stage.StageRewardInfo;
+import com.game.subwayworkerserver.domain.stage.StageRewardInfo.ExtraReward;
 import com.game.subwayworkerserver.domain.baseinfo.GachaTreasure;
 import com.game.subwayworkerserver.domain.baseinfo.StageReward;
 import com.game.subwayworkerserver.entity.UserEntity;

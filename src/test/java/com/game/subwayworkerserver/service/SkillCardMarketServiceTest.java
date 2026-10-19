@@ -1,5 +1,7 @@
 package com.game.subwayworkerserver.service;
 
+import com.game.subwayworkerserver.domain.user.Gender;
+import com.game.subwayworkerserver.domain.baseinfo.CurrencyType;
 import com.game.subwayworkerserver.controller.request.SellingRequest;
 import com.game.subwayworkerserver.domain.skill.SkillCardType;
 import com.game.subwayworkerserver.entity.*;

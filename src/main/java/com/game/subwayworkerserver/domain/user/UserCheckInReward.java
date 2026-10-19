@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.domain.user;
 
-import com.game.subwayworkerserver.entity.RewardType;
-import com.game.subwayworkerserver.service.CheckInReward;
+import com.game.subwayworkerserver.domain.reward.RewardType;
+import com.game.subwayworkerserver.domain.reward.CheckInReward;
 
 import java.util.ArrayList;
 import java.util.List;

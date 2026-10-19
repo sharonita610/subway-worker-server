@@ -8,7 +8,7 @@ import com.game.subwayworkerserver.controller.response.stage.DungeonResponse;
 import com.game.subwayworkerserver.controller.response.stage.MonsterResponse;
 import com.game.subwayworkerserver.controller.response.stage.StageClearResponse;
 import com.game.subwayworkerserver.controller.response.coworker.StageCoworkerListResponse;
-import com.game.subwayworkerserver.controller.sampleData.MonsterSampleData;
+import com.game.subwayworkerserver.domain.stage.MonsterSampleData;
 import com.game.subwayworkerserver.service.CoworkerService;
 import com.game.subwayworkerserver.service.StageService;
 import io.swagger.v3.oas.annotations.Operation;

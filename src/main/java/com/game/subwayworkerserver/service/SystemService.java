@@ -1,5 +1,8 @@
 package com.game.subwayworkerserver.service;
 
+import com.game.subwayworkerserver.domain.reward.RewardType;
+import com.game.subwayworkerserver.domain.reward.RewardSource;
+import com.game.subwayworkerserver.domain.reward.CheckInReward;
 import com.game.subwayworkerserver.config.CacheConfig;
 import com.game.subwayworkerserver.controller.request.SystemMailRequest;
 import com.game.subwayworkerserver.controller.response.user.CheckInListResponse;

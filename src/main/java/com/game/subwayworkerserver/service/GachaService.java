@@ -1,5 +1,7 @@
 package com.game.subwayworkerserver.service;
 
+import com.game.subwayworkerserver.domain.item.ItemName;
+import com.game.subwayworkerserver.domain.baseinfo.CurrencyType;
 import com.game.subwayworkerserver.controller.request.OpenLuckyGachaRequest;
 import com.game.subwayworkerserver.controller.response.gacha.LuckyGachaEarnResponse;
 import com.game.subwayworkerserver.controller.response.gacha.LuckyGachaListResponse;

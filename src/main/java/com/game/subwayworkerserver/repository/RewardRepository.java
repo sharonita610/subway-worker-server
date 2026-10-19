@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.repository;
 
 import com.game.subwayworkerserver.entity.RewardEntity;
-import com.game.subwayworkerserver.entity.RewardSource;
+import com.game.subwayworkerserver.domain.reward.RewardSource;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

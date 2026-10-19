@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.domain.user;
 
 import com.game.subwayworkerserver.domain.baseinfo.SubscriptionItem;
-import com.game.subwayworkerserver.entity.RewardType;
+import com.game.subwayworkerserver.domain.reward.RewardType;
 import com.game.subwayworkerserver.entity.UserSubscriptionEntity;
 
 import java.time.LocalDate;

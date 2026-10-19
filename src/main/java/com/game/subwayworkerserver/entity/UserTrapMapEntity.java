@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.entity;
 
+import com.game.subwayworkerserver.domain.item.ItemName;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

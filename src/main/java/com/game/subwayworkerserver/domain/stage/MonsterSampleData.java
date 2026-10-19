@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.controller.sampleData;
+package com.game.subwayworkerserver.domain.stage;
 
 
 import jakarta.annotation.PostConstruct;

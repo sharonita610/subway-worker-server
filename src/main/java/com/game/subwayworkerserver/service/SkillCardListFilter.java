@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.service;
 
+import com.game.subwayworkerserver.domain.skill.SkillSortType;
 import com.game.subwayworkerserver.controller.request.SkillCardFilterRequest;
 import com.game.subwayworkerserver.domain.market.SkillCardOnSale;
 import com.game.subwayworkerserver.entity.SkillCardEntity;

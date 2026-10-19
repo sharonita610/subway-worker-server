@@ -1,6 +1,8 @@
 package com.game.subwayworkerserver.entity;
 
-import com.game.subwayworkerserver.domain.StageRewardInfo;
+import com.game.subwayworkerserver.domain.reward.RewardType;
+import com.game.subwayworkerserver.domain.user.Gender;
+import com.game.subwayworkerserver.domain.stage.StageRewardInfo;
 import com.game.subwayworkerserver.domain.level.UserLevelConfig;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;

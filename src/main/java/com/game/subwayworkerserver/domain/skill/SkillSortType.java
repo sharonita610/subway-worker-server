@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.service;
+package com.game.subwayworkerserver.domain.skill;
 
 public enum SkillSortType {
 

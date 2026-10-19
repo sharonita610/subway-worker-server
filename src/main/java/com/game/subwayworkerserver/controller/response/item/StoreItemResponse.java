@@ -2,7 +2,7 @@ package com.game.subwayworkerserver.controller.response.item;
 
 import com.game.subwayworkerserver.domain.baseinfo.Coin;
 import com.game.subwayworkerserver.domain.baseinfo.VacationTicket;
-import com.game.subwayworkerserver.entity.ItemName;
+import com.game.subwayworkerserver.domain.item.ItemName;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.service.dto;
+package com.game.subwayworkerserver.domain.coworker;
 
 public record CoworkerUpgradeVO (
         int basePoint,

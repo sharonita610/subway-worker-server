@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.controller.response.item;
 
 
-import com.game.subwayworkerserver.entity.ItemName;
+import com.game.subwayworkerserver.domain.item.ItemName;
 
 public record CaptureItemInfo(
         String engName,

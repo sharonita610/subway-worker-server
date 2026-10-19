@@ -1,5 +1,7 @@
 package com.game.subwayworkerserver.service;
 
+import com.game.subwayworkerserver.domain.item.ItemName;
+import com.game.subwayworkerserver.domain.user.Gender;
 import com.game.subwayworkerserver.controller.response.item.CaptureItemListResponse;
 import com.game.subwayworkerserver.controller.response.item.TrapItemListResponse;
 import com.game.subwayworkerserver.entity.*;

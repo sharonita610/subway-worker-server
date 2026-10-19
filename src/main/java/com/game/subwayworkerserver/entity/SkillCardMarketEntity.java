@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.entity;
 
+import com.game.subwayworkerserver.domain.baseinfo.CurrencyType;
 import com.game.subwayworkerserver.controller.request.SellingRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

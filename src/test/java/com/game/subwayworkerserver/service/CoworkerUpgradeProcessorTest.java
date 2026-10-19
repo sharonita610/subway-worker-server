@@ -4,7 +4,7 @@ import com.game.subwayworkerserver.domain.baseinfo.CoworkerElement;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerLevel;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
-import com.game.subwayworkerserver.service.dto.CoworkerUpgradeVO;
+import com.game.subwayworkerserver.domain.coworker.CoworkerUpgradeVO;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

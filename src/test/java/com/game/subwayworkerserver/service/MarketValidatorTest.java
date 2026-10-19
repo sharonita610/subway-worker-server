@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.service;
 
-import com.game.subwayworkerserver.entity.Gender;
+import com.game.subwayworkerserver.domain.user.Gender;
 import com.game.subwayworkerserver.entity.UserEntity;
 import com.game.subwayworkerserver.exception.BaseException;
 import org.junit.jupiter.api.Test;

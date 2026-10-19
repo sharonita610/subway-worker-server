@@ -1,5 +1,8 @@
 package com.game.subwayworkerserver.service;
 
+import com.game.subwayworkerserver.domain.reward.RewardType;
+import com.game.subwayworkerserver.domain.reward.RewardSource;
+import com.game.subwayworkerserver.domain.reward.CheckInReward;
 import com.game.subwayworkerserver.controller.request.SystemMailRequest;
 import com.game.subwayworkerserver.controller.request.SystemMailRequest.SystemRewardRequest;
 import com.game.subwayworkerserver.domain.baseinfo.SubscriptionItem;
@@ -16,9 +19,9 @@ import org.springframework.data.domain.PageRequest;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.game.subwayworkerserver.entity.RewardSource.SUBSCRIPTION;
-import static com.game.subwayworkerserver.entity.RewardSource.SYSTEM_REWARD;
-import static com.game.subwayworkerserver.entity.RewardType.*;
+import static com.game.subwayworkerserver.domain.reward.RewardSource.SUBSCRIPTION;
+import static com.game.subwayworkerserver.domain.reward.RewardSource.SYSTEM_REWARD;
+import static com.game.subwayworkerserver.domain.reward.RewardType.*;
 
 @Component
 @RequiredArgsConstructor

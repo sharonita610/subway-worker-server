@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.controller.response.stage;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.game.subwayworkerserver.domain.StageRewardInfo;
+import com.game.subwayworkerserver.domain.stage.StageRewardInfo;
 import com.game.subwayworkerserver.domain.reward.DungeonReward;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

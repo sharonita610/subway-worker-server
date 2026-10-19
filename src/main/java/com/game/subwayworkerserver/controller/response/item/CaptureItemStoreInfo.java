@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.controller.response.item;
 
-import com.game.subwayworkerserver.entity.ItemName;
+import com.game.subwayworkerserver.domain.item.ItemName;
 import com.fasterxml.jackson.annotation.JsonInclude; // Import 추가
 import com.fasterxml.jackson.annotation.JsonInclude.Include; // Import 추가
 

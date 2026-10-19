@@ -15,7 +15,7 @@ import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.SkillCardRepository;
 import com.game.subwayworkerserver.repository.UserGachaRepository;
-import com.game.subwayworkerserver.service.dto.CoworkerUpgradeVO;
+import com.game.subwayworkerserver.domain.coworker.CoworkerUpgradeVO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

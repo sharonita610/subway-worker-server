@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.entity;
 
+import com.game.subwayworkerserver.domain.item.ItemName;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import jakarta.persistence.*;

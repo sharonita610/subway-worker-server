@@ -1,5 +1,8 @@
 package com.game.subwayworkerserver.service;
 
+import com.game.subwayworkerserver.domain.reward.RewardType;
+import com.game.subwayworkerserver.domain.user.Gender;
+import com.game.subwayworkerserver.domain.reward.CheckInReward;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.repository.MailRepository;
 import com.game.subwayworkerserver.repository.RewardRepository;

@@ -2,7 +2,7 @@ package com.game.subwayworkerserver.service;
 
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
-import com.game.subwayworkerserver.service.dto.CoworkerUpgradeVO;
+import com.game.subwayworkerserver.domain.coworker.CoworkerUpgradeVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

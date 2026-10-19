@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.service;
+package com.game.subwayworkerserver.domain.reward;
 
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.exception.BaseException;

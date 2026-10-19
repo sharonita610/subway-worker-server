@@ -5,7 +5,7 @@ import com.game.subwayworkerserver.domain.baseinfo.CoworkerElement;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerLevel;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
-import com.game.subwayworkerserver.entity.Gender;
+import com.game.subwayworkerserver.domain.user.Gender;
 import com.game.subwayworkerserver.entity.UserEntity;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;

@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.controller.response.gps;
 
 import com.game.subwayworkerserver.domain.reward.RandomBoxReward;
-import com.game.subwayworkerserver.entity.ItemName;
+import com.game.subwayworkerserver.domain.item.ItemName;
 
 import java.util.List;
 

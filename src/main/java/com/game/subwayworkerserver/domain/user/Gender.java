@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.entity;
+package com.game.subwayworkerserver.domain.user;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 

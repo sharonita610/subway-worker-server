@@ -9,7 +9,7 @@ import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.SkillCardPaymentOption;
 import com.game.subwayworkerserver.domain.skill.SkillCardType;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
-import com.game.subwayworkerserver.entity.CurrencyType;
+import com.game.subwayworkerserver.domain.baseinfo.CurrencyType;
 import com.game.subwayworkerserver.entity.SkillCardEntity;
 import com.game.subwayworkerserver.entity.UserEntity;
 import com.game.subwayworkerserver.exception.BaseException;

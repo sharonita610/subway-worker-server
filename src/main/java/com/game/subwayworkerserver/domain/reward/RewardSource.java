@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.entity;
+package com.game.subwayworkerserver.domain.reward;
 
 public enum RewardSource {
 
