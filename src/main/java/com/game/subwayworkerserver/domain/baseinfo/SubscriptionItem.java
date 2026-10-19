@@ -18,7 +18,6 @@ public enum SubscriptionItem {
     private final int price;
     private final int durationDays;
 
-    // 혜택
     private final int instanceTicket;
     private final int dailyTicket;
     private final int adSkipDays;

@@ -44,7 +44,6 @@ public record CoworkerOnSale(
         boolean isSold,
         CoworkerType type
 ) {
-    // 2. 정적 팩토리 메서드 구현
     public static List<CoworkerOnSale> toDomain(final List<CoworkerMarketEntity> marketCoworkers, final List<CoworkerEntity> allCoworkersOnSale) {
 
         Map<Long, CoworkerEntity> coworkerMap = allCoworkersOnSale.stream()
@@ -64,7 +63,6 @@ public record CoworkerOnSale(
                     }
 
                     return CoworkerOnSale.builder()
-                            // MarketEntity (마켓 정보)
                             .marketId(market.getId())
                             .coworkerId(coworkerId)
                             .price(market.getPrice())

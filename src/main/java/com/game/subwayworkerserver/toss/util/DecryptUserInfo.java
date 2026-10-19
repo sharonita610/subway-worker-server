@@ -30,18 +30,15 @@ public class DecryptUserInfo {
             String aad
     ) throws Exception {
 
-        // 1. 데이터 디코딩 및 키 준비
         byte[] decoded = Base64.getDecoder().decode(encryptedBase64);
         byte[] keyByteArray = Base64.getDecoder().decode(base64EncodedKey);
 
-        // 2. IV, 암호문+태그 분리
         // IV는 decoded의 첫 12바이트
         byte[] iv = Arrays.copyOfRange(decoded, 0, IV_LENGTH);
 
         // 암호문과 태그는 IV 다음부터 끝까지 (복호화 시 Cipher.doFinal에 전체를 전달)
         final int cipherTextAndTagLength = decoded.length - IV_LENGTH;
 
-        // 3. Cipher 및 KeySpec 설정
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
         SecretKeySpec key = new SecretKeySpec(keyByteArray, "AES");
 
@@ -50,10 +47,8 @@ public class DecryptUserInfo {
 
         cipher.init(Cipher.DECRYPT_MODE, key, nonceSpec);
 
-        // 4. AAD (Associated Additional Data) 설정
         cipher.updateAAD(aad.getBytes(StandardCharsets.UTF_8));
 
-        // 5. 복호화 실행
         // Java에서는 IV 다음 부분부터 (IV_LENGTH) 암호문과 태그를 포함한 전체 바이트를 doFinal에 전달합니다.
         byte[] decrypted = cipher.doFinal(
                 decoded,
@@ -61,7 +56,6 @@ public class DecryptUserInfo {
                 cipherTextAndTagLength
         );
 
-        // 6. 평문 반환
         return new String(decrypted, StandardCharsets.UTF_8);
     }
 }

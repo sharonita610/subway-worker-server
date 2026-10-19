@@ -6,7 +6,6 @@ import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import java.util.List;
 
 public record CoworkerTotal(
-        // 기본 정보
         long coworkerId,
         String engName,
         String korName,

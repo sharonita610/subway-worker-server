@@ -60,11 +60,9 @@ public class TrapService {
     @Transactional
     public void setTrap(String uuid, GpsAddTrapRequest request) {
 
-        // 1. 유저 정보 조회
         UserEntity user = userFinder.getByUuid(uuid);
         long userId = user.getId();
 
-        // 2. 트랩 아이템 정보 조회 (Enum)
         ItemName trapItem;
         try {
             trapItem = ItemName.fromConstantName(request.trapName());
@@ -72,11 +70,9 @@ public class TrapService {
             throw new BaseException(ErrorCode.BAD_REQUEST, "유효하지 않은 트랩 아이템 이름입니다.");
         }
 
-        // 트랩 카테고리인지 확인하는 로직 필요 (ItemCategory.TRAP 인지 확인)
         if (trapItem.getCategory() != ItemCategory.TRAP) {
             throw new BaseException(ErrorCode.BAD_REQUEST, "선택된 아이템은 트랩 설치 도구가 아닙니다.");
         }
-        // 3. 인벤토리에서 트랩 아이템 소모
         UserItemMapEntity itemMap = userItemMapRepository.findByUserIdAndItemName(userId, trapItem)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND, "인벤토리에 해당 트랩 아이템이 없습니다."));
 
@@ -87,7 +83,6 @@ public class TrapService {
             throw new BaseException(ErrorCode.BAD_REQUEST, "트랩 아이템 수량이 부족합니다.");
         }
 
-        // 4. 트랩 설치 엔티티 생성 및 DB 저장 (12시간 후 만료)
         LocalDateTime expiresAt = LocalDateTime.now().plusHours(TRAP_VALID_HOURS);
         UserTrapMapEntity setTrap = UserTrapMapEntity.of(
                 userId,
@@ -236,16 +231,13 @@ public class TrapService {
                         try {
                             int coworkerLevel = Integer.parseInt(levelString);
 
-                            // 3. DB에 CoworkerEntity 저장
                             CoworkerEntity coworkerEntity = CoworkerEntity.of(trapMap.getUserId(), coworkerName, coworkerLevel);
                             CoworkerEntity savedCoworker = coworkerRepository.save(coworkerEntity);
 
-                            // 4. ⭐ 트랩 상태 업데이트: 성공 처리 및 즉시 만료 ⭐
                             trapMap.setIsSuccessful();
                             trapMap.setExpiresAt();
                             redisTemplate.delete(trappedKey);
 
-                            // 5. 성공한 친구 엔티티를 수집하기 위해 반환
                             return savedCoworker;
                         } catch (NumberFormatException e) {
                             log.error("Invalid coworkerLevel format: {}", levelString);

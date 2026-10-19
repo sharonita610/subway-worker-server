@@ -10,9 +10,6 @@ public class CharacterGenerator {
 
     private static final Random RANDOM = new Random();
 
-    /**
-     * 최소값(min)과 최대값(max) 사이의 랜덤 정수를 계산합니다.
-     */
     private static int getRandomStat(int min, int max) {
         if (min > max) {
             return min;
@@ -20,26 +17,19 @@ public class CharacterGenerator {
         return RANDOM.nextInt(max - min + 1) + min;
     }
 
-    /**
-     * 최소/최대 값을 저장하는 Record.
-     */
     public record Range(int min, int max) {}
 
-    /**
-     * 생성된 캐릭터의 최종 스탯을 저장하는 Record.
-     */
     public record CharacterStats(
-            CoworkerElement attribute, //
+            CoworkerElement attribute,
             int hp,
-            int mpNow, // 현재 마나
-            int mpMax, // 최대 마나
+            int mpNow,
+            int mpMax,
             int manaRecovery,
             int attack,
             int defense
     ) {
         @Override
         public String toString() {
-            // String.format() 출력 필드명도 type으로 변경
             return String.format(
                     "[직업: %s] HP: %d, MP: %d/%d (회복:%d), 공격: %d, 방어: %d",
                     attribute, hp, mpNow, mpMax, manaRecovery, attack, defense

@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.service.stage; // 패키지 변경 가정
+package com.game.subwayworkerserver.service.stage;
 
 import com.game.subwayworkerserver.domain.stage.StageRewardInfo;
 import com.game.subwayworkerserver.domain.stage.StageRewardInfo.ExtraReward;

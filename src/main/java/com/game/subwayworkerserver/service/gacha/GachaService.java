@@ -128,7 +128,7 @@ public class GachaService {
                 .ifPresentOrElse(
                         UserGachaEntity::increaseGachaCount,
                         () -> {
-                            UserGachaEntity newRecord = UserGachaEntity.of(userId, treasure); // from 메서드 수정 필요
+                            UserGachaEntity newRecord = UserGachaEntity.of(userId, treasure);
                             gachaRepository.save(newRecord);
                         }
                 );

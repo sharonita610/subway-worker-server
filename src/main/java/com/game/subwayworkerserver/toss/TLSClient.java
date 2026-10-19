@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.toss;
 
-import com.fasterxml.jackson.databind.ObjectMapper; // JSON 처리를 위해 필요
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 
@@ -25,51 +25,35 @@ import org.springframework.stereotype.Component;
 
 import static org.apache.tomcat.util.http.fileupload.FileUploadBase.CONTENT_TYPE;
 
-
 @Component
-public class TLSClient { // 실제 파일 이름은 TossTLSClient 등이 될 수 있습니다.
+public class TLSClient {
 
-    private final ObjectMapper objectMapper = new ObjectMapper(); // JSON 파서
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // 🚨 [필수] Node.js의 loadCertificate/loadPrivateKey를 대체하는 메서드가 존재한다고 가정
-    // public SSLContext createSSLContext(String certPem, String keyPem) { ... }
-
-    // ----------------------------------------------------
-    // --- 1. POST with BODY (Access Token 발급, Refresh) ---
-    // ----------------------------------------------------
     public ApiResponse<Map<String, Object>> sendPostRequest(
             String fullUrl,
             Object requestBody,
             String contentType,
             SSLContext sslContext
     ) throws Exception {
-        // Node.js의 makeRequest(url, 'POST', data, headers) 역할
         return executeRequest(fullUrl, "POST", contentType, requestBody, null, sslContext);
     }
 
-    // ----------------------------------------------------
-    // --- 2. POST with HEADERS (Logout by Access Token) ---
-    // ----------------------------------------------------
     public ApiResponse<Map<String, Object>> sendPostRequest(
             String fullUrl,
-            Object requestBody, // null을 전달받음
+            Object requestBody,
             String contentType,
-            Map<String, String> headers, // 추가 헤더 받음
+            Map<String, String> headers,
             SSLContext sslContext
     ) throws Exception {
-        // Node.js의 makeRequest(url, 'POST', data=null, headers) 역할
         return executeRequest(fullUrl, "POST", contentType, requestBody, headers, sslContext);
     }
 
-    // ----------------------------------------------------
-    // --- 3. GET Request (User Info) ---
-    // ----------------------------------------------------
     public ApiResponse<Map<String, Object>> sendGetRequest(
             String fullUrl,
             Map<String, String> headers,
             SSLContext sslContext
     ) throws Exception {
-        // Node.js의 client.get(url, headers) 역할
         return executeRequest(fullUrl, "GET", CONTENT_TYPE, null, headers, sslContext);
     }
 
@@ -94,7 +78,6 @@ public class TLSClient { // 실제 파일 이름은 TossTLSClient 등이 될 수
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
 
-            // 헤더 설정
             connection.setRequestProperty("Content-Type", contentType);
             if (headers != null) {
                 headers.forEach(connection::setRequestProperty);
@@ -110,7 +93,6 @@ public class TLSClient { // 실제 파일 이름은 TossTLSClient 등이 될 수
 
             int statusCode = connection.getResponseCode();
 
-            // 응답 스트림 읽기
             InputStream stream = (statusCode >= 200 && statusCode < 300)
                     ? connection.getInputStream()
                     : connection.getErrorStream();
@@ -120,13 +102,11 @@ public class TLSClient { // 실제 파일 이름은 TossTLSClient 등이 될 수
                 responseBody = reader.lines().collect(Collectors.joining("\n"));
             }
 
-            // 응답 파싱
             if (statusCode != 200) {
                 // 토스 API가 에러 시에도 JSON을 반환한다고 가정하고 에러를 BaseException으로 변환
                 throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR, "외부 API 오류: " + responseBody);
             }
 
-            // 💡 Node.js의 JSON.parse(response.data) 역할
             Map<String, Object> data = objectMapper.readValue(responseBody, new TypeReference<>() {});
 
             return new ApiResponse<>(statusCode, "성공", data);
@@ -140,30 +120,24 @@ public class TLSClient { // 실제 파일 이름은 TossTLSClient 등이 될 수
 
     public SSLContext createSSLContext(String certPem, String keyPem) throws Exception {
 
-        // 1. PEM 문자열을 Java 객체로 로드
         X509Certificate cert = loadCertificate(certPem);
         PrivateKey key = loadPrivateKey(keyPem);
 
-        // 2. KeyStore 생성 및 인증서/키 설정
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        keyStore.load(null, null); // 빈 KeyStore 로드
+        keyStore.load(null, null);
 
         char[] password = "".toCharArray(); // 개인 키에 암호가 없다고 가정
         keyStore.setCertificateEntry("client-cert", cert);
         keyStore.setKeyEntry("client-key", key, password, new X509Certificate[]{cert});
 
-        // 3. KeyManagerFactory 초기화
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         kmf.init(keyStore, password);
 
-        // 4. SSLContext 초기화
         SSLContext context = SSLContext.getInstance("TLS");
         context.init(kmf.getKeyManagers(), null, null); // TrustManager는 기본값 사용
 
         return context;
     }
-
-// --------------------------------------------------------------------------------
 
     /**
      * PEM 문자열에서 X509 인증서를 로드합니다.

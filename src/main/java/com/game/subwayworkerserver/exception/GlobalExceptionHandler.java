@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
         ErrorResponse response = ErrorResponse.builder()
                 .status(errorCode.getStatus().value())
                 .error(errorCode.getStatus().getReasonPhrase())
-                .message(e.getMessage()) // BaseException에 설정된 메시지 사용
+                .message(e.getMessage())
                 .path(((ServletWebRequest) request).getRequest().getRequestURI())
                 .build();
 
@@ -119,7 +119,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-
     /**
      * 지원하지 않는 HTTP Method로 요청 시 발생하는 예외 처리 (HTTP 405 Method Not Allowed)
      */
@@ -127,14 +126,10 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(
             HttpRequestMethodNotSupportedException e, WebRequest request) {
 
-        // 405 Method Not Allowed 상태 사용
         HttpStatus status = HttpStatus.METHOD_NOT_ALLOWED;
         String detailMessage = e.getMessage() != null ?
                 e.getMessage() :
                 "지원하지 않는 HTTP 요청 방식입니다.";
-
-        // Note: ErrorCode에 405가 명시적으로 정의되어 있다면 그것을 사용해도 됩니다.
-        // 여기서는 HttpStatus를 직접 사용하여 처리합니다.
 
         ErrorResponse response = ErrorResponse.builder()
                 .status(status.value())

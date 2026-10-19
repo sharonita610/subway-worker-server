@@ -1,6 +1,5 @@
 package com.game.subwayworkerserver.config;
 
-import com.game.subwayworkerserver.service.gps.GpsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
@@ -16,18 +15,15 @@ public class RedisConfig {
 
     /**
      * 기본 RedisTemplate 설정 (Key: String, Value: JSON 직렬화)
-     * 이 Bean은 GpsService, AbstractRedisRepository 등에서 사용됩니다.
-     */
+         */
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(connectionFactory);
 
-        // 1. Key Serializer 설정 (String 사용)
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
 
-        // 2. Value Serializer 설정 (JSON 직렬화 사용)
         // GenericJackson2JsonRedisSerializer를 커스터마이징하여 자바 객체를 JSON으로 변환
         redisTemplate.setValueSerializer(jsonRedisSerializer());
         redisTemplate.setHashValueSerializer(jsonRedisSerializer());

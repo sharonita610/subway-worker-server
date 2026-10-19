@@ -33,7 +33,6 @@ public class CaptureCoworkerService {
     private final UserLevelProcessor userLevelProcessor;
     private final CaptureCoworkerProcessor captureCoworkerProcessor;
 
-
     private static final long ACQUIRED_KEY_TTL_HOURS = 4;
 
     @Transactional
@@ -42,7 +41,6 @@ public class CaptureCoworkerService {
         final String acquiredKey = GpsRedisKeys.USER_ACQUIRED_PREFIX + uuid + ":" + GpsRedisKeys.COWORKER_LOCATIONS_KEY;
         final String coworkerId = request.coworkerId();
 
-        // Redis Set에 해당 coworkerId가 이미 존재하는지 확인
         Boolean isAlreadyHidden = redisTemplate.opsForSet().isMember(acquiredKey, coworkerId);
         if (isAlreadyHidden != null && isAlreadyHidden) {
             throw new BaseException(ErrorCode.BAD_REQUEST, "이미 획득했거나 도망쳐서 포획할 수 없는 동료입니다.");
@@ -55,21 +53,17 @@ public class CaptureCoworkerService {
             throw new BaseException(ErrorCode.NOT_FOUND, "포획하고자 하는 동료 조회 에러 발생.");
         }
 
-        // user 정보 조회
         UserEntity user = userFinder.getByUuid(uuid);
         long userId = user.getId();
 
-        // user item map 에서 도구 조회
         ItemName itemName = ItemName.fromConstantName(request.captureItemName());
         UserItemMapEntity userItemMapEntity = userItemMapRepository.findByUserIdAndItemName(userId, itemName)
                 .orElseThrow(
                         () -> new BaseException(ErrorCode.NOT_FOUND, "사용 가능한 포획도구가 더이상 없습니다.")
                 );
 
-        // 도구 사용
         userItemMapEntity.decreaseQuantity();
 
-        //  포획 기록
         CaptureRecordEntity captureRecord = captureRecordRepository.findByUserId(userId)
                 .orElseGet(() -> captureRecordRepository.save(CaptureRecordEntity.of(userId)));
         captureRecord.increaseTryCount();
@@ -95,9 +89,7 @@ public class CaptureCoworkerService {
             return CaptureResponse.of(captureReward, extraExp, coworkerEntity, position);
         }
 
-        // 3. 포획 실패 (Failure)
         else {
-            // 3-1. 시도 횟수 증가 및 Redis에 업데이트 (실패해도 시도 횟수는 증가해야 함)
             int newAttemptCount = captureAttemptCount + 1;
             redisTemplate.opsForHash().put(instanceKey, "captureAttemptCount", String.valueOf(newAttemptCount));
 

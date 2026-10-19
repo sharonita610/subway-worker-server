@@ -53,7 +53,7 @@ class UserLevelProcessorTest {
     @Test
     void 연속_레벨업이_한번에_발생한다() {
         UserEntity user = createUser(1, 0);
-        // level 1→2: 200, level 2→3: 400 → total 600 for two level-ups
+        // level 1->2: 200, level 2->3: 400 -> total 600 for two level-ups
         userLevelProcessor.processExpGainAndLevelUp(user, 600);
 
         assertThat(user.getLevel()).isGreaterThanOrEqualTo(3);
@@ -70,7 +70,7 @@ class UserLevelProcessorTest {
     @Test
     void 레벨업_보상에서_가챠티켓_수량이_올바르게_저장된다() {
         // LEVEL_RANGE_31_40 보상: UserLevelUpReward(coin=200000, vacationTicket=5, gachaTicket=300)
-        // 버그: gachaTicket 수량에 vacationTicket 값(5)이 저장됨 → 300이어야 함
+        // 버그: gachaTicket 수량에 vacationTicket 값(5)이 저장됨 -> 300이어야 함
         UserEntity user = createUser(31, 0);
         // level 31 required exp: 31 * 1000 = 31000
         userLevelProcessor.processExpGainAndLevelUp(user, 31_000);

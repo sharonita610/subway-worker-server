@@ -19,7 +19,7 @@ public enum CoworkerLevel {
 
     private final int level;
     private final String title;
-    private final int requiredExpToNextLevel; // 다음 레벨로 가기 위해 필요한 경험치 (현재 레벨 0부터 시작)l
+    private final int requiredExpToNextLevel; // 다음 레벨로 가기 위해 필요한 경험치 (현재 레벨 0부터 시작)
     private final int cumulativeExp;          // 1레벨부터 누적 경험치
     private final double levelUpStatIncreaseRate; // 레벨업 시 수치 증가 (이전 대비 증가율) (예: 105% -> 0.05)
     private final double statRatioToInitial;  // 초기 능력치 대비 비율

@@ -5,8 +5,8 @@ import jakarta.validation.Payload;
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = ProfanityValidator.class) // 사용할 검증기 지정
-@Target({ElementType.FIELD, ElementType.PARAMETER}) // 필드와 파라미터에 적용 가능
+@Constraint(validatedBy = ProfanityValidator.class)
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ProfanityCheck {
 

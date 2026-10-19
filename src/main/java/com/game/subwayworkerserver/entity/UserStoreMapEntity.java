@@ -31,12 +31,10 @@ public class UserStoreMapEntity {
     @Column(name = "price", nullable = false)
     private int price;
 
-    // 5. 사용된 재화 (티켓, 코인, 원화 등)
     @Enumerated(EnumType.STRING)
     @Column(name = "currency_type", nullable = false,  length = 30)
     private CurrencyType currencyType;
 
-    // 6. 구매 날짜
     @Column(name = "purchase_date", nullable = false)
     private LocalDateTime purchaseDate;
 

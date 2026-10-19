@@ -19,10 +19,8 @@ public record VacationTicketStoreInfo(
         return vacationTicketList.stream()
                 .map(ticket -> {
 
-                    // 1. 첫 구매 혜택 상품인 경우
                     if (ticket.isFirstBuyOffer()) {
 
-                        // 1-1. 아직 구매하지 않은 경우 (혜택 제공)
                         if (!hasPurchasedBefore) {
                             return new VacationTicketStoreInfo(
                                     ticket.name(),
@@ -32,7 +30,6 @@ public record VacationTicketStoreInfo(
                                     true  // isAvailable: 구매 가능
                             );
                         }
-                        // 1-2. 이미 구매한 경우 (혜택 만료)
                         else {
                             return new VacationTicketStoreInfo(
                                     ticket.name(),
@@ -44,7 +41,6 @@ public record VacationTicketStoreInfo(
                         }
                     }
 
-                    // 2. 일반 상품인 경우 (모두에게 항상 구매 가능)
                     else {
                         return new VacationTicketStoreInfo(
                                 ticket.name(),

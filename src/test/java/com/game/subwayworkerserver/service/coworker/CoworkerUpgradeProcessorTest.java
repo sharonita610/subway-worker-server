@@ -16,8 +16,8 @@ class CoworkerUpgradeProcessorTest {
     private final CoworkerUpgradeProcessor processor = new CoworkerUpgradeProcessor();
 
     // 재료 totalExp=100, BASE_EXTRA_EXP=50 기준
-    // 동일 타입/ENERZ: Math.round((100+50)*1.2) = 180 → basePoint = (int)(180 * 0.4) = 72
-    // 다른 타입:       100+50 = 150              → basePoint = (int)(150 * 0.4) = 60
+    // 동일 타입/ENERZ: Math.round((100+50)*1.2) = 180 -> basePoint = (int)(180 * 0.4) = 72
+    // 다른 타입:       100+50 = 150              -> basePoint = (int)(150 * 0.4) = 60
 
     private CoworkerEntity createCoworker(CoworkerType type, int totalExp) {
         return CoworkerEntity.builder()

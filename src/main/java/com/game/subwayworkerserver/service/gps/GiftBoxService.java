@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-
 @Service
 @RequiredArgsConstructor
 public class GiftBoxService {
@@ -58,17 +57,14 @@ public class GiftBoxService {
     @Transactional
     public GpsRandomGiftResponse getRandomGift(GpsRandomGiftRequest request, String userUuid) {
 
-        // 1. Redis에서 위도/경도를 가지고 아이템(선물 상자) 찾기
         String giftBoxId = findNearestGiftBoxId(request.latitude(), request.longitude());
 
         if (giftBoxId == null) {
             throw new BaseException(ErrorCode.NOT_FOUND, "50m 반경 내에 선물 상자가 없습니다.");
         }
 
-        // 2. 찾은 아이템을 유저별 획득 기록에 저장하기 (중복 획득 방지)
         String acquiredKey = GpsRedisKeys.USER_ACQUIRED_PREFIX + userUuid + ":" + GpsRedisKeys.RANDOM_GIFT_BOX_KEY;
 
-        // 이미 획득했는지 확인
         if (redisTemplate.opsForSet().isMember(acquiredKey, giftBoxId)) {
             throw new BaseException(ErrorCode.BAD_REQUEST, "이미 획득한 선물 상자입니다.");
         }
@@ -78,11 +74,9 @@ public class GiftBoxService {
 
         redisTemplate.expire(acquiredKey, ACQUIRED_KEY_TTL_DAYS, TimeUnit.DAYS);
 
-        // 3. 기본 선물 랜덤 뽑기 및 4. 추가 선물 랜덤 뽑기
         List<DefaultGift> defaultGifts = calculateDefaultRewards();
         List<ExtraGift> bonusGifts = calculateBonusRewards();
 
-        // 5. DB 업데이트 로직 (유저 재화 증가) 필요
         updateUserRewardsAndItems(userUuid, defaultGifts, bonusGifts);
         return GpsRandomGiftResponse.of(defaultGifts, bonusGifts);
     }
@@ -90,7 +84,6 @@ public class GiftBoxService {
     private void updateUserRewardsAndItems(String userUuid, List<DefaultGift> defaultGifts, List<ExtraGift> bonusGifts) {
         UserEntity user = userFinder.getByUuid(userUuid);
 
-        // 2. 기본 재화 합산
         int totalCoins = 0;
         int totalTickets = 0;
         int totalExperience = 0;
@@ -109,11 +102,9 @@ public class GiftBoxService {
             }
         }
 
-        // 3. 유저 잔고 업데이트
         user.increaseCoin(totalCoins);
         user.increaseVacationTicket(totalTickets);
         userLevelProcessor.processExpGainAndLevelUp(user, totalExperience);
-        // 4. 추가 아이템 인벤토리 업데이트 (재료, 도구 등)
         for (ExtraGift item : bonusGifts) {
 
             if (item.name().equals(GACHA_TICKET)) {
@@ -125,7 +116,6 @@ public class GiftBoxService {
                     .ifPresentOrElse(
                             UserItemMapEntity::increaseQuantity,
 
-                            // 가지고 있지 않은 경우: 새로운 항목 생성
                             () -> {
                                 UserItemMapEntity newMap = UserItemMapEntity.of(user.getId(), itemName);
                                 userItemMapRepository.save(newMap);

@@ -25,13 +25,11 @@ public class TossAuthService {
     private final TossApiClient tossApiClient;
     private final TossAuthConfig tossAuthConfig;
 
-    // 🚨 함수형 인터페이스 정의 (API 호출 람다를 받기 위함)
     @FunctionalInterface
     private interface ApiCallSupplier<T> {
         T get() throws Throwable;
     }
 
-    // 🚨 예외 처리를 위한 헬퍼 메서드
     private <T> ApiResponse<T> handleApiCall(ApiCallSupplier<ApiResponse<T>> supplier, String apiName) {
         try {
             return supplier.get();
@@ -43,7 +41,6 @@ public class TossAuthService {
         }
     }
 
-    // AccessToken 발급
     public ApiResponse<Map<String, Object>> getAccessToken(GetAccessTokenRequest request) {
         return handleApiCall(() -> {
             ApiResponse<Map<String, Object>> post = tossApiClient.post("/generate-token", request);
@@ -52,12 +49,10 @@ public class TossAuthService {
         }, "AccessToken 발급");
     }
 
-    // AccessToken 재발급
     public ApiResponse<Map<String, Object>> refreshAccessToken(RefreshTokenRequest request) {
         return handleApiCall(() -> tossApiClient.post("/refresh-token", request), "AccessToken 재발급");
     }
 
-    // 사용자 정보 조회 (복호화 포함)
     public ApiResponse<Map<String, Object>> getUserInfo(String accessToken) {
         return handleApiCall(() -> {
             ApiResponse<Map<String, Object>> response = tossApiClient.get("/login-me", accessToken);

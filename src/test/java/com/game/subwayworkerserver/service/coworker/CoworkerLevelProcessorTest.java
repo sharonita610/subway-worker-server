@@ -47,7 +47,7 @@ class CoworkerLevelProcessorTest {
     @Test
     void 연속_레벨업이_한번에_발생한다() {
         CoworkerEntity coworker = createCoworker(CoworkerLevel.INTERN);
-        // INTERN→WORKER: 100, WORKER→SENIOR: 200 → total 300
+        // INTERN->WORKER: 100, WORKER->SENIOR: 200 -> total 300
         processor.processCoworkerExpAndLevelUp(coworker, 300);
 
         assertThat(coworker.getLevel()).isEqualTo(CoworkerLevel.SENIOR);

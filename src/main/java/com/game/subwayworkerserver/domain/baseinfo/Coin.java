@@ -8,13 +8,10 @@ import java.util.List;
 public enum Coin {
     // (획득 코인, 티켓 가격, 설명)
 
-    // 1. 10,000 코인 상품
     COIN_PACK_10K(10000, 10, "휴가 티켓 10개로 10,000 코인 구매"),
 
-    // 2. 60,000 코인 상품
     COIN_PACK_60K(60000, 50, "휴가 티켓 50개로 60,000 코인 구매"),
 
-    // 3. 140,000 코인 상품
     COIN_PACK_140K(140000, 100, "휴가 티켓 100개로 140,000 코인 구매");
 
     Coin(int acquiredCoin, int ticketPrice, String description) {
@@ -26,7 +23,6 @@ public enum Coin {
     private final int acquiredCoin;   // 획득 코인 양 (상단 박스)
     private final int ticketPrice;    // 바캉스 티켓 가격 (하단 박스)
     private final String description; // 설명
-
 
     public static Coin fromTicketPrice(int ticketPrice) {
         for (Coin coinPack : values()) {

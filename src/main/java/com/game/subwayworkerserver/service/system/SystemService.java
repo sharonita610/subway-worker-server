@@ -212,12 +212,8 @@ public class SystemService {
             throw new BaseException(ErrorCode.BAD_REQUEST, "이미 구독중인 상품입니다.");
         }
 
-        // 결제 기능
-
-
         UserSubscriptionEntity userSubscriptionEntity = UserSubscriptionEntity.of(user.getId(), subscriptionItem);
         subscriptionRepository.save(userSubscriptionEntity);
-
 
         user.extendAdFreeBenefit(subscriptionItem.getAdSkipDays());
         rewardProcessor.processSubscriptionReward(user, subscriptionItem);

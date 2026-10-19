@@ -15,7 +15,7 @@ import java.util.Map;
 @Profile("!dev")
 @Component
 @RequiredArgsConstructor
-public class TossSecretsLoader { // SecretsLoader 대신 구체적인 이름 사용
+public class TossSecretsLoader {
 
     private final TossAuthConfig tossAuthConfig;
     private final ObjectMapper objectMapper;
@@ -30,7 +30,6 @@ public class TossSecretsLoader { // SecretsLoader 대신 구체적인 이름 사
         String secretName = "toss-partner-mtls-certs";
         Region region = Region.of("ap-southeast-2");
 
-        // Create a Secrets Manager client
         SecretsManagerClient client = SecretsManagerClient.builder()
                 .region(region)
                 .build();
@@ -45,7 +44,6 @@ public class TossSecretsLoader { // SecretsLoader 대신 구체적인 이름 사
             getSecretValueResponse = client.getSecretValue(getSecretValueRequest);
             String secret = getSecretValueResponse.secretString();
 
-            // ⭐️ JSON 파싱 및 키 추출
             @SuppressWarnings("unchecked")
             Map<String, String> secrets = objectMapper.readValue(secret, Map.class);
 

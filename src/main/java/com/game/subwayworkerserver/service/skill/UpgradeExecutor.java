@@ -33,7 +33,7 @@ public class UpgradeExecutor {
      * lv 5 count 5 / 6 req - 15 accumulate
      *
      */
-    // ⭐️ [수정된 맵] 해당 레벨 달성 직후, 카운트 1로 시작하기 위해 필요한 총 누적 갯수
+    // 해당 레벨 달성 직후, 카운트 1로 시작하기 위해 필요한 총 누적 갯수
     private static final Map<Integer, Integer> LEVEL_START_CUMULATIVE_COUNT = Map.of(
             1, 1,
             2, 2,
@@ -47,7 +47,6 @@ public class UpgradeExecutor {
      */
     public UpgradeResult executeSkillCardLogic(SkillCardEntity targetCard, List<SkillCardEntity> materialCards) {
 
-        // 1. 재료 카드의 총 가치 합산 (Total Accumulated Count는 getAccumulateCount 필드에 있어야 함)
         final int addedMaterialValue = materialCards.stream()
                 .mapToInt(SkillCardEntity::getAccumulateCount)
                 .sum();
@@ -57,7 +56,6 @@ public class UpgradeExecutor {
         int calculatedLevel = 1;
         int requiredForCurrentLevelStart = 1;
 
-        // 2. 레벨 역순 순회 및 판정 (수정된 맵 사용)
         List<Integer> sortedLevels = LEVEL_START_CUMULATIVE_COUNT.keySet().stream()
                 .sorted(Comparator.reverseOrder())
                 .toList();
@@ -72,15 +70,12 @@ public class UpgradeExecutor {
             }
         }
 
-        // 3. 현재 레벨의 최대 필요 Count (Req) 계산
         int requiredToStartNextLevel = LEVEL_START_CUMULATIVE_COUNT.getOrDefault(calculatedLevel + 1, Integer.MAX_VALUE);
         int maxRequiredCountForCurrentLevel = requiredToStartNextLevel - requiredForCurrentLevelStart;
 
-        // 4. 최종 잔여 카운트 (Count 1부터 시작)
         // 예시: 누적 2 (목표) - 시작 2 = 0. Count는 1부터 시작하므로 +1 필요
         int finalRemainingCount = (finalTotalAccumulatedCount - requiredForCurrentLevelStart) + 1;
 
-        // 5. ⭐ 레벨업 조건 확인 (Max Count 초과 시 레벨업) ⭐
         if (finalRemainingCount > maxRequiredCountForCurrentLevel) {
             calculatedLevel++;
             finalRemainingCount = 1; // 다음 레벨의 1/N로 리셋

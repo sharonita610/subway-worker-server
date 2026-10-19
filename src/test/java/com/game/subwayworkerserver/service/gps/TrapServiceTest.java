@@ -141,8 +141,6 @@ class TrapServiceTest {
         verify(userRepository, never()).findById(any());
     }
 
-    // ---- 보상 수령: 트랩 도구 확률 판정 결과에 따른 처리 ----
-
     private UserTrapMapEntity successfulTrap(ItemName tool) {
         UserTrapMapEntity trap = new UserTrapMapEntity(USER_ID, tool, 37.5, 127.0, LocalDateTime.now().plusHours(1));
         trap.markSuccess(COWORKER_ID);

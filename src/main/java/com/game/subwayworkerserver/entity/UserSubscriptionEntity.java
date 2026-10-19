@@ -59,13 +59,10 @@ public class UserSubscriptionEntity extends BaseTimeEntity {
     }
 
     public boolean canClaimDailyReward(LocalDate today) {
-        // 1. 구독이 만료되었는지 확인
         if (this.expirationDate.isBefore(today)) {
             return false;
         }
 
-        // 2. 오늘 이미 보상을 받았는지 확인
-        // lastRewardClaimedDate가 null이 아니면서 오늘 날짜와 같으면 이미 수령 완료
         if (this.lastRewardClaimedDate != null && this.lastRewardClaimedDate.isEqual(today)) {
             return false;
         }

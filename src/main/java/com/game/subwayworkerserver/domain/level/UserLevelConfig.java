@@ -19,7 +19,7 @@ public enum UserLevelConfig {
     private final int minLevel;
     private final int maxLevel;
     private final int expMultiplier; // 해당 구간의 레벨당 경험치 증가 배수 (레벨 * ExpMultiplier)
-    private final UserLevelUpReward baseReward; // 기본 보상
+    private final UserLevelUpReward baseReward;
 
     UserLevelConfig(int minLevel, int maxLevel, int expMultiplier, UserLevelUpReward baseReward) {
         this.minLevel = minLevel;
@@ -28,9 +28,6 @@ public enum UserLevelConfig {
         this.baseReward = baseReward;
     }
 
-    /**
-     * 특정 레벨이 이 구간에 속하는지 확인
-     */
     public boolean contains(int level) {
         return level >= minLevel && level <= maxLevel;
     }
@@ -43,9 +40,6 @@ public enum UserLevelConfig {
         return (long) level * userLevel.expMultiplier;
     }
 
-    /**
-     * 레벨을 기반으로 해당 구간 설정을 찾는 정적 헬퍼 메서드
-     */
     public static UserLevelConfig getConfigByLevel(int level) {
         for (UserLevelConfig config : values()) {
             if (config.contains(level)) {

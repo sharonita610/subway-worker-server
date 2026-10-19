@@ -30,7 +30,7 @@ public class TossApiClient {
         this.sslContext = initializeSslContext();
     }
     /**
-     * mTLS 설정을 초기화하고 SSLContext를 생성합니다. (로직 유지)
+     * mTLS 설정을 초기화하고 SSLContext를 생성합니다.
      */
     private SSLContext initializeSslContext() {
         try {
@@ -41,12 +41,10 @@ public class TossApiClient {
         }
     }
 
-    // --- POST 요청 (AccessToken 발급/Refresh) ---
     public ApiResponse<Map<String, Object>> post(String endpointPath, Object requestBody) throws Exception {
         String fullUrl = tossAuthConfig.getAuthApiUrl(API_VERSION + endpointPath);
 
-        // Node.js의 client.post(url, body) 역할
-        return tlsClient.sendPostRequest( // ⭐️ TLSClient에 sendPostRequest(url, body, contentType, sslContext) 메서드 가정
+        return tlsClient.sendPostRequest(
                 fullUrl,
                 requestBody,
                 CONTENT_TYPE,
@@ -54,28 +52,24 @@ public class TossApiClient {
         );
     }
 
-    // --- GET 요청 (User Info) ---
     public ApiResponse<Map<String, Object>> get(String endpointPath, String accessToken) throws Exception {
         String fullUrl = tossAuthConfig.getAuthApiUrl(API_VERSION + endpointPath);
         Map<String, String> headers = Map.of("Authorization", "Bearer " + accessToken);
 
-        // ⭐️ [수정] GET 요청 전용 메서드 호출 (headers를 포함해야 함)
-        return tlsClient.sendGetRequest( // ⭐️ TLSClient에 sendGetRequest(url, headers, sslContext) 메서드 가정
+        return tlsClient.sendGetRequest(
                 fullUrl,
                 headers,
                 sslContext
         );
     }
 
-    // --- POST 요청 (Header Only - Logout) ---
     public ApiResponse<Map<String, Object>> postWithHeader(String endpointPath, String accessToken) throws Exception {
         String fullUrl = tossAuthConfig.getAuthApiUrl(API_VERSION + endpointPath);
         Map<String, String> headers = Map.of("Authorization", "Bearer " + accessToken);
 
-        // Node.js의 client.post(url, {}, headers) 역할
-        return tlsClient.sendPostRequest( // ⭐️ TLSClient에 sendPostRequest(url, body, contentType, headers, sslContext) 메서드 가정
+        return tlsClient.sendPostRequest(
                 fullUrl,
-                null, // 빈 본문
+                null,
                 CONTENT_TYPE,
                 headers,
                 sslContext

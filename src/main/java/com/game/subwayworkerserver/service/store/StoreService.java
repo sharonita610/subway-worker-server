@@ -58,13 +58,10 @@ public class StoreService {
     }
 
     public int getTodayPurchaseCount(Long userId, String itemName) {
-        // 1. 오늘의 시작 시각 (00:00:00) 계산
         LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
 
-        // 2. 오늘의 종료 시각 (23:59:59.999...) 계산
         LocalDateTime endOfToday = LocalDate.now().plusDays(1).atStartOfDay().minusNanos(1);
 
-        // 3. Repository 호출
         long count = userStoreMapRepository.countByUserIdAndItemNameAndPurchaseDateBetween(
                 userId,
                 itemName,
@@ -136,8 +133,6 @@ public class StoreService {
         UserEntity user = userFinder.getByUuid(uuid);
         VacationTicket vacationTicket = VacationTicket.valueOf(request.name());
 
-        // 외부 결제 api
-
         user.increaseVacationTicket(vacationTicket.getAcquiredTickets());
         saveUserStoreRecord(
                 user.getId(),
@@ -148,7 +143,6 @@ public class StoreService {
         );
 
     }
-
 
     @Transactional
     public ItemResponse purchaseRandomItem(String uuid, PurchaseRequest request) {

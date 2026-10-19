@@ -27,7 +27,6 @@ public record SkillCardOnSale(
         boolean isSold,
         String cardType
 
-
 ) {
     @Builder
     public SkillCardOnSale {
@@ -38,14 +37,12 @@ public record SkillCardOnSale(
             final List<SkillCardEntity> skillCardOnSaleByCardIds
     ) {
 
-        // 1. SkillCardEntity 목록을 Map<CardId, SkillCardEntity>으로 변환하여 빠른 조회를 준비합니다.
         Map<Long, SkillCardEntity> cardMap = skillCardOnSaleByCardIds.stream()
                 .collect(Collectors.toMap(
-                        SkillCardEntity::getId, // Key: SkillCardEntity의 ID
-                        card -> card           // Value: SkillCardEntity 객체 자체
+                        SkillCardEntity::getId,
+                        card -> card
                 ));
 
-        // 2. SkillCardMarketEntity 목록을 순회하며 데이터 결합 및 DTO로 변환합니다.
         return marketSkillCardLists.stream()
                 .map(market -> {
                     long cardId = market.getSkillCardId();
@@ -56,9 +53,7 @@ public record SkillCardOnSale(
                         return null;
                     }
 
-                    // 3. Builder를 사용하여 SkillCardOnSale 객체 생성
                     return SkillCardOnSale.builder()
-                            // SkillCardMarketEntity (마켓 정보)
                             .marketId(market.getId())
                             .cardId(cardId)
                             .price(market.getPrice())
@@ -67,7 +62,6 @@ public record SkillCardOnSale(
                             .isSold(market.isSold())
                             .available(market.isAvailable())
 
-                            // SkillCardEntity (상세 스킬 정보)
                             // SkillCardEntity의 name 필드가 영어 이름이라고 가정
                             .engName(card.getEngName())
                             .korName(card.getKorName())

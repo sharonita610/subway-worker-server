@@ -31,7 +31,6 @@ public class SwaggerConfig {
     private static final String UNAUTHORIZED = "401";
 
     static {
-        // @CurrentUuid 매개변수는 헤더에서 주입되므로 API 파라미터로 노출하지 않는다.
         SpringDocUtils.getConfig().addAnnotationsToIgnore(CurrentUuid.class);
     }
 

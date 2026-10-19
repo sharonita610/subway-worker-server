@@ -1,8 +1,8 @@
 package com.game.subwayworkerserver.controller.response.item;
 
 import com.game.subwayworkerserver.domain.item.ItemName;
-import com.fasterxml.jackson.annotation.JsonInclude; // import 추가
-import com.fasterxml.jackson.annotation.JsonInclude.Include; // import 추가
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import java.util.List;
 
