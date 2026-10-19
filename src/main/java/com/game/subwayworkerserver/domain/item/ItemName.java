@@ -145,17 +145,5 @@ public enum ItemName {
         );
     }
 
-    public boolean canTrapSucceed() {
-        if (this.category != ItemCategory.TRAP) {
-            throw new BaseException(ErrorCode.BAD_REQUEST, "'" + this.name + "'은 트랩(Trap) 도구가 아닙니다. TRAP 카테고리만 호출해야 합니다.");
-        }
-
-        if (this.percentage >= 100) {
-            return true;
-        }
-
-        int randomRoll = ThreadLocalRandom.current().nextInt(100);
-        return randomRoll < this.percentage;
-    }
 
 }

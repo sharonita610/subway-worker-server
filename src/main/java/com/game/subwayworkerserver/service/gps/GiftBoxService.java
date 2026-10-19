@@ -6,6 +6,8 @@ import com.game.subwayworkerserver.controller.request.gps.GpsRandomGiftRequest;
 import com.game.subwayworkerserver.controller.response.gps.GpsRandomGiftResponse;
 import com.game.subwayworkerserver.domain.reward.RandomBoxReward.DefaultGift;
 import com.game.subwayworkerserver.domain.reward.RandomBoxReward.ExtraGift;
+import com.game.subwayworkerserver.domain.reward.RewardRoller;
+import com.game.subwayworkerserver.domain.reward.RewardRoller.Chance;
 import com.game.subwayworkerserver.domain.item.ItemName;
 import com.game.subwayworkerserver.entity.UserEntity;
 import com.game.subwayworkerserver.entity.UserItemMapEntity;
@@ -17,12 +19,9 @@ import org.springframework.data.geo.*;
 import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // 트랜잭션 어노테이션 사용 가정
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 
@@ -36,17 +35,25 @@ public class GiftBoxService {
     private final UserItemMapRepository userItemMapRepository;
     private final UserLevelProcessor userLevelProcessor;
 
-    private static final String RANDOM_GIFT_BOX_KEY = GpsRedisKeys.RANDOM_GIFT_BOX_KEY;
-    private static final String USER_ACQUIRED_PREFIX = GpsRedisKeys.USER_ACQUIRED_PREFIX;
     private static final double SEARCH_RADIUS_METER = 50.0;
 
     private static final int BASE_EXP = 20;
     private static final long ACQUIRED_KEY_TTL_DAYS = 5;
 
-     private static final long COIN_MIN_ADJUSTED = 10000;
-     private static final long COIN_MAX_ADJUSTED = 80000;
-     private static final int TICKET_MIN_ADJUSTED = 3;
-     private static final int TICKET_MAX_ADJUSTED = 200;
+    private static final long COIN_MIN_ADJUSTED = 10000;
+    private static final long COIN_MAX_ADJUSTED = 80000;
+    private static final int TICKET_MIN_ADJUSTED = 3;
+    private static final int TICKET_MAX_ADJUSTED = 200;
+    private static final String GACHA_TICKET = "GACHA_TICKET";
+
+    /** 상자를 열 때 후보마다 독립적으로 굴리는 보너스 보상. */
+    private static final List<Chance> BONUS_REWARD_CHANCES = List.of(
+            new Chance(ItemName.WOOD_SHOVEL.name(), 50),
+            new Chance(ItemName.SILVER_SHOVEL.name(), 10),
+            new Chance(ItemName.PAPER_BOX.name(), 30),
+            new Chance(ItemName.BRIEFCASE.name(), 5),
+            new Chance(GACHA_TICKET, 30)
+    );
 
     @Transactional
     public GpsRandomGiftResponse getRandomGift(GpsRandomGiftRequest request, String userUuid) {
@@ -59,7 +66,7 @@ public class GiftBoxService {
         }
 
         // 2. 찾은 아이템을 유저별 획득 기록에 저장하기 (중복 획득 방지)
-        String acquiredKey = USER_ACQUIRED_PREFIX + userUuid + ":" + RANDOM_GIFT_BOX_KEY;
+        String acquiredKey = GpsRedisKeys.USER_ACQUIRED_PREFIX + userUuid + ":" + GpsRedisKeys.RANDOM_GIFT_BOX_KEY;
 
         // 이미 획득했는지 확인
         if (redisTemplate.opsForSet().isMember(acquiredKey, giftBoxId)) {
@@ -109,11 +116,11 @@ public class GiftBoxService {
         // 4. 추가 아이템 인벤토리 업데이트 (재료, 도구 등)
         for (ExtraGift item : bonusGifts) {
 
-            if(item.name().equals("gachaTicket")) {
+            if (item.name().equals(GACHA_TICKET)) {
                 user.increaseGachaTicket();
                 continue;
             }
-            ItemName itemName = ItemName.fromKoreanName(item.name());
+            ItemName itemName = ItemName.fromConstantName(item.name());
             userItemMapRepository.findByUserIdAndItemName(user.getId(), itemName)
                     .ifPresentOrElse(
                             UserItemMapEntity::increaseQuantity,
@@ -137,7 +144,7 @@ public class GiftBoxService {
 
         GeoResults<RedisGeoCommands.GeoLocation<String>> results = redisTemplate.opsForGeo()
                 .radius(
-                        RANDOM_GIFT_BOX_KEY,
+                        GpsRedisKeys.RANDOM_GIFT_BOX_KEY,
                         searchArea,
                         args
                 );
@@ -149,50 +156,18 @@ public class GiftBoxService {
     }
 
     private List<DefaultGift> calculateDefaultRewards() {
-        final double SKEW_FACTOR = 3.5;
-        final double COIN_SKEW_FACTOR = 6.0;
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-
-        final long COIN_RANGE = COIN_MAX_ADJUSTED - COIN_MIN_ADJUSTED;
-
-        double skewedRandomCoin = Math.pow(ThreadLocalRandom.current().nextDouble(0, 1), COIN_SKEW_FACTOR);
-        long coins = (long) (COIN_MIN_ADJUSTED + skewedRandomCoin * COIN_RANGE);
-
-        final int TICKET_RANGE = TICKET_MAX_ADJUSTED - TICKET_MIN_ADJUSTED;
-
-        double skewedRandomTicket = Math.pow(random.nextDouble(0, 1), SKEW_FACTOR);
-        int tickets = (int) (TICKET_MIN_ADJUSTED + skewedRandomTicket * TICKET_RANGE);
-
-        List<DefaultGift> defaultGiftList = new ArrayList<>();
-        defaultGiftList.add(new DefaultGift("coin", "코인", (int) coins));
-        defaultGiftList.add(new DefaultGift("vacationTicket", "휴가티켓", tickets));
-        defaultGiftList.add(new DefaultGift("exp", "경험치", BASE_EXP));
-
-        return defaultGiftList;
+        int coins = (int) RewardRoller.skewedBetween(COIN_MIN_ADJUSTED, COIN_MAX_ADJUSTED, RewardRoller.COIN_SKEW_FACTOR);
+        int tickets = (int) RewardRoller.skewedBetween(TICKET_MIN_ADJUSTED, TICKET_MAX_ADJUSTED, RewardRoller.TICKET_SKEW_FACTOR);
+        return List.of(
+                new DefaultGift("coin", "코인", coins),
+                new DefaultGift("vacationTicket", "휴가티켓", tickets),
+                new DefaultGift("exp", "경험치", BASE_EXP)
+        );
     }
 
     private List<ExtraGift> calculateBonusRewards() {
-        List<ExtraGift> rewards = new ArrayList<>();
-
-        Map<String, Integer> probabilityMap = Map.of(
-
-                ItemName.WOOD_SHOVEL.getName(), 50,
-                ItemName.SILVER_SHOVEL.getName(), 10,
-                ItemName.PAPER_BOX.getName(), 30,
-                ItemName.BRIEFCASE.getName(), 5,
-                "gachaTicket", 30
-        );
-
-        for (Map.Entry<String, Integer> entry : probabilityMap.entrySet()) {
-            String item = entry.getKey();
-            int requiredProbability = entry.getValue();
-
-            double roll = ThreadLocalRandom.current().nextDouble(0, 100);
-
-            if (roll < requiredProbability) {
-                rewards.add(new ExtraGift(item, 1));
-            }
-        }
-        return rewards;
+        return RewardRoller.rollEach(BONUS_REWARD_CHANCES).stream()
+                .map(name -> new ExtraGift(name, 1))
+                .toList();
     }
 }

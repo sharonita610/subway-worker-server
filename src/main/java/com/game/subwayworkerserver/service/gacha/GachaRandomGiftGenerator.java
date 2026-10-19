@@ -2,149 +2,93 @@ package com.game.subwayworkerserver.service.gacha;
 
 import com.game.subwayworkerserver.domain.baseinfo.GachaTreasure;
 import com.game.subwayworkerserver.domain.item.ItemName;
-import com.game.subwayworkerserver.exception.BaseException;
-import com.game.subwayworkerserver.exception.ErrorCode;
+import com.game.subwayworkerserver.domain.reward.RandomBoxReward.DefaultGift;
+import com.game.subwayworkerserver.domain.reward.RandomBoxReward.ExtraGift;
+import com.game.subwayworkerserver.domain.reward.RewardRoller;
+import com.game.subwayworkerserver.domain.reward.RewardRoller.Chance;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
+/**
+ * 럭키 가챠의 기본 보상(코인·휴가티켓)과 추가 보상(도구·재료·보물)을 뽑는다.
+ * 난수 공식은 RewardRoller를 쓴다.
+ */
 public class GachaRandomGiftGenerator {
 
     private static final int MAX_TREASURE_COUNT = 20;
-
     private static final String MATERIAL_COWORKER = "MATERIAL_COWORKER";
     private static final String TREASURE = "TREASURE";
 
-    private static final double SKEW_FACTOR = 3.5;
-    private static final double COIN_SKEW_FACTOR = 6.0;
-    private static final long COIN_MIN_ADJUSTED = 10000;
-    private static final long COIN_MAX_ADJUSTED = 150000;
-    private static final int TICKET_MIN_ADJUSTED = 20;
-    private static final int TICKET_MAX_ADJUSTED = 200;
+    private static final long COIN_MIN = 10_000;
+    private static final long COIN_MAX = 150_000;
+    private static final long TICKET_MIN = 20;
+    private static final long TICKET_MAX = 200;
 
-    private static final List<RewardConfig> EXTRA_REWARDS_CONFIGS = List.of(
-            new RewardConfig(ItemName.BRIEFCASE.name(), 30),
-            new RewardConfig(ItemName.BUSINESS_CARRIER.name(), 10),
-            new RewardConfig(ItemName.SILVER_SHOVEL.name(), 30),
-            new RewardConfig(ItemName.GOLD_SHOVEL.name(), 10),
-            new RewardConfig(MATERIAL_COWORKER, 10),
-            new RewardConfig(TREASURE, 25)
+    private static final List<Chance> EXTRA_REWARD_CHANCES = List.of(
+            new Chance(ItemName.BRIEFCASE.name(), 30),
+            new Chance(ItemName.BUSINESS_CARRIER.name(), 10),
+            new Chance(ItemName.SILVER_SHOVEL.name(), 30),
+            new Chance(ItemName.GOLD_SHOVEL.name(), 10),
+            new Chance(MATERIAL_COWORKER, 10),
+            new Chance(TREASURE, 25)
     );
 
-    private record RewardConfig(String type, int chancePercent) {
+    private GachaRandomGiftGenerator() {
     }
 
+    /** count 번 뽑은 기본 보상을 종류별로 합산해 돌려준다. */
     public static List<DefaultGift> getDefaultReward(final int count) {
-        List<DefaultGift> rawRewards = new ArrayList<>();
+        Map<String, DefaultGift> summed = new LinkedHashMap<>();
         for (int i = 0; i < count; i++) {
-            rawRewards.addAll(calculateSingleDefaultReward());
-        }
-
-        if (rawRewards.isEmpty()) {
-            return List.of();
-        }
-
-        Map<String, Integer> summedMap = rawRewards.stream()
-                .collect(Collectors.groupingBy(
-                        DefaultGift::type,
-                        Collectors.summingInt(DefaultGift::quantity)
-                ));
-
-        return summedMap.entrySet().stream()
-                .map(entry -> new DefaultGift(
-                        entry.getKey(),
-                        entry.getKey(),
-                        entry.getValue()
-                ))
-                .collect(Collectors.toList());
-    }
-
-    private static List<DefaultGift> calculateSingleDefaultReward() {
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-
-        final long COIN_RANGE = COIN_MAX_ADJUSTED - COIN_MIN_ADJUSTED;
-        double skewedRandomCoin = Math.pow(ThreadLocalRandom.current().nextDouble(0, 1), COIN_SKEW_FACTOR);
-        long coins = (long) (COIN_MIN_ADJUSTED + skewedRandomCoin * COIN_RANGE);
-
-        final int TICKET_RANGE = TICKET_MAX_ADJUSTED - TICKET_MIN_ADJUSTED;
-        double skewedRandomTicket = Math.pow(random.nextDouble(0, 1), SKEW_FACTOR);
-        int tickets = (int) (TICKET_MIN_ADJUSTED + skewedRandomTicket * TICKET_RANGE);
-
-        List<DefaultGift> defaultGiftList = new ArrayList<>();
-        defaultGiftList.add(new DefaultGift("coin", "코인", (int) coins));
-        defaultGiftList.add(new DefaultGift("vacationTicket", "휴가티켓", tickets));
-
-        return defaultGiftList;
-    }
-
-    public static List<ExtraGift> getExtraReward(int count, Map<GachaTreasure, Integer> userTreasureCounts) {
-        List<ExtraGift> rawRewards = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            rawRewards.addAll(calculateSingleExtraReward(userTreasureCounts));
-        }
-
-        if (rawRewards.isEmpty()) {
-            return List.of();
-        }
-
-        Map<String, Integer> summedMap = rawRewards.stream()
-                .collect(Collectors.groupingBy(
-                        ExtraGift::type,
-                        Collectors.summingInt(ExtraGift::quantity)
-                ));
-
-        return summedMap.entrySet().stream()
-                .map(entry -> new ExtraGift(
-                        entry.getKey(),
-                        entry.getValue()
-                ))
-                .collect(Collectors.toList());
-    }
-
-    private static List<ExtraGift> calculateSingleExtraReward(final Map<GachaTreasure, Integer> userTreasureCounts) {
-        List<ExtraGift> rewards = new ArrayList<>();
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-
-        for (RewardConfig config : EXTRA_REWARDS_CONFIGS) {
-            int requiredProbability = config.chancePercent();
-
-            double roll = random.nextDouble(0, 100);
-
-            if (roll < requiredProbability) {
-
-                if (config.type().equals(TREASURE)) {
-                    GachaTreasure treasure = substituteRandomAvailableTreasure(userTreasureCounts);
-                    rewards.add(new ExtraGift(treasure.name(), 1));
-
-                } else {
-                    rewards.add(new ExtraGift(config.type(), 1));
-                }
+            for (DefaultGift gift : rollDefaultReward()) {
+                summed.merge(gift.name(), gift,
+                        (a, b) -> new DefaultGift(a.name(), a.koreanName(), a.quantity() + b.quantity()));
             }
+        }
+        return new ArrayList<>(summed.values());
+    }
+
+    private static List<DefaultGift> rollDefaultReward() {
+        int coins = (int) RewardRoller.skewedBetween(COIN_MIN, COIN_MAX, RewardRoller.COIN_SKEW_FACTOR);
+        int tickets = (int) RewardRoller.skewedBetween(TICKET_MIN, TICKET_MAX, RewardRoller.TICKET_SKEW_FACTOR);
+        return List.of(
+                new DefaultGift("coin", "코인", coins),
+                new DefaultGift("vacationTicket", "휴가티켓", tickets)
+        );
+    }
+
+    /** count 번 뽑은 추가 보상을 종류별로 합산해 돌려준다. 보물은 보유 한도에 닿지 않은 것 중에서 고른다. */
+    public static List<ExtraGift> getExtraReward(final int count, final Map<GachaTreasure, Integer> userTreasureCounts) {
+        Map<String, Integer> summed = new LinkedHashMap<>();
+        for (int i = 0; i < count; i++) {
+            for (ExtraGift gift : rollExtraReward(userTreasureCounts)) {
+                summed.merge(gift.name(), gift.quantity(), Integer::sum);
+            }
+        }
+        return summed.entrySet().stream()
+                .map(entry -> new ExtraGift(entry.getKey(), entry.getValue()))
+                .toList();
+    }
+
+    private static List<ExtraGift> rollExtraReward(final Map<GachaTreasure, Integer> userTreasureCounts) {
+        List<ExtraGift> rewards = new ArrayList<>();
+        for (String hit : RewardRoller.rollEach(EXTRA_REWARD_CHANCES)) {
+            String name = hit.equals(TREASURE)
+                    ? substituteRandomAvailableTreasure(userTreasureCounts).name()
+                    : hit;
+            rewards.add(new ExtraGift(name, 1));
         }
         return rewards;
     }
 
+    /** 보유 한도(20개)에 도달한 보물을 제외하고 하나를 고른다. 남은 보물이 없으면 GachaTreasure가 예외를 던진다. */
     private static GachaTreasure substituteRandomAvailableTreasure(final Map<GachaTreasure, Integer> userTreasureCounts) {
-        List<GachaTreasure> allTreasures = List.of(GachaTreasure.values());
-
-        List<GachaTreasure> maxedOutTreasures = allTreasures.stream()
-                .filter(treasure -> userTreasureCounts.getOrDefault(treasure, 0) == MAX_TREASURE_COUNT)
+        List<GachaTreasure> maxedOut = List.of(GachaTreasure.values()).stream()
+                .filter(treasure -> userTreasureCounts.getOrDefault(treasure, 0) >= MAX_TREASURE_COUNT)
                 .toList();
-
-        if (maxedOutTreasures.size() == MAX_TREASURE_COUNT) {
-            throw new BaseException(ErrorCode.BAD_REQUEST, "모든 보물의 최대 보유 한도(20개)에 도달했습니다.");
-        }
-
-        return GachaTreasure.getRandom(maxedOutTreasures);
-    }
-
-
-    public record DefaultGift(String type, String displayName, int quantity) {
-    }
-
-    public record ExtraGift(String type, int quantity) {
+        return GachaTreasure.getRandom(maxedOut);
     }
 }

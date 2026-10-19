@@ -1,8 +1,8 @@
 package com.game.subwayworkerserver.controller.response.gacha;
 
 import com.game.subwayworkerserver.domain.baseinfo.GachaTreasure;
-import com.game.subwayworkerserver.service.gacha.GachaRandomGiftGenerator.DefaultGift;
-import com.game.subwayworkerserver.service.gacha.GachaRandomGiftGenerator.ExtraGift;
+import com.game.subwayworkerserver.domain.reward.RandomBoxReward.DefaultGift;
+import com.game.subwayworkerserver.domain.reward.RandomBoxReward.ExtraGift;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ public record LuckyGachaEarnResponse(
 
     private record DefaultRewardInfo(String name, int quantity) {
         public static DefaultRewardInfo from(final DefaultGift defaultGift) {
-            return new DefaultRewardInfo(defaultGift.type(), defaultGift.quantity());
+            return new DefaultRewardInfo(defaultGift.name(), defaultGift.quantity());
         }
     }
 
@@ -39,7 +39,7 @@ public record LuckyGachaEarnResponse(
             List<TreasureRewardInfo> itemsList = new ArrayList<>();
 
             for (ExtraGift extraGift : extraGiftList) {
-                String giftName = extraGift.type();
+                String giftName = extraGift.name();
                 int quantity = extraGift.quantity();
 
                 if (GachaTreasure.isGacha(giftName)) {

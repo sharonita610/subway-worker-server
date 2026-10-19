@@ -3,8 +3,8 @@ package com.game.subwayworkerserver.service.gacha;
 import com.game.subwayworkerserver.domain.baseinfo.GachaTreasure;
 import com.game.subwayworkerserver.domain.item.ItemName;
 import com.game.subwayworkerserver.exception.BaseException;
-import com.game.subwayworkerserver.service.gacha.GachaRandomGiftGenerator.DefaultGift;
-import com.game.subwayworkerserver.service.gacha.GachaRandomGiftGenerator.ExtraGift;
+import com.game.subwayworkerserver.domain.reward.RandomBoxReward.DefaultGift;
+import com.game.subwayworkerserver.domain.reward.RandomBoxReward.ExtraGift;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -24,7 +24,7 @@ class GachaRandomGiftGeneratorTest {
     private static final int ROLLS = 10_000;
 
     private static int quantityOf(List<DefaultGift> gifts, String type) {
-        return gifts.stream().filter(g -> g.type().equals(type)).mapToInt(DefaultGift::quantity).sum();
+        return gifts.stream().filter(g -> g.name().equals(type)).mapToInt(DefaultGift::quantity).sum();
     }
 
     @Test
@@ -36,7 +36,7 @@ class GachaRandomGiftGeneratorTest {
     void 기본_보상은_코인과_휴가티켓_두_종류이고_정해진_범위_안이다() {
         List<DefaultGift> gifts = GachaRandomGiftGenerator.getDefaultReward(1);
 
-        assertThat(gifts).extracting(DefaultGift::type).containsExactlyInAnyOrder("coin", "vacationTicket");
+        assertThat(gifts).extracting(DefaultGift::name).containsExactlyInAnyOrder("coin", "vacationTicket");
         assertThat(quantityOf(gifts, "coin")).isBetween(10_000, 150_000);
         assertThat(quantityOf(gifts, "vacationTicket")).isBetween(20, 200);
     }
@@ -64,7 +64,7 @@ class GachaRandomGiftGeneratorTest {
 
         for (int i = 0; i < 300; i++) {
             for (ExtraGift gift : GachaRandomGiftGenerator.getExtraReward(1, Map.of())) {
-                assertThat(allowed).contains(gift.type());
+                assertThat(allowed).contains(gift.name());
                 assertThat(gift.quantity()).isGreaterThanOrEqualTo(1);
             }
         }
@@ -74,7 +74,7 @@ class GachaRandomGiftGeneratorTest {
     void 서류가방은_약_30퍼센트_확률로_나온다() {
         long hits = IntStream.range(0, ROLLS)
                 .filter(i -> GachaRandomGiftGenerator.getExtraReward(1, Map.of()).stream()
-                        .anyMatch(g -> g.type().equals(ItemName.BRIEFCASE.name())))
+                        .anyMatch(g -> g.name().equals(ItemName.BRIEFCASE.name())))
                 .count();
 
         assertThat(hits).isBetween(2_700L, 3_300L);

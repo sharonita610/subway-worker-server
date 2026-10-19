@@ -1,7 +1,6 @@
 package com.game.subwayworkerserver.service.gps;
 
-import com.game.subwayworkerserver.controller.response.coworker.CaptureResponse;
-import com.game.subwayworkerserver.domain.reward.BaseReward;
+import com.game.subwayworkerserver.domain.item.ItemName;
 import com.game.subwayworkerserver.exception.BaseException;
 import org.junit.jupiter.api.Test;
 
@@ -23,8 +22,12 @@ class CaptureCoworkerProcessorTest {
         return IntStream.range(0, ROLLS).filter(i -> processor.calculateCaptureSucceed(tool, level)).count();
     }
 
+    private long trapSuccesses(ItemName tool) {
+        return IntStream.range(0, ROLLS).filter(i -> processor.calculateTrapSucceed(tool)).count();
+    }
+
     private long escapes(int level) {
-        return IntStream.range(0, ROLLS).filter(i -> processor.calculateEscape(level).run()).count();
+        return IntStream.range(0, ROLLS).filter(i -> processor.calculateEscape(level)).count();
     }
 
     @Test
@@ -77,13 +80,27 @@ class CaptureCoworkerProcessorTest {
     }
 
     @Test
-    void 도주_판정_응답은_실패_보상과_빈_동료_정보를_가진다() {
-        CaptureResponse response = processor.calculateEscape(1);
+    void 트랩_도구가_아니면_트랩_판정은_예외를_던진다() {
+        assertThatThrownBy(() -> processor.calculateTrapSucceed(ItemName.BRIEFCASE)).isInstanceOf(BaseException.class);
+    }
 
-        assertThat(response.success()).isFalse();
-        assertThat(response.run()).isFalse();
-        assertThat(response.reward()).isEqualTo(BaseReward.getFailedCaptureReward());
-        assertThat(response.extraExpReward()).isZero();
-        assertThat(response.capturedCoworkerInfo()).isNull();
+    @Test
+    void 금삽_트랩은_항상_성공한다() {
+        assertThat(trapSuccesses(ItemName.GOLD_SHOVEL)).isEqualTo(ROLLS);
+    }
+
+    @Test
+    void 랜덤트랩은_확률이_0이라_항상_실패한다() {
+        assertThat(trapSuccesses(ItemName.RANDOM_TRAP)).isZero();
+    }
+
+    @Test
+    void 나무삽_트랩은_약_50퍼센트_성공한다() {
+        assertThat(trapSuccesses(ItemName.WOOD_SHOVEL)).isBetween(4_700L, 5_300L);
+    }
+
+    @Test
+    void 은삽_트랩은_약_70퍼센트_성공한다() {
+        assertThat(trapSuccesses(ItemName.SILVER_SHOVEL)).isBetween(6_700L, 7_300L);
     }
 }

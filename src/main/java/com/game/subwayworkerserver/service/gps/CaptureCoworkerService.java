@@ -33,16 +33,13 @@ public class CaptureCoworkerService {
     private final UserLevelProcessor userLevelProcessor;
     private final CaptureCoworkerProcessor captureCoworkerProcessor;
 
-    private static final String COWORKER_LOCATIONS_KEY = GpsRedisKeys.COWORKER_LOCATIONS_KEY;
-    private static final String USER_ACQUIRED_PREFIX = GpsRedisKeys.USER_ACQUIRED_PREFIX;
-    private static final String COWORKER_DATA_PREFIX = GpsRedisKeys.COWORKER_DATA_PREFIX;
 
     private static final long ACQUIRED_KEY_TTL_HOURS = 4;
 
     @Transactional
     public CaptureResponse tryToCapture(final String uuid, final CaptureCoworkerRequest request) {
 
-        final String acquiredKey = USER_ACQUIRED_PREFIX + uuid + ":" + COWORKER_LOCATIONS_KEY;
+        final String acquiredKey = GpsRedisKeys.USER_ACQUIRED_PREFIX + uuid + ":" + GpsRedisKeys.COWORKER_LOCATIONS_KEY;
         final String coworkerId = request.coworkerId();
 
         // Redis Set에 해당 coworkerId가 이미 존재하는지 확인
@@ -51,7 +48,7 @@ public class CaptureCoworkerService {
             throw new BaseException(ErrorCode.BAD_REQUEST, "이미 획득했거나 도망쳐서 포획할 수 없는 동료입니다.");
         }
 
-        String instanceKey = COWORKER_DATA_PREFIX + request.coworkerId();
+        String instanceKey = GpsRedisKeys.COWORKER_DATA_PREFIX + request.coworkerId();
         Map<Object, Object> hashData = redisTemplate.opsForHash().entries(instanceKey);
 
         if (hashData.isEmpty()) {
@@ -106,11 +103,11 @@ public class CaptureCoworkerService {
 
             captureRecord.increaseFailCount();
 
-            CaptureResponse captureResponse = captureCoworkerProcessor.calculateEscape(coworkerLevel);
-            if (captureResponse.run()) {
+            boolean escaped = captureCoworkerProcessor.calculateEscape(coworkerLevel);
+            if (escaped) {
                 hideCoworkerFromUser(request.coworkerId(), acquiredKey);
             }
-            return captureResponse;
+            return CaptureResponse.of(false, escaped);
         }
     }
 

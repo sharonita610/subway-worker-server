@@ -38,12 +38,12 @@ public record GpsRandomGiftResponse(
             int quantity
     ) {
 
-        public static BonusGiftInfo of(String itemKoreanName, int quantity) {
-            if (itemKoreanName.equals("gachaTicket")){
+        public static BonusGiftInfo of(String itemConstantName, int quantity) {
+            if (itemConstantName.equals("GACHA_TICKET")) {
                 return new BonusGiftInfo("GACHA_TICKET", "가챠티켓", "가챠티켓", quantity);
             }
-            ItemName itemName = ItemName.fromKoreanName(itemKoreanName);
-            return new BonusGiftInfo(itemName.toString(), itemKoreanName, itemName.getDescription(), quantity);
+            ItemName itemName = ItemName.fromConstantName(itemConstantName);
+            return new BonusGiftInfo(itemName.toString(), itemName.getName(), itemName.getDescription(), quantity);
         }
     }
 }

@@ -57,6 +57,7 @@ class TrapServiceTest {
     @Mock private UserFinder userFinder;
     @Mock private CoworkerRepository coworkerRepository;
     @Mock private UserLevelProcessor userLevelProcessor;
+    @Mock private CaptureCoworkerProcessor captureCoworkerProcessor;
 
     private static final long USER_ID = 1L;
     private static final String USER_UUID = "user-uuid-1";
@@ -140,7 +141,7 @@ class TrapServiceTest {
         verify(userRepository, never()).findById(any());
     }
 
-    // ---- 보상 수령: 트랩 도구 확률 판정 (리팩터링 전 동작 고정) ----
+    // ---- 보상 수령: 트랩 도구 확률 판정 결과에 따른 처리 ----
 
     private UserTrapMapEntity successfulTrap(ItemName tool) {
         UserTrapMapEntity trap = new UserTrapMapEntity(USER_ID, tool, 37.5, 127.0, LocalDateTime.now().plusHours(1));
@@ -149,9 +150,10 @@ class TrapServiceTest {
     }
 
     @Test
-    void 금삽_트랩은_보상_수령_시_항상_동료가_되고_보상을_준다() {
+    void 트랩_판정이_성공이면_동료가_되고_보상을_준다() {
         UserEntity user = user();
         UserTrapMapEntity trap = successfulTrap(ItemName.GOLD_SHOVEL);
+        when(captureCoworkerProcessor.calculateTrapSucceed(ItemName.GOLD_SHOVEL)).thenReturn(true);
         when(userFinder.getByUuid(USER_UUID)).thenReturn(user);
         when(userTrapMapRepository.findByUserIdAndIsTrappedTrue(USER_ID)).thenReturn(List.of(trap));
         when(redisTemplate.opsForHash()).thenReturn(hashOperations);
@@ -172,9 +174,10 @@ class TrapServiceTest {
     }
 
     @Test
-    void 랜덤트랩은_확률이_0이라_보상_수령_시_항상_실패_처리된다() {
+    void 트랩_판정이_실패면_동료_없이_실패_처리된다() {
         UserEntity user = user();
         UserTrapMapEntity trap = successfulTrap(ItemName.RANDOM_TRAP);
+        when(captureCoworkerProcessor.calculateTrapSucceed(ItemName.RANDOM_TRAP)).thenReturn(false);
         when(userFinder.getByUuid(USER_UUID)).thenReturn(user);
         when(userTrapMapRepository.findByUserIdAndIsTrappedTrue(USER_ID)).thenReturn(List.of(trap));
 

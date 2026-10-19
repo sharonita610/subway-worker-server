@@ -43,6 +43,7 @@ public class TrapService {
     private final UserRepository userRepository;
     private final CoworkerRepository coworkerRepository;
     private final UserLevelProcessor userLevelProcessor;
+    private final CaptureCoworkerProcessor captureCoworkerProcessor;
 
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -211,7 +212,7 @@ public class TrapService {
         return userTrapMapList.stream().map(trapMap -> {
                     ItemName trapItemName = trapMap.getTrapItemName();
 
-                    if (!trapItemName.canTrapSucceed()) {
+                    if (!captureCoworkerProcessor.calculateTrapSucceed(trapItemName)) {
                         trapMap.setIsNotSuccessful();
                         trapMap.setExpiresAt();
                         return null;

@@ -16,8 +16,8 @@ import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.UserGachaRepository;
 import com.game.subwayworkerserver.repository.UserItemMapRepository;
-import com.game.subwayworkerserver.service.gacha.GachaRandomGiftGenerator.DefaultGift;
-import com.game.subwayworkerserver.service.gacha.GachaRandomGiftGenerator.ExtraGift;
+import com.game.subwayworkerserver.domain.reward.RandomBoxReward.DefaultGift;
+import com.game.subwayworkerserver.domain.reward.RandomBoxReward.ExtraGift;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -86,7 +86,7 @@ public class GachaService {
     private void processExtraGift(final List<ExtraGift> extraReward, final long userId) {
         extraReward.forEach(
                 gift -> {
-                    String giftType = gift.type();
+                    String giftType = gift.name();
 
                     if (giftType.equals(MATERIAL_COWORKER)) {
                         processExtraCoworkerReward(userId);
@@ -144,9 +144,9 @@ public class GachaService {
     private void processDefaultGift(final List<DefaultGift> defaultReward, final UserEntity user) {
         defaultReward.forEach(
                 gift -> {
-                    if (gift.type().equals("coin")) {
+                    if (gift.name().equals("coin")) {
                         user.increaseCoin(gift.quantity());
-                    } else if (gift.type().equals("vacationTicket")) {
+                    } else if (gift.name().equals("vacationTicket")) {
                         user.increaseVacationTicket(gift.quantity());
                     }
                 }
