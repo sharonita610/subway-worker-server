@@ -6,7 +6,7 @@ import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MonsterSampleData {
+public class StageMonsterData {
 
     // 몬스터 1 데이터 리스트
     public static List<MonsterType> sampleMonster1 = new ArrayList<>();

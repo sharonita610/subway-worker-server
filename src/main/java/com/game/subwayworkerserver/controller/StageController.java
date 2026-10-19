@@ -8,7 +8,7 @@ import com.game.subwayworkerserver.controller.response.stage.DungeonResponse;
 import com.game.subwayworkerserver.controller.response.stage.MonsterResponse;
 import com.game.subwayworkerserver.controller.response.stage.StageClearResponse;
 import com.game.subwayworkerserver.controller.response.coworker.StageCoworkerListResponse;
-import com.game.subwayworkerserver.domain.stage.MonsterSampleData;
+import com.game.subwayworkerserver.domain.stage.StageMonsterData;
 import com.game.subwayworkerserver.service.CoworkerService;
 import com.game.subwayworkerserver.service.StageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,7 +46,7 @@ public class StageController {
         if (num <= 0) {
             return ResponseEntity.badRequest().build();
         }
-        List<MonsterSampleData.MonsterType> stageMonsters = stageService.getStageMonsters(num);
+        List<StageMonsterData.MonsterType> stageMonsters = stageService.getStageMonsters(num);
 
         if (stageMonsters != null) {
             return ResponseEntity.ok(new MonsterResponse(stageMonsters));

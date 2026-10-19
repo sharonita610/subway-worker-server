@@ -4,7 +4,7 @@ import com.game.subwayworkerserver.controller.request.DungeonRequest;
 import com.game.subwayworkerserver.controller.request.StageClearRequest;
 import com.game.subwayworkerserver.controller.response.stage.DungeonResponse;
 import com.game.subwayworkerserver.controller.response.stage.StageClearResponse;
-import com.game.subwayworkerserver.domain.stage.MonsterSampleData;
+import com.game.subwayworkerserver.domain.stage.StageMonsterData;
 import com.game.subwayworkerserver.domain.stage.StageRewardInfo;
 import com.game.subwayworkerserver.domain.reward.DungeonReward;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
@@ -38,10 +38,10 @@ public class StageService {
     private final CoworkerLevelProcessor coworkerLevelProcessor;
     private final DungeonRecordRepository dungeonRecordRepository;
 
-    public List<MonsterSampleData.MonsterType> getStageMonsters(int num) {
-        MonsterSampleData.initializeData();
-        if (num == 1) return MonsterSampleData.sampleMonster1;
-        if (num == 2) return MonsterSampleData.sampleMonster2;
+    public List<StageMonsterData.MonsterType> getStageMonsters(int num) {
+        StageMonsterData.initializeData();
+        if (num == 1) return StageMonsterData.sampleMonster1;
+        if (num == 2) return StageMonsterData.sampleMonster2;
         throw new BaseException(BAD_REQUEST, "Invalid stage number: " + num);
     }
 
