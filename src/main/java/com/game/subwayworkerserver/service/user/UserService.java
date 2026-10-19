@@ -5,7 +5,7 @@ import com.game.subwayworkerserver.service.coworker.CoworkerListFilter;
 import com.game.subwayworkerserver.domain.item.ItemName;
 import com.game.subwayworkerserver.domain.item.ItemCategory;
 import com.game.subwayworkerserver.domain.user.Gender;
-import com.game.subwayworkerserver.controller.request.UserCreateRequest;
+import com.game.subwayworkerserver.controller.request.user.UserCreateRequest;
 import com.game.subwayworkerserver.controller.response.coworker.*;
 import com.game.subwayworkerserver.controller.response.item.*;
 import com.game.subwayworkerserver.controller.response.user.*;

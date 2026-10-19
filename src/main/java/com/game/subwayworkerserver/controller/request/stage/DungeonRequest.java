@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.controller.request;
+package com.game.subwayworkerserver.controller.request.stage;
 
 public record DungeonRequest(
         String stationName,

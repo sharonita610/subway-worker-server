@@ -3,7 +3,7 @@ package com.game.subwayworkerserver.service.gacha;
 import com.game.subwayworkerserver.service.common.UserFinder;
 import com.game.subwayworkerserver.domain.item.ItemName;
 import com.game.subwayworkerserver.domain.baseinfo.CurrencyType;
-import com.game.subwayworkerserver.controller.request.OpenLuckyGachaRequest;
+import com.game.subwayworkerserver.controller.request.gacha.OpenLuckyGachaRequest;
 import com.game.subwayworkerserver.controller.response.gacha.LuckyGachaEarnResponse;
 import com.game.subwayworkerserver.controller.response.gacha.LuckyGachaListResponse;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerLevel;

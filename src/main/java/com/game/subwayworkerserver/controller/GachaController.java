@@ -1,8 +1,8 @@
 package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.SecurityUtils;
-import com.game.subwayworkerserver.controller.request.OpenLuckyGachaRequest;
-import com.game.subwayworkerserver.controller.request.OpenSkillCardRequest;
+import com.game.subwayworkerserver.controller.request.gacha.OpenLuckyGachaRequest;
+import com.game.subwayworkerserver.controller.request.gacha.OpenSkillCardRequest;
 import com.game.subwayworkerserver.controller.response.skill.EarnedSkillCardResponse;
 import com.game.subwayworkerserver.controller.response.gacha.LuckyGachaEarnResponse;
 import com.game.subwayworkerserver.controller.response.gacha.LuckyGachaListResponse;

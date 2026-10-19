@@ -3,7 +3,7 @@ package com.game.subwayworkerserver.service.store;
 import com.game.subwayworkerserver.service.common.UserFinder;
 import com.game.subwayworkerserver.domain.item.ItemName;
 import com.game.subwayworkerserver.domain.baseinfo.CurrencyType;
-import com.game.subwayworkerserver.controller.request.PurchaseRequest;
+import com.game.subwayworkerserver.controller.request.store.PurchaseRequest;
 import com.game.subwayworkerserver.controller.response.item.ItemResponse;
 import com.game.subwayworkerserver.controller.response.item.StoreItemResponse;
 import com.game.subwayworkerserver.domain.baseinfo.Coin;

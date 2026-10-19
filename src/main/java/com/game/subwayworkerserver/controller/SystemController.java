@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.SecurityUtils;
-import com.game.subwayworkerserver.controller.request.SystemMailRequest;
+import com.game.subwayworkerserver.controller.request.system.SystemMailRequest;
 import com.game.subwayworkerserver.controller.response.user.CheckInListResponse;
 import com.game.subwayworkerserver.controller.response.user.LevelUpRewardResponse;
 import com.game.subwayworkerserver.controller.response.subscription.SubscribeListResponse;

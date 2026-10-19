@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.service.coworker;
 
-import com.game.subwayworkerserver.controller.request.CoworkerFilterRequest;
+import com.game.subwayworkerserver.controller.request.market.CoworkerFilterRequest;
 import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import com.game.subwayworkerserver.domain.market.CoworkerOnSale;

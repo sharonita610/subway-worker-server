@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.service.gps;
 
-import com.game.subwayworkerserver.controller.request.GpsRequest;
+import com.game.subwayworkerserver.controller.request.gps.GpsRequest;
 import com.game.subwayworkerserver.controller.response.gps.RandomGpsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -6,7 +6,7 @@ import com.game.subwayworkerserver.domain.reward.RewardType;
 import com.game.subwayworkerserver.domain.reward.RewardSource;
 import com.game.subwayworkerserver.domain.reward.CheckInReward;
 import com.game.subwayworkerserver.config.CacheConfig;
-import com.game.subwayworkerserver.controller.request.SystemMailRequest;
+import com.game.subwayworkerserver.controller.request.system.SystemMailRequest;
 import com.game.subwayworkerserver.controller.response.user.CheckInListResponse;
 import com.game.subwayworkerserver.controller.response.user.LevelUpRewardResponse;
 import com.game.subwayworkerserver.controller.response.subscription.SubscribeListResponse;

@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.controller.request;
+package com.game.subwayworkerserver.controller.request.gacha;
 
 public record OpenSkillCardRequest (
         String skillCardType,

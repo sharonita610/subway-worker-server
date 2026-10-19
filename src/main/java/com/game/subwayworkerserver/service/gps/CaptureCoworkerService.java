@@ -3,7 +3,7 @@ package com.game.subwayworkerserver.service.gps;
 import com.game.subwayworkerserver.service.common.UserFinder;
 import com.game.subwayworkerserver.service.common.UserLevelProcessor;
 import com.game.subwayworkerserver.domain.item.ItemName;
-import com.game.subwayworkerserver.controller.request.CaptureCoworkerRequest;
+import com.game.subwayworkerserver.controller.request.gps.CaptureCoworkerRequest;
 import com.game.subwayworkerserver.controller.response.coworker.CaptureResponse;
 import com.game.subwayworkerserver.domain.reward.BaseReward;
 import com.game.subwayworkerserver.entity.*;

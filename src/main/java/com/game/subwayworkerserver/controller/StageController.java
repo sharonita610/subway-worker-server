@@ -2,8 +2,8 @@ package com.game.subwayworkerserver.controller;
 
 
 import com.game.subwayworkerserver.config.SecurityUtils;
-import com.game.subwayworkerserver.controller.request.DungeonRequest;
-import com.game.subwayworkerserver.controller.request.StageClearRequest;
+import com.game.subwayworkerserver.controller.request.stage.DungeonRequest;
+import com.game.subwayworkerserver.controller.request.stage.StageClearRequest;
 import com.game.subwayworkerserver.controller.response.stage.DungeonResponse;
 import com.game.subwayworkerserver.controller.response.stage.MonsterResponse;
 import com.game.subwayworkerserver.controller.response.stage.StageClearResponse;

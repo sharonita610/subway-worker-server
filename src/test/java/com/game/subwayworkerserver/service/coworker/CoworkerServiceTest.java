@@ -1,7 +1,8 @@
 package com.game.subwayworkerserver.service.coworker;
 
+import com.game.subwayworkerserver.controller.request.coworker.UpgradeRequest;
 import com.game.subwayworkerserver.service.common.UserFinder;
-import com.game.subwayworkerserver.controller.request.PartnerConfigureRequest;
+import com.game.subwayworkerserver.controller.request.coworker.PartnerConfigureRequest;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerElement;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerLevel;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
@@ -100,8 +101,8 @@ class CoworkerServiceTest {
         // 재료 ID 2개 요청했는데 1개만 조회됨
         when(coworkerRepository.findAllById(List.of(20L, 30L))).thenReturn(List.of(createCoworker(1L)));
 
-        com.game.subwayworkerserver.controller.request.UpgradeRequest request =
-                new com.game.subwayworkerserver.controller.request.UpgradeRequest(10L, List.of(20L, 30L), 0);
+        com.game.subwayworkerserver.controller.request.coworker.UpgradeRequest request =
+                new com.game.subwayworkerserver.controller.request.coworker.UpgradeRequest(10L, List.of(20L, 30L), 0);
 
         assertThatThrownBy(() -> coworkerService.upgradeCoworker(TEST_UUID, request))
                 .isInstanceOf(BaseException.class);

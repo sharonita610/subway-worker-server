@@ -1,5 +1,7 @@
 package com.game.subwayworkerserver.service.stage;
 
+import com.game.subwayworkerserver.controller.request.stage.StageClearRequest;
+import com.game.subwayworkerserver.controller.request.stage.DungeonRequest;
 import com.game.subwayworkerserver.service.common.UserFinder;
 import com.game.subwayworkerserver.service.common.UserLevelProcessor;
 import com.game.subwayworkerserver.service.coworker.CoworkerLevelProcessor;
@@ -74,8 +76,8 @@ class StageServiceTest {
         when(coworkerRepository.findByUserIdAndInUseTrue(user.getId())).thenReturn(coworkers);
         when(stageRecordRepository.findByUserId(user.getId())).thenReturn(Optional.empty());
 
-        com.game.subwayworkerserver.controller.request.StageClearRequest request =
-                new com.game.subwayworkerserver.controller.request.StageClearRequest(true, 1);
+        com.game.subwayworkerserver.controller.request.stage.StageClearRequest request =
+                new com.game.subwayworkerserver.controller.request.stage.StageClearRequest(true, 1);
         when(stageRewardProcessor.giveFirstClearReward(user, 1)).thenReturn(reward);
         when(stageRecordRepository.save(any())).thenReturn(
                 com.game.subwayworkerserver.entity.StageRecordEntity.builder()
@@ -112,8 +114,8 @@ class StageServiceTest {
         when(dungeonRecordRepository.findByUserIdAndStationNameAndDungeonUuId(
                 user.getId(), "강남역", "test-uuid")).thenReturn(Optional.of(dungeonRecord));
 
-        com.game.subwayworkerserver.controller.request.DungeonRequest request =
-                new com.game.subwayworkerserver.controller.request.DungeonRequest("강남역", "test-uuid", true);
+        com.game.subwayworkerserver.controller.request.stage.DungeonRequest request =
+                new com.game.subwayworkerserver.controller.request.stage.DungeonRequest("강남역", "test-uuid", true);
 
         stageService.recordDungeon(TEST_UUID, request);
 

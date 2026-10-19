@@ -2,8 +2,8 @@ package com.game.subwayworkerserver.service.market;
 
 import com.game.subwayworkerserver.service.common.UserFinder;
 import com.game.subwayworkerserver.service.skill.SkillCardListFilter;
-import com.game.subwayworkerserver.controller.request.SellingRequest;
-import com.game.subwayworkerserver.controller.request.SkillCardFilterRequest;
+import com.game.subwayworkerserver.controller.request.market.SellingRequest;
+import com.game.subwayworkerserver.controller.request.market.SkillCardFilterRequest;
 import com.game.subwayworkerserver.controller.response.market.GlobalSkillCardResponse;
 import com.game.subwayworkerserver.controller.response.market.PaymentSuccessResponse;
 import com.game.subwayworkerserver.controller.response.market.SkillOnSaleResponse;

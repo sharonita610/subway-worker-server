@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.controller.request;
+package com.game.subwayworkerserver.controller.request.user;
 
 import com.game.subwayworkerserver.profanity.ProfanityCheck;
 import jakarta.validation.constraints.NotBlank;

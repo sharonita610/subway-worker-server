@@ -1,9 +1,9 @@
 package com.game.subwayworkerserver.service.skill;
 
 import com.game.subwayworkerserver.service.common.UserFinder;
-import com.game.subwayworkerserver.controller.request.OpenSkillCardRequest;
-import com.game.subwayworkerserver.controller.request.SkillCardConfigureRequest;
-import com.game.subwayworkerserver.controller.request.UpgradeRequest;
+import com.game.subwayworkerserver.controller.request.gacha.OpenSkillCardRequest;
+import com.game.subwayworkerserver.controller.request.coworker.SkillCardConfigureRequest;
+import com.game.subwayworkerserver.controller.request.coworker.UpgradeRequest;
 import com.game.subwayworkerserver.controller.response.skill.*;
 import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;

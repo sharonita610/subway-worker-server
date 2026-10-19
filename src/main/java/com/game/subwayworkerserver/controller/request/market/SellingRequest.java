@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.controller.request;
+package com.game.subwayworkerserver.controller.request.market;
 
 public record SellingRequest(
         long targetId,

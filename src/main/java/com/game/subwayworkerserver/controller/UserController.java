@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.SecurityUtils;
-import com.game.subwayworkerserver.controller.request.UserCreateRequest;
+import com.game.subwayworkerserver.controller.request.user.UserCreateRequest;
 import com.game.subwayworkerserver.controller.response.coworker.*;
 import com.game.subwayworkerserver.controller.response.item.*;
 import com.game.subwayworkerserver.controller.response.skill.*;

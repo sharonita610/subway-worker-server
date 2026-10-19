@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.controller.request;
+package com.game.subwayworkerserver.controller.request.gps;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;

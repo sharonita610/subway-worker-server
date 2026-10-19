@@ -1,9 +1,9 @@
 package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.SecurityUtils;
-import com.game.subwayworkerserver.controller.request.PartnerConfigureRequest;
-import com.game.subwayworkerserver.controller.request.SkillCardConfigureRequest;
-import com.game.subwayworkerserver.controller.request.UpgradeRequest;
+import com.game.subwayworkerserver.controller.request.coworker.PartnerConfigureRequest;
+import com.game.subwayworkerserver.controller.request.coworker.SkillCardConfigureRequest;
+import com.game.subwayworkerserver.controller.request.coworker.UpgradeRequest;
 import com.game.subwayworkerserver.controller.response.coworker.*;
 import com.game.subwayworkerserver.controller.response.skill.*;
 import com.game.subwayworkerserver.service.coworker.CoworkerService;

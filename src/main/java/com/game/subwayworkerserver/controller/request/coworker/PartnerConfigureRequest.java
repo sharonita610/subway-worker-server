@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.controller.request;
+package com.game.subwayworkerserver.controller.request.coworker;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

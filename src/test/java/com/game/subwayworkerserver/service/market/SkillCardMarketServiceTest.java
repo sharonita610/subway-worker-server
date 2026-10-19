@@ -4,7 +4,7 @@ import com.game.subwayworkerserver.service.common.UserFinder;
 import com.game.subwayworkerserver.service.skill.SkillCardListFilter;
 import com.game.subwayworkerserver.domain.user.Gender;
 import com.game.subwayworkerserver.domain.baseinfo.CurrencyType;
-import com.game.subwayworkerserver.controller.request.SellingRequest;
+import com.game.subwayworkerserver.controller.request.market.SellingRequest;
 import com.game.subwayworkerserver.domain.skill.SkillCardType;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;

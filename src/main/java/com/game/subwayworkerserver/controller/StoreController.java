@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.SecurityUtils;
-import com.game.subwayworkerserver.controller.request.PurchaseRequest;
+import com.game.subwayworkerserver.controller.request.store.PurchaseRequest;
 import com.game.subwayworkerserver.controller.response.item.ItemResponse;
 import com.game.subwayworkerserver.controller.response.item.StoreItemResponse;
 import com.game.subwayworkerserver.service.store.StoreService;
