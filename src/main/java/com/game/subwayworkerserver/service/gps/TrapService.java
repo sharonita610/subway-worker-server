@@ -13,9 +13,15 @@ import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import com.game.subwayworkerserver.repository.CoworkerRepository;
 import com.game.subwayworkerserver.repository.UserItemMapRepository;
+import com.game.subwayworkerserver.repository.UserRepository;
 import com.game.subwayworkerserver.repository.UserTrapMapRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.geo.Circle;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.GeoResults;
+import org.springframework.data.geo.Point;
+import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -33,13 +40,15 @@ public class TrapService {
     private final UserFinder userFinder;
     private final UserItemMapRepository userItemMapRepository;
     private final UserTrapMapRepository userTrapMapRepository;
+    private final UserRepository userRepository;
     private final CoworkerRepository coworkerRepository;
     private final UserLevelProcessor userLevelProcessor;
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    private static final String COWORKER_COWORKER_DATA_PREFIX = "trapped:coworker:data:";
     private static final long TRAP_VALID_HOURS = 12;
+    private static final double TRAP_CAPTURE_RADIUS_METER = 25.0;
+    private static final long TRAPPED_DATA_TTL_DAYS = 7;
 
     /**
      * 덫 설치 API 요청을 처리하고, 아이템을 소모하여 트랩 정보를 DB에 저장합니다.
@@ -119,8 +128,83 @@ public class TrapService {
         userLevelProcessor.processExpGainAndLevelUp(user, totalExp);
 
         return CoworkerListResponse.of(totalCoin, totalExp, coworkerEntityList);
+    }
 
+    /**
+     * 만료된 트랩을 정리한 뒤, 유효한 트랩의 포획 반경 안에 들어온 동료를 포획 처리한다.
+     * 포획된 동료의 Redis 데이터는 보상 수령 시점까지 별도 키에 백업해 둔다.
+     *
+     * @return 이번 실행에서 포획에 성공한 트랩 수
+     */
+    @Transactional
+    public int checkTrapsForCapture() {
+        long deletedCount = cleanUpExpiredTraps();
+        log.info("[Trap] 만료된 트랩 {}건 삭제", deletedCount);
 
+        List<UserTrapMapEntity> activeTraps =
+                userTrapMapRepository.findByExpiresAtAfterAndIsTrappedFalse(LocalDateTime.now());
+        if (activeTraps.isEmpty()) {
+            return 0;
+        }
+
+        int successCount = 0;
+        for (UserTrapMapEntity trap : activeTraps) {
+            String coworkerId = findCoworkerNearby(trap);
+            if (coworkerId == null) {
+                continue;
+            }
+            backupTrappedCoworker(coworkerId);
+            trap.markSuccess(coworkerId);
+            userRepository.findById(trap.getUserId()).ifPresent(user -> {
+                user.updateTrapSuccess();
+                String acquiredKey = GpsRedisKeys.USER_ACQUIRED_PREFIX + user.getUuid()
+                        + ":" + GpsRedisKeys.COWORKER_LOCATIONS_KEY;
+                redisTemplate.opsForSet().add(acquiredKey, coworkerId);
+            });
+            successCount++;
+        }
+        return successCount;
+    }
+
+    /** 트랩 위치 기준 포획 반경 안에서 가장 가까운 동료 ID를 돌려준다. 없으면 null. */
+    private String findCoworkerNearby(UserTrapMapEntity trap) {
+        Circle searchArea = new Circle(
+                new Point(trap.getLongitude(), trap.getLatitude()),
+                new Distance(TRAP_CAPTURE_RADIUS_METER, RedisGeoCommands.DistanceUnit.METERS)
+        );
+        RedisGeoCommands.GeoRadiusCommandArgs args =
+                RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().limit(1);
+        GeoResults<RedisGeoCommands.GeoLocation<String>> results =
+                redisTemplate.opsForGeo().radius(GpsRedisKeys.COWORKER_LOCATIONS_KEY, searchArea, args);
+
+        if (results == null || results.getContent().isEmpty()) {
+            return null;
+        }
+        return results.getContent().get(0).getContent().getName();
+    }
+
+    /** 동료 속성 해시를 trapped 키로 복사하고 TTL을 건다. 원본이 없으면 경고만 남긴다. */
+    private void backupTrappedCoworker(String coworkerId) {
+        String sourceKey = GpsRedisKeys.COWORKER_DATA_PREFIX + coworkerId;
+        String backupKey = GpsRedisKeys.TRAPPED_COWORKER_DATA_PREFIX + coworkerId;
+
+        Map<Object, Object> attributes = redisTemplate.opsForHash().entries(sourceKey);
+        if (attributes.isEmpty()) {
+            log.warn("[Trap] 동료 {} 데이터가 Redis에 없어 백업하지 못했습니다. key={}", coworkerId, sourceKey);
+            return;
+        }
+        redisTemplate.opsForHash().putAll(backupKey, attributes);
+        redisTemplate.expire(backupKey, TRAPPED_DATA_TTL_DAYS, TimeUnit.DAYS);
+    }
+
+    private long cleanUpExpiredTraps() {
+        List<UserTrapMapEntity> expiredTraps =
+                userTrapMapRepository.findByExpiresAtBeforeAndIsTrappedFalse(LocalDateTime.now());
+        if (expiredTraps.isEmpty()) {
+            return 0;
+        }
+        userTrapMapRepository.deleteAll(expiredTraps);
+        return expiredTraps.size();
     }
 
     private List<CoworkerEntity> saveUserTrapIfSuccess(final List<UserTrapMapEntity> userTrapMapList) {
@@ -134,7 +218,7 @@ public class TrapService {
                     }
 
                     String capturedCoworkerId = trapMap.getCapturedCoworkerId();
-                    String trappedKey = COWORKER_COWORKER_DATA_PREFIX + capturedCoworkerId;
+                    String trappedKey = GpsRedisKeys.TRAPPED_COWORKER_DATA_PREFIX + capturedCoworkerId;
                     Map<Object, Object> hashData = redisTemplate.opsForHash().entries(trappedKey);
 
                     if (hashData.isEmpty()) {

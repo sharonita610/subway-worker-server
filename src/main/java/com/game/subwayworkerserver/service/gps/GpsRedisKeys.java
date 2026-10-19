@@ -8,4 +8,5 @@ public class GpsRedisKeys {
     public static final String RANDOM_GIFT_BOX_KEY = "giftbox:locations";
     public static final String COWORKER_DATA_PREFIX = "coworker:data:";
     public static final String USER_ACQUIRED_PREFIX = "user:acquired:";
+    public static final String TRAPPED_COWORKER_DATA_PREFIX = "trapped:coworker:data:";
 }
