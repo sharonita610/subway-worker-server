@@ -1,8 +1,8 @@
 package com.game.subwayworkerserver.controller.response.gacha;
 
 import com.game.subwayworkerserver.domain.baseinfo.GachaTreasure;
-import com.game.subwayworkerserver.service.GachaRandomGiftGenerator.DefaultGift;
-import com.game.subwayworkerserver.service.GachaRandomGiftGenerator.ExtraGift;
+import com.game.subwayworkerserver.service.gacha.GachaRandomGiftGenerator.DefaultGift;
+import com.game.subwayworkerserver.service.gacha.GachaRandomGiftGenerator.ExtraGift;
 
 import java.util.ArrayList;
 import java.util.List;

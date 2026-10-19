@@ -6,7 +6,7 @@ import com.game.subwayworkerserver.controller.response.user.CheckInListResponse;
 import com.game.subwayworkerserver.controller.response.user.LevelUpRewardResponse;
 import com.game.subwayworkerserver.controller.response.subscription.SubscribeListResponse;
 import com.game.subwayworkerserver.controller.response.user.UserMailBoxResponse;
-import com.game.subwayworkerserver.service.SystemService;
+import com.game.subwayworkerserver.service.system.SystemService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

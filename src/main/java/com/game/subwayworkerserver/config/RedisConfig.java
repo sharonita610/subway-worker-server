@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.config;
 
+import com.game.subwayworkerserver.service.gps.GpsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;

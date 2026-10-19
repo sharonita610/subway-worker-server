@@ -3,7 +3,7 @@ package com.game.subwayworkerserver.scheduler;
 import com.game.subwayworkerserver.entity.UserTrapMapEntity;
 import com.game.subwayworkerserver.repository.UserRepository;
 import com.game.subwayworkerserver.repository.UserTrapMapRepository;
-import com.game.subwayworkerserver.service.GpsRedisKeys;
+import com.game.subwayworkerserver.service.gps.GpsRedisKeys;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

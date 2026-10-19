@@ -3,7 +3,7 @@ package com.game.subwayworkerserver.scheduler;
 import com.game.subwayworkerserver.domain.baseinfo.SubscriptionItem;
 import com.game.subwayworkerserver.entity.UserSubscriptionEntity;
 import com.game.subwayworkerserver.repository.UserSubscriptionRepository;
-import com.game.subwayworkerserver.service.RewardProcessor;
+import com.game.subwayworkerserver.service.common.RewardProcessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
