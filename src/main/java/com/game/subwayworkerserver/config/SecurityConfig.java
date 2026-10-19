@@ -23,13 +23,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    /** X-User-ID 없이 접근할 수 있는 경로. 여기 없는 경로는 전부 헤더가 있어야 하고, 없으면 401. */
-    private static final String[] PUBLIC_GET = {"/user/toss", "/logo", "/stage/monsters", "/coworker-types"};
-    private static final String[] PUBLIC_POST = {"/user", "/verify", "/system/mail"};
-    private static final String[] PUBLIC_ANY = {
-            "/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/swagger-resources/**"
-    };
-
     private final JsonAuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
@@ -42,9 +35,9 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-                        .requestMatchers(HttpMethod.GET, PUBLIC_GET).permitAll()
-                        .requestMatchers(HttpMethod.POST, PUBLIC_POST).permitAll()
-                        .requestMatchers(PUBLIC_ANY).permitAll()
+                        .requestMatchers(HttpMethod.GET, PublicEndpoints.GET).permitAll()
+                        .requestMatchers(HttpMethod.POST, PublicEndpoints.POST).permitAll()
+                        .requestMatchers(PublicEndpoints.ANY).permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
