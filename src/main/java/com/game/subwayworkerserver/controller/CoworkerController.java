@@ -2,7 +2,6 @@ package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.SecurityUtils;
 import com.game.subwayworkerserver.controller.request.PartnerConfigureRequest;
-import com.game.subwayworkerserver.controller.request.SkillByUserRequest;
 import com.game.subwayworkerserver.controller.request.SkillCardConfigureRequest;
 import com.game.subwayworkerserver.controller.request.UpgradeRequest;
 import com.game.subwayworkerserver.controller.response.coworker.*;

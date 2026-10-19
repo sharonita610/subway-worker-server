@@ -8,7 +8,6 @@ import com.game.subwayworkerserver.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Map;
 
 @Getter
 @Entity

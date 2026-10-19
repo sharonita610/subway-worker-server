@@ -1,6 +1,5 @@
 package com.game.subwayworkerserver.entity;
 
-import com.game.subwayworkerserver.domain.baseinfo.CoworkerLevel;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
 import lombok.Getter;

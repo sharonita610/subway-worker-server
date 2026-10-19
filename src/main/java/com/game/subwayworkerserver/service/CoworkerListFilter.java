@@ -4,7 +4,6 @@ import com.game.subwayworkerserver.controller.request.CoworkerFilterRequest;
 import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import com.game.subwayworkerserver.domain.market.CoworkerOnSale;
-import com.game.subwayworkerserver.domain.market.SkillCardOnSale;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
 import org.springframework.stereotype.Component;
 

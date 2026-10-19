@@ -7,7 +7,6 @@ import com.game.subwayworkerserver.entity.RewardEntity;
 import com.game.subwayworkerserver.entity.RewardSource;
 import com.game.subwayworkerserver.entity.RewardType;
 import com.game.subwayworkerserver.entity.UserEntity;
-import com.game.subwayworkerserver.repository.MailRepository;
 import com.game.subwayworkerserver.repository.RewardRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
