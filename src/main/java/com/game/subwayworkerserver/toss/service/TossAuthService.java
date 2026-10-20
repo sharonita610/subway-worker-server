@@ -2,7 +2,7 @@ package com.game.subwayworkerserver.toss.service;
 
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
-import com.game.subwayworkerserver.toss.controller.TossApiClient;
+import com.game.subwayworkerserver.toss.client.TossApiClient;
 import com.game.subwayworkerserver.toss.dto.GetAccessTokenRequest;
 import com.game.subwayworkerserver.toss.dto.LogoutByUserKeyRequest;
 import com.game.subwayworkerserver.toss.dto.RefreshTokenRequest;

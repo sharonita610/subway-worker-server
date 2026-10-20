@@ -39,7 +39,8 @@ flowchart LR
 ## 구조
 
 ```
-controller/      컨트롤러와 요청 · 응답 DTO (도메인별 패키지)
+controller/      컨트롤러 (요청 바인딩과 응답 반환만)
+dto/             request · response DTO (도메인별 패키지). controller와 service가 함께 사용
 service/
   common/        UserFinder, UserLevelProcessor, RewardProcessor (모든 도메인이 공유)
   user coworker skill market gacha gps stage store system
@@ -48,7 +49,7 @@ entity/ repository/   JPA
 config/          Security (X-User-ID 필터, 공개 경로 목록), Swagger, Redis, JPA Auditing
 ```
 
-의존 방향은 `common ← 각 도메인`, `coworker ← user · market · stage`, `skill ← market`으로 한 방향이며 순환이 없습니다.
+계층은 `controller → service → repository`로만 흐르고, service는 controller를 모릅니다. service 안에서는 `common ← 각 도메인`, `coworker ← user · market · stage`, `skill ← market`으로 한 방향이며 순환이 없습니다. 이 규칙은 `ArchitectureTest`(ArchUnit)가 검사합니다.
 
 ## 실행
 

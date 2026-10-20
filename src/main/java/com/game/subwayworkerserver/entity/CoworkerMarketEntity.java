@@ -1,7 +1,6 @@
 package com.game.subwayworkerserver.entity;
 
 import com.game.subwayworkerserver.domain.baseinfo.CurrencyType;
-import com.game.subwayworkerserver.dto.request.market.SellingRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -63,13 +62,13 @@ public class CoworkerMarketEntity extends BaseTimeEntity {
     }
 
 
-    public static CoworkerMarketEntity of(final long userId, final SellingRequest request) {
+    public static CoworkerMarketEntity of(final long userId, final long targetId, final int sellingPrice, final int sellingCommission) {
         return new CoworkerMarketEntity(
                 userId,
-                request.sellingPrice(),
-                request.sellingCommission(),
+                sellingPrice,
+                sellingCommission,
                 CurrencyType.VACATION_TICKET,
-                request.targetId(),
+                targetId,
                 true
         );
     }

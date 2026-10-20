@@ -74,7 +74,7 @@ public class SkillCardMarketService {
         skillCard.sellOnMarket();
         verifySkillCardExistenceOnMarket(skillCard.getId(), userId);
 
-        SkillCardMarketEntity skillCardMarketEntity = SkillCardMarketEntity.of(userId, request);
+        SkillCardMarketEntity skillCardMarketEntity = SkillCardMarketEntity.of(userId, request.targetId(), request.sellingPrice(), request.sellingCommission());
         skillCardMarketRepository.save(skillCardMarketEntity);
 
         user.purchaseWithCoin(request.registrationFee());

@@ -80,7 +80,7 @@ public class CoworkerMarketService {
         }
 
         coworkerEntity.coworkerOnSale();
-        CoworkerMarketEntity coworkerMarketEntity = CoworkerMarketEntity.of(userId, request);
+        CoworkerMarketEntity coworkerMarketEntity = CoworkerMarketEntity.of(userId, request.targetId(), request.sellingPrice(), request.sellingCommission());
         coworkerMarketRepository.save(coworkerMarketEntity);
         user.purchaseWithCoin(request.registrationFee());
     }

@@ -1,4 +1,4 @@
-package com.game.subwayworkerserver.toss.controller;
+package com.game.subwayworkerserver.toss.client;
 
 import com.game.subwayworkerserver.toss.TLSClient;
 import com.game.subwayworkerserver.toss.service.ApiResponse;
