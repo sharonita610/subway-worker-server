@@ -32,6 +32,6 @@ public record CoworkerListResponse(
         List<CoworkerBaseInfo> coworkerBaseInfos = coworkerEntityList.stream()
                 .map(CoworkerBaseInfo::fromEntity)
                 .toList();
-        return new CoworkerListResponse(new BaseReward(coin, exp), coworkerBaseInfos);
+        return new CoworkerListResponse(new BaseReward(exp, coin), coworkerBaseInfos);
     }
 }
