@@ -4,7 +4,7 @@ import com.game.subwayworkerserver.service.common.UserFinder;
 import com.game.subwayworkerserver.domain.item.ItemName;
 import com.game.subwayworkerserver.domain.baseinfo.CurrencyType;
 import com.game.subwayworkerserver.dto.request.store.PurchaseRequest;
-import com.game.subwayworkerserver.dto.response.item.ItemResponse;
+import com.game.subwayworkerserver.dto.response.item.ItemInfo;
 import com.game.subwayworkerserver.dto.response.item.StoreItemResponse;
 import com.game.subwayworkerserver.domain.baseinfo.Coin;
 import com.game.subwayworkerserver.domain.baseinfo.VacationTicket;
@@ -145,14 +145,14 @@ public class StoreService {
     }
 
     @Transactional
-    public ItemResponse purchaseRandomItem(String uuid, PurchaseRequest request) {
+    public ItemInfo purchaseRandomItem(String uuid, PurchaseRequest request) {
         UserEntity user = userFinder.getByUuid(uuid);
         String name = request.name();
         ItemName itemName = ItemName.getRandomItem(name);
 
         saveUserItemIntoMap(user.getId(), itemName);
         saveUserStoreRecord(user.getId(), name, 1, 0, CurrencyType.FREE);
-        return ItemResponse.of(itemName.name(), itemName.getName(), itemName.getDescription(), 1);
+        return ItemInfo.withDescription(itemName, 1);
     }
 }
 

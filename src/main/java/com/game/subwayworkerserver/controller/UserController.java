@@ -1,8 +1,7 @@
 package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.dto.response.coworker.CoworkerListResponse;
-import com.game.subwayworkerserver.dto.response.item.CaptureItemListResponse;
-import com.game.subwayworkerserver.dto.response.item.TrapItemListResponse;
+import com.game.subwayworkerserver.dto.response.item.ItemListResponse;
 import com.game.subwayworkerserver.dto.response.skill.SkillByUserResponse;
 import com.game.subwayworkerserver.dto.response.user.UserResponse;
 import com.game.subwayworkerserver.dto.response.user.UuidResponse;
@@ -50,13 +49,13 @@ public class UserController {
 
     @Operation(summary = "포획도구리스트 조회", description = "유저 uuid 로 사용 가능한 포획도구 리스트 조회")
     @GetMapping("/user/capture-item-list")
-    public ResponseEntity<CaptureItemListResponse> getCaptureListByUser(@CurrentUuid String uuid) {
+    public ResponseEntity<ItemListResponse> getCaptureListByUser(@CurrentUuid String uuid) {
         return ResponseEntity.ok(userService.getCaptureItemList(uuid));
     }
 
     @Operation(summary = "트랩 도구리스트 조회", description = "유저 uuid 로 사용 가능한 트랩 리스트 조회")
     @GetMapping("/user/trap-item-list")
-    public ResponseEntity<TrapItemListResponse> getTrapListByUser(@CurrentUuid String uuid) {
+    public ResponseEntity<ItemListResponse> getTrapListByUser(@CurrentUuid String uuid) {
         return ResponseEntity.ok(userService.getTrapItemList(uuid));
     }
 

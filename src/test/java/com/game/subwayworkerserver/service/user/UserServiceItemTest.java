@@ -1,11 +1,10 @@
 package com.game.subwayworkerserver.service.user;
 
+import com.game.subwayworkerserver.dto.response.item.ItemListResponse;
 import com.game.subwayworkerserver.service.common.UserFinder;
 import com.game.subwayworkerserver.service.coworker.CoworkerListFilter;
 import com.game.subwayworkerserver.domain.item.ItemName;
 import com.game.subwayworkerserver.domain.user.Gender;
-import com.game.subwayworkerserver.dto.response.item.CaptureItemListResponse;
-import com.game.subwayworkerserver.dto.response.item.TrapItemListResponse;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
 import com.game.subwayworkerserver.exception.ErrorCode;
@@ -69,10 +68,10 @@ class UserServiceItemTest {
         when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(userItemMapRepository.findByUserId(user.getId())).thenReturn(allItems);
 
-        CaptureItemListResponse response = userService.getCaptureItemList(TEST_UUID);
+        ItemListResponse response = userService.getCaptureItemList(TEST_UUID);
 
-        assertThat(response.captureItemList()).hasSize(2);
-        assertThat(response.captureItemList())
+        assertThat(response.itemList()).hasSize(2);
+        assertThat(response.itemList())
                 .allMatch(item -> List.of("종이박스", "서류가방").contains(item.korName()));
     }
 
@@ -89,10 +88,10 @@ class UserServiceItemTest {
         when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(userItemMapRepository.findByUserId(user.getId())).thenReturn(allItems);
 
-        TrapItemListResponse response = userService.getTrapItemList(TEST_UUID);
+        ItemListResponse response = userService.getTrapItemList(TEST_UUID);
 
-        assertThat(response.trapItemInfoList()).hasSize(2);
-        assertThat(response.trapItemInfoList())
+        assertThat(response.itemList()).hasSize(2);
+        assertThat(response.itemList())
                 .allMatch(item -> List.of("나무삽", "은삽").contains(item.korName()));
     }
 
@@ -103,11 +102,11 @@ class UserServiceItemTest {
         when(userFinder.getByUuid(TEST_UUID)).thenReturn(user);
         when(userItemMapRepository.findByUserId(user.getId())).thenReturn(List.of());
 
-        CaptureItemListResponse captureResponse = userService.getCaptureItemList(TEST_UUID);
-        TrapItemListResponse trapResponse = userService.getTrapItemList(TEST_UUID);
+        ItemListResponse captureResponse = userService.getCaptureItemList(TEST_UUID);
+        ItemListResponse trapResponse = userService.getTrapItemList(TEST_UUID);
 
-        assertThat(captureResponse.captureItemList()).isEmpty();
-        assertThat(trapResponse.trapItemInfoList()).isEmpty();
+        assertThat(captureResponse.itemList()).isEmpty();
+        assertThat(trapResponse.itemList()).isEmpty();
     }
 
     @Test

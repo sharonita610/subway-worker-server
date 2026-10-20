@@ -2,7 +2,7 @@ package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.CurrentUuid;
 import com.game.subwayworkerserver.dto.request.store.PurchaseRequest;
-import com.game.subwayworkerserver.dto.response.item.ItemResponse;
+import com.game.subwayworkerserver.dto.response.item.ItemInfo;
 import com.game.subwayworkerserver.dto.response.item.StoreItemResponse;
 import com.game.subwayworkerserver.service.store.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,7 +36,7 @@ public class StoreController {
 
     @Operation(summary = "광고를 보고 아이템 구매 하기 (외부 광고 API 제외)", description = "광고를 보고 랜덤 아이템을 얻는 기능")
     @PostMapping("/store/random-item")
-    public ResponseEntity<ItemResponse> buyRandomItem(@CurrentUuid String uuid, @RequestBody PurchaseRequest request) {
+    public ResponseEntity<ItemInfo> buyRandomItem(@CurrentUuid String uuid, @RequestBody PurchaseRequest request) {
         return ResponseEntity.ok(storeService.purchaseRandomItem(uuid, request));
     }
 

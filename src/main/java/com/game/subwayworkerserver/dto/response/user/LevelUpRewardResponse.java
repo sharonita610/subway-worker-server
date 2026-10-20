@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.dto.response.user;
 
-import com.game.subwayworkerserver.dto.response.gps.RewardInfo;
+import com.game.subwayworkerserver.dto.response.common.RewardInfo;
 import com.game.subwayworkerserver.entity.RewardEntity;
 
 import java.util.List;

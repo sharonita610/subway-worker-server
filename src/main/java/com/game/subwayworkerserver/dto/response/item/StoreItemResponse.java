@@ -7,10 +7,10 @@ import com.game.subwayworkerserver.domain.item.ItemName;
 import java.util.List;
 
 public record StoreItemResponse(
-        List<TrapItemStoreInfo> trapItemList,
-        List<CaptureItemStoreInfo> captureItemList,
-        List<CoinItemStoreInfo> coinItemInfoList,
-        List<VacationTicketStoreInfo> vacationTicketList
+        List<StoreItemInfo> trapItemList,
+        List<StoreItemInfo> captureItemList,
+        List<PackStoreInfo> coinItemInfoList,
+        List<PackStoreInfo> vacationTicketList
 ) {
     public static StoreItemResponse of(
             List<ItemName> trapList,
@@ -21,12 +21,11 @@ public record StoreItemResponse(
             List<VacationTicket> vacationTicketList,
             boolean isFirst
     ) {
-
         return new StoreItemResponse(
-                TrapItemStoreInfo.of(trapList, todayRandomTrapPurchase),
-                CaptureItemStoreInfo.of(captureList, todayRandomCapture),
-                CoinItemStoreInfo.of(coinList),
-                VacationTicketStoreInfo.of(vacationTicketList, isFirst)
+                StoreItemInfo.of(trapList, todayRandomTrapPurchase),
+                StoreItemInfo.of(captureList, todayRandomCapture),
+                PackStoreInfo.ofCoins(coinList),
+                PackStoreInfo.ofVacationTickets(vacationTicketList, isFirst)
         );
     }
 }

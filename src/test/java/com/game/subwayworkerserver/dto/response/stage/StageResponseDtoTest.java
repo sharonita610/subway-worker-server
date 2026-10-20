@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.game.subwayworkerserver.domain.reward.DungeonReward;
 import com.game.subwayworkerserver.domain.stage.StageMonsterData;
 import com.game.subwayworkerserver.domain.stage.StageRewardInfo;
+import com.game.subwayworkerserver.dto.response.common.RewardInfo;
 import org.junit.jupiter.api.Test;
 
 import static com.game.subwayworkerserver.dto.DtoFixtures.json;
@@ -27,7 +28,7 @@ class StageResponseDtoTest {
         assertThat(response.gachaTicket()).isEqualTo(1);
         assertThat(response.vacationTicket()).isEqualTo(2);
         assertThat(response.firstClear()).isTrue();
-        assertThat(response.extraReward()).isEqualTo(new StageClearResponse.ExtraReward("HP_INCREASE", 1));
+        assertThat(response.extraReward()).isEqualTo(RewardInfo.of("HP_INCREASE", 1));
     }
 
     @Test

@@ -7,7 +7,7 @@ import com.game.subwayworkerserver.domain.reward.RewardType;
 import com.game.subwayworkerserver.domain.user.MailReward;
 import com.game.subwayworkerserver.domain.user.UserCheckInReward;
 import com.game.subwayworkerserver.domain.user.UserSubscription;
-import com.game.subwayworkerserver.dto.response.gps.RewardInfo;
+import com.game.subwayworkerserver.dto.response.common.RewardInfo;
 import com.game.subwayworkerserver.dto.response.subscription.SubscribeListResponse;
 import com.game.subwayworkerserver.entity.RewardEntity;
 import com.game.subwayworkerserver.entity.UserEntity;

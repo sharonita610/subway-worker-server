@@ -2,6 +2,7 @@ package com.game.subwayworkerserver.dto.response.stage;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.game.subwayworkerserver.domain.stage.StageRewardInfo;
+import com.game.subwayworkerserver.dto.response.common.RewardInfo;
 import com.game.subwayworkerserver.domain.reward.DungeonReward;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -12,11 +13,11 @@ public record StageClearResponse(
         int gachaTicket,
         int vacationTicket,
         Boolean firstClear,
-        ExtraReward extraReward
+        RewardInfo extraReward
 ) {
     public static StageClearResponse of(final StageRewardInfo reward) {
-        ExtraReward extra = reward.extraReward() != null
-                ? ExtraReward.of(reward.extraReward().name(), reward.extraReward().quantity())
+        RewardInfo extra = reward.extraReward() != null
+                ? RewardInfo.of(reward.extraReward().name(), reward.extraReward().quantity())
                 : null;
         return new StageClearResponse(
                 reward.userExp(),
@@ -45,12 +46,4 @@ public record StageClearResponse(
         );
     }
 
-    public record ExtraReward(
-            String name,
-            int quantity
-    ) {
-        public static ExtraReward of(String name, int quantity) {
-            return new ExtraReward(name, quantity);
-        }
-    }
 }

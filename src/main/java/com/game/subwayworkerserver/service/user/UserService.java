@@ -1,10 +1,8 @@
 package com.game.subwayworkerserver.service.user;
 
 import com.game.subwayworkerserver.dto.response.coworker.CoworkerListResponse;
-import com.game.subwayworkerserver.dto.response.item.CaptureItemInfo;
-import com.game.subwayworkerserver.dto.response.item.CaptureItemListResponse;
-import com.game.subwayworkerserver.dto.response.item.TrapItemInfo;
-import com.game.subwayworkerserver.dto.response.item.TrapItemListResponse;
+import com.game.subwayworkerserver.dto.response.item.ItemInfo;
+import com.game.subwayworkerserver.dto.response.item.ItemListResponse;
 import com.game.subwayworkerserver.dto.response.user.CoworkerInUseInfo;
 import com.game.subwayworkerserver.dto.response.user.UserBaseInfo;
 import com.game.subwayworkerserver.dto.response.user.UserLevelInfo;
@@ -116,18 +114,18 @@ public class UserService {
         );
     }
 
-    public CaptureItemListResponse getCaptureItemList(final String uuid) {
-        List<CaptureItemInfo> list = getItemsByCategory(uuid, ItemCategory.CAPTURE).stream()
-                .map(item -> CaptureItemInfo.of(item.getItemName().getName(), item.getQuantity()))
+    public ItemListResponse getCaptureItemList(final String uuid) {
+        List<ItemInfo> list = getItemsByCategory(uuid, ItemCategory.CAPTURE).stream()
+                .map(item -> ItemInfo.of(item.getItemName(), item.getQuantity()))
                 .collect(Collectors.toList());
-        return CaptureItemListResponse.of(list);
+        return ItemListResponse.of(list);
     }
 
-    public TrapItemListResponse getTrapItemList(final String uuid) {
-        List<TrapItemInfo> list = getItemsByCategory(uuid, ItemCategory.TRAP).stream()
-                .map(item -> TrapItemInfo.of(item.getItemName().getName(), item.getQuantity()))
+    public ItemListResponse getTrapItemList(final String uuid) {
+        List<ItemInfo> list = getItemsByCategory(uuid, ItemCategory.TRAP).stream()
+                .map(item -> ItemInfo.of(item.getItemName(), item.getQuantity()))
                 .collect(Collectors.toList());
-        return TrapItemListResponse.of(list);
+        return ItemListResponse.of(list);
     }
 
     private List<UserItemMapEntity> getItemsByCategory(String uuid, ItemCategory category) {

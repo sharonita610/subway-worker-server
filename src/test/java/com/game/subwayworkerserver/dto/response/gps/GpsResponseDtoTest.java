@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.game.subwayworkerserver.domain.item.ItemName;
 import com.game.subwayworkerserver.domain.reward.RandomBoxReward.DefaultGift;
 import com.game.subwayworkerserver.domain.reward.RandomBoxReward.ExtraGift;
+import com.game.subwayworkerserver.dto.response.common.RewardInfo;
 import com.game.subwayworkerserver.dto.response.gps.RandomGpsResponse.RandomCoworkerLocationResponse;
 import com.game.subwayworkerserver.entity.UserTrapMapEntity;
 import com.game.subwayworkerserver.exception.BaseException;
@@ -69,7 +70,7 @@ class GpsResponseDtoTest {
 
     @Test
     void RewardInfo와_ItemLocationResponse는_값을_그대로_담는다() {
-        assertThat(RewardInfo.of("COIN", 5)).isEqualTo(new RewardInfo("COIN", 5));
+        assertThat(RewardInfo.of("COIN", 5).quantity()).isEqualTo(5);
         assertThat(new RandomGpsResponse.ItemLocationResponse("giftbox", 37.5, 127.0, 0.1).itemName()).isEqualTo("giftbox");
     }
 }
