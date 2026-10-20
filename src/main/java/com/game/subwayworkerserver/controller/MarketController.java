@@ -1,11 +1,9 @@
 package com.game.subwayworkerserver.controller;
 
 
-import com.game.subwayworkerserver.dto.response.market.GlobalCoworkerResponse;
-import com.game.subwayworkerserver.dto.response.market.GlobalSkillCardResponse;
-import com.game.subwayworkerserver.dto.response.market.MyCoworkersMarketResponse;
+import com.game.subwayworkerserver.dto.response.market.MarketCoworkerListResponse;
+import com.game.subwayworkerserver.dto.response.market.MarketSkillCardListResponse;
 import com.game.subwayworkerserver.dto.response.market.PaymentSuccessResponse;
-import com.game.subwayworkerserver.dto.response.market.SkillOnSaleResponse;
 import com.game.subwayworkerserver.config.CurrentUuid;
 import com.game.subwayworkerserver.dto.request.market.CoworkerFilterRequest;
 import com.game.subwayworkerserver.dto.request.market.SellingRequest;
@@ -30,13 +28,13 @@ public class MarketController {
 
     @Operation(summary = "영입 가능한 동료 리스트 조회", description = "장터에 올라온 모든 동료의 리스트를 필터링 기능을 포함하여 조회")
     @PostMapping("/market/global/coworker")
-    public ResponseEntity<GlobalCoworkerResponse> getCoworkersOnSale(@CurrentUuid String uuid, @Nullable @RequestBody CoworkerFilterRequest request) {
+    public ResponseEntity<MarketCoworkerListResponse> getCoworkersOnSale(@CurrentUuid String uuid, @Nullable @RequestBody CoworkerFilterRequest request) {
         return ResponseEntity.ok(coworkerMarketService.getCoworkerMarket(uuid, request));
     }
 
     @Operation(summary = "내가 판매 중인 동료 리스트 조회", description = "내가 판매 중인 동료의 리스트를 포함하여 조회")
     @PostMapping("/market/coworker/selling-list")
-    public ResponseEntity<MyCoworkersMarketResponse> getMyCoworkerSellingList(@CurrentUuid String uuid){
+    public ResponseEntity<MarketCoworkerListResponse> getMyCoworkerSellingList(@CurrentUuid String uuid){
         return ResponseEntity.ok(coworkerMarketService.getMyCoworkerOnSale(uuid));
     }
 
@@ -69,7 +67,7 @@ public class MarketController {
 
     @Operation(summary = "구매 가능한 스킬카드 리스트 조회", description = "장터에 올라온 모든 스킬 카드의 리스트를 필터링 기능을 포함하여 조회")
     @PostMapping("/market/global/skill")
-    public ResponseEntity<GlobalSkillCardResponse> getGlobalSkillCardOnSale(@CurrentUuid String uuid,
+    public ResponseEntity<MarketSkillCardListResponse> getGlobalSkillCardOnSale(@CurrentUuid String uuid,
             @Nullable @RequestBody SkillCardFilterRequest request
     ){
         return ResponseEntity.ok(skillCardMarketService.getSkillCardMarket(uuid, request));
@@ -77,7 +75,7 @@ public class MarketController {
 
     @Operation(summary = "내가 판매 중인 스킬카드 리스트 조회", description = "내가 판매 중인 스킬카드 리스트를 조회")
     @PostMapping("/market/skill/selling-list")
-    public ResponseEntity<SkillOnSaleResponse> getMySkillSellingList(@CurrentUuid String uuid){
+    public ResponseEntity<MarketSkillCardListResponse> getMySkillSellingList(@CurrentUuid String uuid){
         return ResponseEntity.ok(skillCardMarketService.getMySkillCardOnSale(uuid));
     }
 

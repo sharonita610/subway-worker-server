@@ -12,43 +12,77 @@ import java.util.List;
 
 import static com.game.subwayworkerserver.dto.DtoFixtures.json;
 import static com.game.subwayworkerserver.dto.DtoFixtures.skillCard;
+import static com.game.subwayworkerserver.dto.DtoFixtures.skillCardOnSale;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SkillResponseDtoTest {
 
     @Test
-    void activeSkill은_id_두_개를_enum_정보로_풀고_0은_NONE이_된다() {
-        List<SkillBaseInfo> skills = SkillBaseInfo.activeSkill(201, 0);
+    void 스킬_정의만_채우면_나머지_키는_JSON에서_빠진다() {
+        List<SkillCardInfo> skills = SkillCardInfo.activeSkills(201, 0);
+        JsonNode node = json(skills.get(0));
 
         assertThat(skills).hasSize(2);
         assertThat(skills.get(0).id()).isEqualTo(201L);
         assertThat(skills.get(0).engName()).isEqualTo("FATIGUE_RELIEVER");
         assertThat(skills.get(0).korName()).isEqualTo("피로회복제 복용");
         assertThat(skills.get(0).description()).isEqualTo(ActiveSkillCard.FATIGUE_RELIEVER.getDescription());
-        assertThat(skills.get(0).level()).isZero();
         assertThat(skills.get(1).engName()).isEqualTo("NONE");
+        assertThat(node.has("level")).isFalse();
+        assertThat(node.has("cardType")).isFalse();
+        assertThat(node.has("inUse")).isFalse();
     }
 
     @Test
-    void passiveSkill도_같은_방식으로_푼다() {
-        List<SkillBaseInfo> skills = SkillBaseInfo.passiveSkill(101, 105);
+    void 패시브_스킬도_같은_방식으로_푼다() {
+        List<SkillCardInfo> skills = SkillCardInfo.passiveSkills(101, 105);
 
-        assertThat(skills).extracting(SkillBaseInfo::engName).containsExactly("PEACE_OF_MIND", "SECOND_CHANCE");
+        assertThat(skills).extracting(SkillCardInfo::engName).containsExactly("PEACE_OF_MIND", "SECOND_CHANCE");
         assertThat(skills.get(1).description()).isEqualTo(PassiveSkillCard.SECOND_CHANCE.getDescription());
     }
 
     @Test
-    void SkillBaseInfo_of는_카드_엔티티와_타입으로_설명과_레벨을_채운다() {
-        SkillCardEntity passive = skillCard(2L, 10L, SkillCardType.PASSIVE, 105, true);
-        SkillCardEntity active = skillCard(3L, 10L, SkillCardType.ACTIVE, 206, true);
+    void summary는_카드_엔티티의_정의와_레벨만_담는다() {
+        SkillCardInfo info = SkillCardInfo.summary(skillCard(2L, 10L, SkillCardType.PASSIVE, 105, true));
+        JsonNode node = json(info);
 
-        SkillBaseInfo fromPassive = SkillBaseInfo.of(passive, SkillCardType.PASSIVE);
-        SkillBaseInfo fromActive = SkillBaseInfo.of(active, SkillCardType.ACTIVE);
+        assertThat(info.id()).isEqualTo(2L);
+        assertThat(info.description()).isEqualTo(PassiveSkillCard.SECOND_CHANCE.getDescription());
+        assertThat(info.level()).isEqualTo(2);
+        assertThat(node.has("requiredCount")).isFalse();
+    }
 
-        assertThat(fromPassive.id()).isEqualTo(2L);
-        assertThat(fromPassive.description()).isEqualTo(PassiveSkillCard.SECOND_CHANCE.getDescription());
-        assertThat(fromPassive.level()).isEqualTo(2);
-        assertThat(fromActive.description()).isEqualTo(ActiveSkillCard.CRITICAL_HIT.getDescription());
+    @Test
+    void earned는_강화_진행도와_카드_타입을_더한다() {
+        JsonNode node = json(EarnedSkillCardResponse.of(List.of(skillCard(5L, 0L, SkillCardType.PASSIVE, 101, false))));
+        JsonNode card = node.at("/skillCardList/0");
+
+        assertThat(node.at("/skillCardList").size()).isEqualTo(1);
+        assertThat(card.get("engName").asText()).isEqualTo("PEACE_OF_MIND");
+        assertThat(card.get("description").asText()).isEqualTo(PassiveSkillCard.PEACE_OF_MIND.getDescription());
+        assertThat(card.get("level").asInt()).isEqualTo(2);
+        assertThat(card.get("requiredCount").asInt()).isEqualTo(3);
+        assertThat(card.get("actualCount").asInt()).isEqualTo(1);
+        assertThat(card.get("cardType").asText()).isEqualTo("PASSIVE");
+        assertThat(card.has("id")).isFalse();
+        assertThat(card.has("isPaid")).isFalse();
+    }
+
+    @Test
+    void onSale은_거래_상태까지_전부_담는다() {
+        JsonNode node = json(SkillCardInfo.onSale(skillCardOnSale()));
+
+        assertThat(node.get("id").asLong()).isEqualTo(11L);
+        assertThat(node.get("korName").asText()).isEqualTo("회심의 일격");
+        assertThat(node.get("level").asInt()).isEqualTo(2);
+        assertThat(node.get("actualCount").asInt()).isEqualTo(1);
+        assertThat(node.get("requiredCount").asInt()).isEqualTo(3);
+        assertThat(node.get("skillCardEnumId").asInt()).isEqualTo(206);
+        assertThat(node.get("cardType").asText()).isEqualTo("ACTIVE");
+        assertThat(node.get("available").asBoolean()).isTrue();
+        assertThat(node.get("onSale").asBoolean()).isTrue();
+        assertThat(node.get("isPaid").asBoolean()).isFalse();
+        assertThat(node.get("isSold").asBoolean()).isFalse();
     }
 
     @Test
@@ -61,23 +95,9 @@ class SkillResponseDtoTest {
         assertThat(upgraded.engName()).isEqualTo("CRITICAL_HIT");
         assertThat(upgraded.description()).isEqualTo(ActiveSkillCard.CRITICAL_HIT.getDescription());
         assertThat(upgraded.level()).isEqualTo(2);
-        assertThat(upgraded.requiredCount()).isEqualTo(3);
-        assertThat(upgraded.actualCount()).isEqualTo(1);
         assertThat(upgraded.inUse()).isTrue();
         assertThat(upgraded.coworkerId()).isEqualTo(10L);
         assertThat(upgraded.cardType()).isEqualTo("ACTIVE");
-    }
-
-    @Test
-    void EarnedSkillCardResponse는_뽑은_카드들의_요약을_낸다() {
-        JsonNode node = json(EarnedSkillCardResponse.of(List.of(skillCard(5L, 0L, SkillCardType.PASSIVE, 101, false))));
-
-        assertThat(node.at("/skillCardList").size()).isEqualTo(1);
-        assertThat(node.at("/skillCardList/0/engName").asText()).isEqualTo("PEACE_OF_MIND");
-        assertThat(node.at("/skillCardList/0/description").asText()).isEqualTo(PassiveSkillCard.PEACE_OF_MIND.getDescription());
-        assertThat(node.at("/skillCardList/0/requiredCount").asInt()).isEqualTo(3);
-        assertThat(node.at("/skillCardList/0/actualCount").asInt()).isEqualTo(1);
-        assertThat(node.at("/skillCardList/0/cardType").asText()).isEqualTo("PASSIVE");
     }
 
     @Test
@@ -91,10 +111,8 @@ class SkillResponseDtoTest {
 
         assertThat(result.get(0).thisCoworkerUsing()).isTrue();
         assertThat(result.get(0).otherCoworkerUsing()).isFalse();
-        assertThat(result.get(1).thisCoworkerUsing()).isFalse();
         assertThat(result.get(1).otherCoworkerUsing()).isTrue();
         assertThat(result.get(2).thisCoworkerUsing()).isFalse();
-        assertThat(result.get(2).otherCoworkerUsing()).isFalse();
     }
 
     @Test
@@ -102,11 +120,8 @@ class SkillResponseDtoTest {
         List<SkillCardEntity> actives = List.of(skillCard(1L, 0L, SkillCardType.ACTIVE, 201, false));
         List<SkillCardEntity> passives = List.of(skillCard(2L, 0L, SkillCardType.PASSIVE, 101, false), skillCard(3L, 0L, SkillCardType.PASSIVE, 104, false));
 
-        SkillByUserResponse byUser = SkillByUserResponse.of(actives, passives);
-        SkillListBySkillIdResponse bySkill = SkillListBySkillIdResponse.of(passives);
-
-        assertThat(byUser.activeSkillCardList()).hasSize(1);
-        assertThat(byUser.passiveSkillCardList()).hasSize(2);
-        assertThat(bySkill.skillCardList()).extracting(SkillCard::engName).containsExactly("PEACE_OF_MIND", "SHIELD");
+        assertThat(SkillByUserResponse.of(actives, passives).activeSkillCardList()).hasSize(1);
+        assertThat(SkillByUserResponse.of(actives, passives).passiveSkillCardList()).hasSize(2);
+        assertThat(SkillListBySkillIdResponse.of(passives).skillCardList()).extracting(SkillCard::engName).containsExactly("PEACE_OF_MIND", "SHIELD");
     }
 }

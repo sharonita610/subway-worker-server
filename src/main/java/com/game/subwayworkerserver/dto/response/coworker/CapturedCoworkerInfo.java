@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.dto.response.coworker;
 
-import com.game.subwayworkerserver.dto.response.skill.SkillBaseInfo;
+import com.game.subwayworkerserver.dto.response.skill.SkillCardInfo;
 import com.game.subwayworkerserver.domain.baseinfo.*;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
 import lombok.Builder;
@@ -23,8 +23,8 @@ public record CapturedCoworkerInfo(
         long attack,
         long defense,
         long manaRecovery,
-        List<SkillBaseInfo> activeSkills,
-        List<SkillBaseInfo> passiveSkills,
+        List<SkillCardInfo> activeSkills,
+        List<SkillCardInfo> passiveSkills,
         String engElementName,
         String korElementName
 ) {
@@ -46,8 +46,8 @@ public record CapturedCoworkerInfo(
                 .attack(coworker.getAttack())
                 .defense(coworker.getDefense())
                 .manaRecovery(coworker.getManaRecovery())
-                .activeSkills(SkillBaseInfo.activeSkill(coworker.getActiveSkill1(), coworker.getActiveSkill2()))
-                .passiveSkills(SkillBaseInfo.passiveSkill(coworker.getPassiveSkill1(), coworker.getPassiveSkill2()))
+                .activeSkills(SkillCardInfo.activeSkills(coworker.getActiveSkill1(), coworker.getActiveSkill2()))
+                .passiveSkills(SkillCardInfo.passiveSkills(coworker.getPassiveSkill1(), coworker.getPassiveSkill2()))
                 .engElementName(coworker.getCoworkerElement().name())
                 .korElementName(coworker.getCoworkerElement().getKoreanName())
                 .build();

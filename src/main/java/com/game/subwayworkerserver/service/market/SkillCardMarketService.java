@@ -4,9 +4,8 @@ import com.game.subwayworkerserver.service.common.UserFinder;
 import com.game.subwayworkerserver.service.skill.SkillCardListFilter;
 import com.game.subwayworkerserver.dto.request.market.SellingRequest;
 import com.game.subwayworkerserver.dto.request.market.SkillCardFilterRequest;
-import com.game.subwayworkerserver.dto.response.market.GlobalSkillCardResponse;
+import com.game.subwayworkerserver.dto.response.market.MarketSkillCardListResponse;
 import com.game.subwayworkerserver.dto.response.market.PaymentSuccessResponse;
-import com.game.subwayworkerserver.dto.response.market.SkillOnSaleResponse;
 import com.game.subwayworkerserver.domain.market.SkillCardOnSale;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
@@ -29,7 +28,7 @@ public class SkillCardMarketService {
     private final SkillCardMarketRepository skillCardMarketRepository;
     private final SkillCardListFilter skillCardListFilter;
 
-    public GlobalSkillCardResponse getSkillCardMarket(final String uuid, final SkillCardFilterRequest request) {
+    public MarketSkillCardListResponse getSkillCardMarket(final String uuid, final SkillCardFilterRequest request) {
         UserEntity user = userFinder.getByUuid(uuid);
         List<SkillCardMarketEntity> marketSkillCardLists = skillCardMarketRepository.findAllByAvailableTrueAndSoldFalseAndSellerIdNot(user.getId());
         List<Long> skillCardIds = getSkillCardIds(marketSkillCardLists);
@@ -37,10 +36,10 @@ public class SkillCardMarketService {
         List<SkillCardEntity> skillCardOnSaleByCardIds = findSkillCardOnSaleByCardIds(skillCardIds);
         List<SkillCardOnSale> coworkerOnSalesDomainList = SkillCardOnSale.toDomain(marketSkillCardLists, skillCardOnSaleByCardIds);
         if(request == null) {
-            return GlobalSkillCardResponse.of(coworkerOnSalesDomainList);
+            return MarketSkillCardListResponse.of(coworkerOnSalesDomainList);
         }
         List<SkillCardOnSale> filteredCoworkers = skillCardListFilter.filter(coworkerOnSalesDomainList, request);
-        return GlobalSkillCardResponse.of(filteredCoworkers);
+        return MarketSkillCardListResponse.of(filteredCoworkers);
     }
 
     private List<SkillCardEntity> findSkillCardOnSaleByCardIds(final List<Long> skillCardIds) {
@@ -53,13 +52,13 @@ public class SkillCardMarketService {
                 .toList();
     }
 
-    public SkillOnSaleResponse getMySkillCardOnSale(final String uuid) {
+    public MarketSkillCardListResponse getMySkillCardOnSale(final String uuid) {
         UserEntity user = userFinder.getByUuid(uuid);
         List<SkillCardMarketEntity> skillCardOnSale = skillCardMarketRepository.findAllBySellerIdOrderByIdDesc(user.getId());
         List<Long> skillCardIds = getSkillCardIds(skillCardOnSale);
         List<SkillCardEntity> skillCardEntityList = skillCardRepository.findAllByIdIn(skillCardIds);
         List<SkillCardOnSale> coworkerOnSalesDomainList = SkillCardOnSale.toDomain(skillCardOnSale, skillCardEntityList);
-        return SkillOnSaleResponse.of(coworkerOnSalesDomainList);
+        return MarketSkillCardListResponse.of(coworkerOnSalesDomainList);
     }
 
     @Transactional

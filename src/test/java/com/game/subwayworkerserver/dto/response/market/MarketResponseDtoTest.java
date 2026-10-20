@@ -13,8 +13,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MarketResponseDtoTest {
 
     @Test
-    void GlobalSkillCardInfo는_장터_스킬카드를_가격_정보와_카드_정보로_나눈다() {
-        GlobalSkillCardInfo info = GlobalSkillCardInfo.of(skillCardOnSale());
+    void 장터_스킬카드는_가격_정보와_카드_정보로_나뉜다() {
+        MarketSkillCardInfo info = MarketSkillCardInfo.of(skillCardOnSale());
         JsonNode node = json(info);
 
         assertThat(info.price()).isEqualTo(40);
@@ -23,40 +23,38 @@ class MarketResponseDtoTest {
         assertThat(node.at("/skillCardBaseInfo/id").asLong()).isEqualTo(11L);
         assertThat(node.at("/skillCardBaseInfo/korName").asText()).isEqualTo("회심의 일격");
         assertThat(node.at("/skillCardBaseInfo/cardType").asText()).isEqualTo("ACTIVE");
-        assertThat(node.at("/skillCardBaseInfo/currentLevel").asInt()).isEqualTo(2);
-        assertThat(node.at("/skillCardBaseInfo/count").asInt()).isEqualTo(1);
-        assertThat(node.at("/skillCardBaseInfo/requiredCount").asInt()).isEqualTo(3);
+        assertThat(node.at("/skillCardBaseInfo/level").asInt()).isEqualTo(2);
         assertThat(node.at("/skillCardBaseInfo/skillCardEnumId").asInt()).isEqualTo(206);
-        assertThat(node.at("/skillCardBaseInfo/available").asBoolean()).isTrue();
     }
 
     @Test
-    void GlobalCoworkerInfo는_가격_정보와_동료_기본_정보로_나눈다() {
-        GlobalCoworkerInfo info = GlobalCoworkerInfo.of(coworkerOnSale());
+    void 전역_장터_동료는_판매자가_붙고_정산_상태는_빠진다() {
+        JsonNode node = json(MarketCoworkerListResponse.onSale(List.of(coworkerOnSale()))).at("/coworkerList/0");
 
-        assertThat(info.price()).isEqualTo(300);
-        assertThat(info.sellerId()).isEqualTo(7L);
-        assertThat(info.marketId()).isEqualTo(5L);
-        assertThat(info.coworkerBaseInfo().id()).isEqualTo(10L);
-        assertThat(info.coworkerBaseInfo().korName()).isEqualTo("뭉실");
+        assertThat(node.get("price").asInt()).isEqualTo(300);
+        assertThat(node.get("sellerId").asLong()).isEqualTo(7L);
+        assertThat(node.get("marketId").asLong()).isEqualTo(5L);
+        assertThat(node.has("isPaid")).isFalse();
+        assertThat(node.has("isSold")).isFalse();
+        assertThat(node.at("/coworkerBaseInfo/korName").asText()).isEqualTo("뭉실");
     }
 
     @Test
-    void MyCoworkersMarketResponse는_내_판매_목록을_정산_상태와_함께_낸다() {
-        JsonNode node = json(MyCoworkersMarketResponse.of(List.of(coworkerOnSale())));
+    void 내_판매_동료는_정산_상태가_붙고_판매자는_빠진다() {
+        JsonNode node = json(MarketCoworkerListResponse.mine(List.of(coworkerOnSale()))).at("/coworkerList/0");
 
-        assertThat(node.at("/coworkerList").size()).isEqualTo(1);
-        assertThat(node.at("/coworkerList/0/price").asInt()).isEqualTo(300);
-        assertThat(node.at("/coworkerList/0/marketId").asLong()).isEqualTo(5L);
-        assertThat(node.at("/coworkerList/0/coworkerBaseInfo/id").asLong()).isEqualTo(10L);
+        assertThat(node.get("price").asInt()).isEqualTo(300);
+        assertThat(node.has("sellerId")).isFalse();
+        assertThat(node.get("isPaid").asBoolean()).isFalse();
+        assertThat(node.get("isSold").asBoolean()).isFalse();
+        assertThat(node.at("/coworkerBaseInfo/id").asLong()).isEqualTo(10L);
     }
 
     @Test
     void 목록_응답들은_입력_개수만큼_항목을_만든다() {
-        assertThat(SkillOnSaleResponse.of(List.of(skillCardOnSale(), skillCardOnSale())).skillCardList()).hasSize(2);
-        assertThat(GlobalSkillCardResponse.of(List.of(skillCardOnSale())).skillCardList()).hasSize(1);
-        assertThat(GlobalCoworkerResponse.of(List.of(coworkerOnSale())).coworkerList()).hasSize(1);
-        assertThat(GlobalCoworkerResponse.of(List.of()).coworkerList()).isEmpty();
+        assertThat(MarketSkillCardListResponse.of(List.of(skillCardOnSale(), skillCardOnSale())).skillCardList()).hasSize(2);
+        assertThat(MarketCoworkerListResponse.onSale(List.of()).coworkerList()).isEmpty();
+        assertThat(MarketCoworkerListResponse.mine(List.of(coworkerOnSale())).coworkerList()).hasSize(1);
     }
 
     @Test

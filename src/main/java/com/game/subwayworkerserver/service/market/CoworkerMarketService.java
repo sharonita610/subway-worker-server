@@ -4,8 +4,7 @@ import com.game.subwayworkerserver.service.common.UserFinder;
 import com.game.subwayworkerserver.service.coworker.CoworkerListFilter;
 import com.game.subwayworkerserver.dto.request.market.CoworkerFilterRequest;
 import com.game.subwayworkerserver.dto.request.market.SellingRequest;
-import com.game.subwayworkerserver.dto.response.market.GlobalCoworkerResponse;
-import com.game.subwayworkerserver.dto.response.market.MyCoworkersMarketResponse;
+import com.game.subwayworkerserver.dto.response.market.MarketCoworkerListResponse;
 import com.game.subwayworkerserver.dto.response.market.PaymentSuccessResponse;
 import com.game.subwayworkerserver.domain.market.CoworkerOnSale;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
@@ -31,7 +30,7 @@ public class CoworkerMarketService {
     private final CoworkerMarketRepository coworkerMarketRepository;
     private final CoworkerListFilter coworkerListFilter;
 
-    public GlobalCoworkerResponse getCoworkerMarket(final String uuid, CoworkerFilterRequest request) {
+    public MarketCoworkerListResponse getCoworkerMarket(final String uuid, CoworkerFilterRequest request) {
         UserEntity user = userFinder.getByUuid(uuid);
         List<CoworkerMarketEntity> marketCoworkers = coworkerMarketRepository.findAllByAvailableTrueAndSoldFalseAndSellerIdNot(user.getId());
         List<Long> coworkersId = getCoworkersId(marketCoworkers);
@@ -39,7 +38,7 @@ public class CoworkerMarketService {
         List<CoworkerEntity> allByIdInAndOnSale = findCoworkersOnSaleByCoworkerIds(coworkersId);
         List<CoworkerOnSale> coworkerOnSalesDomainList = CoworkerOnSale.toDomain(marketCoworkers, allByIdInAndOnSale);
         List<CoworkerOnSale> filteredCoworkers = coworkerListFilter.filter(coworkerOnSalesDomainList, request);
-        return GlobalCoworkerResponse.of(filteredCoworkers);
+        return MarketCoworkerListResponse.onSale(filteredCoworkers);
     }
 
     private List<CoworkerEntity> findCoworkersOnSaleByCoworkerIds(List<Long> coworkerIds) {
@@ -52,13 +51,13 @@ public class CoworkerMarketService {
                 .toList();
     }
 
-    public MyCoworkersMarketResponse getMyCoworkerOnSale(final String uuid) {
+    public MarketCoworkerListResponse getMyCoworkerOnSale(final String uuid) {
         UserEntity user = userFinder.getByUuid(uuid);
         List<CoworkerMarketEntity> coworkersOnSale = coworkerMarketRepository.findAllBySellerIdOrderByIdDesc(user.getId());
         List<Long> coworkersId = getCoworkersId(coworkersOnSale);
         List<CoworkerEntity> coworkersOnSaleByCoworkerIds = findCoworkersOnSaleByCoworkerIds(coworkersId);
         List<CoworkerOnSale> coworkerOnSalesDomainList = CoworkerOnSale.toDomain(coworkersOnSale, coworkersOnSaleByCoworkerIds);
-        return MyCoworkersMarketResponse.of(coworkerOnSalesDomainList);
+        return MarketCoworkerListResponse.mine(coworkerOnSalesDomainList);
     }
 
     @Transactional

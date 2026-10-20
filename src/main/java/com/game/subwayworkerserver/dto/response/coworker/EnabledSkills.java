@@ -1,26 +1,27 @@
 package com.game.subwayworkerserver.dto.response.coworker;
 
-import com.game.subwayworkerserver.dto.response.skill.SkillBaseInfo;
 import com.game.subwayworkerserver.domain.market.CoworkerOnSale;
+import com.game.subwayworkerserver.dto.response.skill.SkillCardInfo;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
 
 import java.util.List;
 
+/** 동료가 쓸 수 있는 액티브·패시브 스킬 정의 */
 public record EnabledSkills(
-        List<SkillBaseInfo> activeSkills,
-        List<SkillBaseInfo> passiveSkills
+        List<SkillCardInfo> activeSkills,
+        List<SkillCardInfo> passiveSkills
 ) {
     public static EnabledSkills of(CoworkerEntity coworker) {
         return new EnabledSkills(
-                SkillBaseInfo.activeSkill(coworker.getActiveSkill1(), coworker.getActiveSkill2()),
-                SkillBaseInfo.passiveSkill(coworker.getPassiveSkill1(), coworker.getPassiveSkill2())
+                SkillCardInfo.activeSkills(coworker.getActiveSkill1(), coworker.getActiveSkill2()),
+                SkillCardInfo.passiveSkills(coworker.getPassiveSkill1(), coworker.getPassiveSkill2())
         );
     }
 
     public static EnabledSkills of(CoworkerOnSale coworkerOnSale) {
         return new EnabledSkills(
-                SkillBaseInfo.activeSkill(coworkerOnSale.activeSkillId1(), coworkerOnSale.activeSkillId2()),
-                SkillBaseInfo.passiveSkill(coworkerOnSale.passiveSkillId1(), coworkerOnSale.passiveSkillId2())
+                SkillCardInfo.activeSkills(coworkerOnSale.activeSkillId1(), coworkerOnSale.activeSkillId2()),
+                SkillCardInfo.passiveSkills(coworkerOnSale.passiveSkillId1(), coworkerOnSale.passiveSkillId2())
         );
     }
 }
