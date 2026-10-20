@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.service.gacha;
 
 import com.game.subwayworkerserver.service.common.UserFinder;
-import com.game.subwayworkerserver.controller.request.gacha.OpenLuckyGachaRequest;
+import com.game.subwayworkerserver.dto.request.gacha.OpenLuckyGachaRequest;
 import com.game.subwayworkerserver.domain.user.Gender;
 import com.game.subwayworkerserver.entity.UserEntity;
 import com.game.subwayworkerserver.exception.BaseException;

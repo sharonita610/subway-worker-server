@@ -2,12 +2,12 @@ package com.game.subwayworkerserver.controller;
 
 
 import com.game.subwayworkerserver.config.CurrentUuid;
-import com.game.subwayworkerserver.controller.request.stage.DungeonRequest;
-import com.game.subwayworkerserver.controller.request.stage.StageClearRequest;
-import com.game.subwayworkerserver.controller.response.stage.DungeonResponse;
-import com.game.subwayworkerserver.controller.response.stage.MonsterResponse;
-import com.game.subwayworkerserver.controller.response.stage.StageClearResponse;
-import com.game.subwayworkerserver.controller.response.coworker.StageCoworkerListResponse;
+import com.game.subwayworkerserver.dto.request.stage.DungeonRequest;
+import com.game.subwayworkerserver.dto.request.stage.StageClearRequest;
+import com.game.subwayworkerserver.dto.response.stage.DungeonResponse;
+import com.game.subwayworkerserver.dto.response.stage.MonsterResponse;
+import com.game.subwayworkerserver.dto.response.stage.StageClearResponse;
+import com.game.subwayworkerserver.dto.response.coworker.StageCoworkerListResponse;
 import com.game.subwayworkerserver.domain.stage.StageMonsterData;
 import com.game.subwayworkerserver.service.coworker.CoworkerService;
 import com.game.subwayworkerserver.service.stage.StageService;

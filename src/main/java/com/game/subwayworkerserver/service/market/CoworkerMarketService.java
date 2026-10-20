@@ -2,11 +2,11 @@ package com.game.subwayworkerserver.service.market;
 
 import com.game.subwayworkerserver.service.common.UserFinder;
 import com.game.subwayworkerserver.service.coworker.CoworkerListFilter;
-import com.game.subwayworkerserver.controller.request.market.CoworkerFilterRequest;
-import com.game.subwayworkerserver.controller.request.market.SellingRequest;
-import com.game.subwayworkerserver.controller.response.market.GlobalCoworkerResponse;
-import com.game.subwayworkerserver.controller.response.market.MyCoworkersMarketResponse;
-import com.game.subwayworkerserver.controller.response.market.PaymentSuccessResponse;
+import com.game.subwayworkerserver.dto.request.market.CoworkerFilterRequest;
+import com.game.subwayworkerserver.dto.request.market.SellingRequest;
+import com.game.subwayworkerserver.dto.response.market.GlobalCoworkerResponse;
+import com.game.subwayworkerserver.dto.response.market.MyCoworkersMarketResponse;
+import com.game.subwayworkerserver.dto.response.market.PaymentSuccessResponse;
 import com.game.subwayworkerserver.domain.market.CoworkerOnSale;
 import com.game.subwayworkerserver.entity.CoworkerEntity;
 import com.game.subwayworkerserver.entity.CoworkerMarketEntity;

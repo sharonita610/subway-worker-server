@@ -1,11 +1,11 @@
 package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.CurrentUuid;
-import com.game.subwayworkerserver.controller.request.gacha.OpenLuckyGachaRequest;
-import com.game.subwayworkerserver.controller.request.gacha.OpenSkillCardRequest;
-import com.game.subwayworkerserver.controller.response.skill.EarnedSkillCardResponse;
-import com.game.subwayworkerserver.controller.response.gacha.LuckyGachaEarnResponse;
-import com.game.subwayworkerserver.controller.response.gacha.LuckyGachaListResponse;
+import com.game.subwayworkerserver.dto.request.gacha.OpenLuckyGachaRequest;
+import com.game.subwayworkerserver.dto.request.gacha.OpenSkillCardRequest;
+import com.game.subwayworkerserver.dto.response.skill.EarnedSkillCardResponse;
+import com.game.subwayworkerserver.dto.response.gacha.LuckyGachaEarnResponse;
+import com.game.subwayworkerserver.dto.response.gacha.LuckyGachaListResponse;
 import com.game.subwayworkerserver.service.gacha.GachaService;
 import com.game.subwayworkerserver.service.skill.SkillCardService;
 import io.swagger.v3.oas.annotations.Operation;

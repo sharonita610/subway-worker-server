@@ -1,11 +1,11 @@
 package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.CurrentUuid;
-import com.game.subwayworkerserver.controller.request.system.SystemMailRequest;
-import com.game.subwayworkerserver.controller.response.user.CheckInListResponse;
-import com.game.subwayworkerserver.controller.response.user.LevelUpRewardResponse;
-import com.game.subwayworkerserver.controller.response.subscription.SubscribeListResponse;
-import com.game.subwayworkerserver.controller.response.user.UserMailBoxResponse;
+import com.game.subwayworkerserver.dto.request.system.SystemMailRequest;
+import com.game.subwayworkerserver.dto.response.user.CheckInListResponse;
+import com.game.subwayworkerserver.dto.response.user.LevelUpRewardResponse;
+import com.game.subwayworkerserver.dto.response.subscription.SubscribeListResponse;
+import com.game.subwayworkerserver.dto.response.user.UserMailBoxResponse;
 import com.game.subwayworkerserver.service.system.SystemService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;

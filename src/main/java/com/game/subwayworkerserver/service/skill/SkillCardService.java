@@ -1,10 +1,14 @@
 package com.game.subwayworkerserver.service.skill;
 
+import com.game.subwayworkerserver.dto.response.skill.EarnedSkillCardResponse;
+import com.game.subwayworkerserver.dto.response.skill.SkillByCoworkerResponse;
+import com.game.subwayworkerserver.dto.response.skill.SkillByUserResponse;
+import com.game.subwayworkerserver.dto.response.skill.SkillListBySkillIdResponse;
+import com.game.subwayworkerserver.dto.response.skill.UpgradedSkillCardResponse;
 import com.game.subwayworkerserver.service.common.UserFinder;
-import com.game.subwayworkerserver.controller.request.gacha.OpenSkillCardRequest;
-import com.game.subwayworkerserver.controller.request.coworker.SkillCardConfigureRequest;
-import com.game.subwayworkerserver.controller.request.coworker.UpgradeRequest;
-import com.game.subwayworkerserver.controller.response.skill.*;
+import com.game.subwayworkerserver.dto.request.gacha.OpenSkillCardRequest;
+import com.game.subwayworkerserver.dto.request.coworker.SkillCardConfigureRequest;
+import com.game.subwayworkerserver.dto.request.coworker.UpgradeRequest;
 import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.SkillCardPaymentOption;

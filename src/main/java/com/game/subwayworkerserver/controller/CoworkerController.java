@@ -1,11 +1,14 @@
 package com.game.subwayworkerserver.controller;
 
+import com.game.subwayworkerserver.dto.response.coworker.CoworkerTypesResponse;
+import com.game.subwayworkerserver.dto.response.coworker.UserUpgradeResponse;
+import com.game.subwayworkerserver.dto.response.skill.SkillByCoworkerResponse;
+import com.game.subwayworkerserver.dto.response.skill.SkillListBySkillIdResponse;
+import com.game.subwayworkerserver.dto.response.skill.UpgradedSkillCardResponse;
 import com.game.subwayworkerserver.config.CurrentUuid;
-import com.game.subwayworkerserver.controller.request.coworker.PartnerConfigureRequest;
-import com.game.subwayworkerserver.controller.request.coworker.SkillCardConfigureRequest;
-import com.game.subwayworkerserver.controller.request.coworker.UpgradeRequest;
-import com.game.subwayworkerserver.controller.response.coworker.*;
-import com.game.subwayworkerserver.controller.response.skill.*;
+import com.game.subwayworkerserver.dto.request.coworker.PartnerConfigureRequest;
+import com.game.subwayworkerserver.dto.request.coworker.SkillCardConfigureRequest;
+import com.game.subwayworkerserver.dto.request.coworker.UpgradeRequest;
 import com.game.subwayworkerserver.service.coworker.CoworkerService;
 import com.game.subwayworkerserver.service.skill.SkillCardService;
 import io.swagger.v3.oas.annotations.Operation;

@@ -1,8 +1,8 @@
 package com.game.subwayworkerserver.service.gps;
 
-import com.game.subwayworkerserver.controller.response.gps.RandomGpsResponse;
-import com.game.subwayworkerserver.controller.response.gps.RandomGpsResponse.ItemLocationResponse;
-import com.game.subwayworkerserver.controller.response.gps.RandomGpsResponse.RandomCoworkerLocationResponse;
+import com.game.subwayworkerserver.dto.response.gps.RandomGpsResponse;
+import com.game.subwayworkerserver.dto.response.gps.RandomGpsResponse.ItemLocationResponse;
+import com.game.subwayworkerserver.dto.response.gps.RandomGpsResponse.RandomCoworkerLocationResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;

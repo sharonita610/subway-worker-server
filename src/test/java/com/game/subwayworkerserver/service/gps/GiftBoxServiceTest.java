@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.service.gps;
 
-import com.game.subwayworkerserver.controller.request.gps.GpsRandomGiftRequest;
-import com.game.subwayworkerserver.controller.response.gps.GpsRandomGiftResponse;
+import com.game.subwayworkerserver.dto.request.gps.GpsRandomGiftRequest;
+import com.game.subwayworkerserver.dto.response.gps.GpsRandomGiftResponse;
 import com.game.subwayworkerserver.domain.user.Gender;
 import com.game.subwayworkerserver.entity.UserEntity;
 import com.game.subwayworkerserver.exception.BaseException;

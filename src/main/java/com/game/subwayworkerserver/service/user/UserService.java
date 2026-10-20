@@ -1,14 +1,21 @@
 package com.game.subwayworkerserver.service.user;
 
+import com.game.subwayworkerserver.dto.response.coworker.CoworkerListResponse;
+import com.game.subwayworkerserver.dto.response.item.CaptureItemInfo;
+import com.game.subwayworkerserver.dto.response.item.CaptureItemListResponse;
+import com.game.subwayworkerserver.dto.response.item.TrapItemInfo;
+import com.game.subwayworkerserver.dto.response.item.TrapItemListResponse;
+import com.game.subwayworkerserver.dto.response.user.CoworkerInUseInfo;
+import com.game.subwayworkerserver.dto.response.user.UserBaseInfo;
+import com.game.subwayworkerserver.dto.response.user.UserLevelInfo;
+import com.game.subwayworkerserver.dto.response.user.UserResponse;
+import com.game.subwayworkerserver.dto.response.user.UuidResponse;
 import com.game.subwayworkerserver.service.common.UserFinder;
 import com.game.subwayworkerserver.service.coworker.CoworkerListFilter;
 import com.game.subwayworkerserver.domain.item.ItemName;
 import com.game.subwayworkerserver.domain.item.ItemCategory;
 import com.game.subwayworkerserver.domain.user.Gender;
-import com.game.subwayworkerserver.controller.request.user.UserCreateRequest;
-import com.game.subwayworkerserver.controller.response.coworker.*;
-import com.game.subwayworkerserver.controller.response.item.*;
-import com.game.subwayworkerserver.controller.response.user.*;
+import com.game.subwayworkerserver.dto.request.user.UserCreateRequest;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.domain.baseinfo.SubscriptionItem;
 import com.game.subwayworkerserver.entity.*;

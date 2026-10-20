@@ -1,6 +1,6 @@
 package com.game.subwayworkerserver.service.gps;
 
-import com.game.subwayworkerserver.controller.response.gps.RandomGpsResponse;
+import com.game.subwayworkerserver.dto.response.gps.RandomGpsResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

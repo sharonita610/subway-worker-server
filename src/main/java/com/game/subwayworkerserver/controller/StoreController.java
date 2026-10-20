@@ -1,9 +1,9 @@
 package com.game.subwayworkerserver.controller;
 
 import com.game.subwayworkerserver.config.CurrentUuid;
-import com.game.subwayworkerserver.controller.request.store.PurchaseRequest;
-import com.game.subwayworkerserver.controller.response.item.ItemResponse;
-import com.game.subwayworkerserver.controller.response.item.StoreItemResponse;
+import com.game.subwayworkerserver.dto.request.store.PurchaseRequest;
+import com.game.subwayworkerserver.dto.response.item.ItemResponse;
+import com.game.subwayworkerserver.dto.response.item.StoreItemResponse;
 import com.game.subwayworkerserver.service.store.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

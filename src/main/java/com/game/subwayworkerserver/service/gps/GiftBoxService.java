@@ -2,8 +2,8 @@ package com.game.subwayworkerserver.service.gps;
 
 import com.game.subwayworkerserver.service.common.UserFinder;
 import com.game.subwayworkerserver.service.common.UserLevelProcessor;
-import com.game.subwayworkerserver.controller.request.gps.GpsRandomGiftRequest;
-import com.game.subwayworkerserver.controller.response.gps.GpsRandomGiftResponse;
+import com.game.subwayworkerserver.dto.request.gps.GpsRandomGiftRequest;
+import com.game.subwayworkerserver.dto.response.gps.GpsRandomGiftResponse;
 import com.game.subwayworkerserver.domain.reward.RandomBoxReward.DefaultGift;
 import com.game.subwayworkerserver.domain.reward.RandomBoxReward.ExtraGift;
 import com.game.subwayworkerserver.domain.reward.RewardRoller;

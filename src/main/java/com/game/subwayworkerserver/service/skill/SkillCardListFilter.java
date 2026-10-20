@@ -1,7 +1,7 @@
 package com.game.subwayworkerserver.service.skill;
 
 import com.game.subwayworkerserver.domain.skill.SkillSortType;
-import com.game.subwayworkerserver.controller.request.market.SkillCardFilterRequest;
+import com.game.subwayworkerserver.dto.request.market.SkillCardFilterRequest;
 import com.game.subwayworkerserver.domain.market.SkillCardOnSale;
 import com.game.subwayworkerserver.entity.SkillCardEntity;
 import org.springframework.stereotype.Component;

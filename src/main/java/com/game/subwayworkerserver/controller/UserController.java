@@ -1,11 +1,13 @@
 package com.game.subwayworkerserver.controller;
 
+import com.game.subwayworkerserver.dto.response.coworker.CoworkerListResponse;
+import com.game.subwayworkerserver.dto.response.item.CaptureItemListResponse;
+import com.game.subwayworkerserver.dto.response.item.TrapItemListResponse;
+import com.game.subwayworkerserver.dto.response.skill.SkillByUserResponse;
+import com.game.subwayworkerserver.dto.response.user.UserResponse;
+import com.game.subwayworkerserver.dto.response.user.UuidResponse;
 import com.game.subwayworkerserver.config.CurrentUuid;
-import com.game.subwayworkerserver.controller.request.user.UserCreateRequest;
-import com.game.subwayworkerserver.controller.response.coworker.*;
-import com.game.subwayworkerserver.controller.response.item.*;
-import com.game.subwayworkerserver.controller.response.skill.*;
-import com.game.subwayworkerserver.controller.response.user.*;
+import com.game.subwayworkerserver.dto.request.user.UserCreateRequest;
 import com.game.subwayworkerserver.profanity.ProfanityCheck;
 import com.game.subwayworkerserver.service.skill.SkillCardService;
 import com.game.subwayworkerserver.service.user.UserService;

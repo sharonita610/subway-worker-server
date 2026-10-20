@@ -1,12 +1,15 @@
 package com.game.subwayworkerserver.controller;
 
-import com.game.subwayworkerserver.controller.request.gps.GpsRequest;
-import com.game.subwayworkerserver.controller.request.gps.GpsAddTrapRequest;
-import com.game.subwayworkerserver.controller.request.gps.GpsRandomGiftRequest;
-import com.game.subwayworkerserver.controller.request.gps.CaptureCoworkerRequest;
+import com.game.subwayworkerserver.dto.response.coworker.CaptureResponse;
+import com.game.subwayworkerserver.dto.response.coworker.CoworkerListResponse;
+import com.game.subwayworkerserver.dto.response.gps.GpsRandomGiftResponse;
+import com.game.subwayworkerserver.dto.response.gps.RandomGpsResponse;
+import com.game.subwayworkerserver.dto.response.gps.UserTrapListResponse;
+import com.game.subwayworkerserver.dto.request.gps.GpsRequest;
+import com.game.subwayworkerserver.dto.request.gps.GpsAddTrapRequest;
+import com.game.subwayworkerserver.dto.request.gps.GpsRandomGiftRequest;
+import com.game.subwayworkerserver.dto.request.gps.CaptureCoworkerRequest;
 import com.game.subwayworkerserver.config.CurrentUuid;
-import com.game.subwayworkerserver.controller.response.coworker.*;
-import com.game.subwayworkerserver.controller.response.gps.*;
 import com.game.subwayworkerserver.service.gps.CaptureCoworkerService;
 import com.game.subwayworkerserver.service.gps.GiftBoxService;
 import com.game.subwayworkerserver.service.gps.GpsService;

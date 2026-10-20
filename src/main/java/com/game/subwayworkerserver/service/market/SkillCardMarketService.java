@@ -2,11 +2,11 @@ package com.game.subwayworkerserver.service.market;
 
 import com.game.subwayworkerserver.service.common.UserFinder;
 import com.game.subwayworkerserver.service.skill.SkillCardListFilter;
-import com.game.subwayworkerserver.controller.request.market.SellingRequest;
-import com.game.subwayworkerserver.controller.request.market.SkillCardFilterRequest;
-import com.game.subwayworkerserver.controller.response.market.GlobalSkillCardResponse;
-import com.game.subwayworkerserver.controller.response.market.PaymentSuccessResponse;
-import com.game.subwayworkerserver.controller.response.market.SkillOnSaleResponse;
+import com.game.subwayworkerserver.dto.request.market.SellingRequest;
+import com.game.subwayworkerserver.dto.request.market.SkillCardFilterRequest;
+import com.game.subwayworkerserver.dto.response.market.GlobalSkillCardResponse;
+import com.game.subwayworkerserver.dto.response.market.PaymentSuccessResponse;
+import com.game.subwayworkerserver.dto.response.market.SkillOnSaleResponse;
 import com.game.subwayworkerserver.domain.market.SkillCardOnSale;
 import com.game.subwayworkerserver.entity.*;
 import com.game.subwayworkerserver.exception.BaseException;
