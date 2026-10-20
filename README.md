@@ -1,5 +1,7 @@
 # Subway Worker Server
 
+[![Test](https://github.com/sharonita610/subway-worker-server/actions/workflows/test.yml/badge.svg)](https://github.com/sharonita610/subway-worker-server/actions/workflows/test.yml)
+
 출퇴근길 위치를 기반으로 동료를 포획하고 성장시키는 수집형 게임의 백엔드입니다. 토스 미니앱으로 운영했으며 현재는 운영을 종료했습니다.
 
 ## 기술 스택
@@ -69,6 +71,7 @@ GitHub Actions ─ Gradle build ─ Docker build ─ ECR push ─ (수동 승인
 ```
 
 - **이미지 빌드**: `prod-image-deploy`가 JAR을 빌드해 Docker 이미지로 만들고 ECR에 `latest`와 고유 태그로 올립니다.
+- **테스트**: `test` 워크플로가 main push와 PR마다 `./gradlew test`를 실행합니다. 이미지 빌드도 테스트를 통과해야 진행됩니다.
 - **배포**: `prod-deploy`를 이미지 태그를 지정해 수동 실행하면 EC2에 SSH로 접속해 ECR에서 pull, 기존 컨테이너 교체, `--restart unless-stopped`로 기동합니다. DB 비밀번호는 EC2가 Parameter Store에서 직접 읽어 환경변수로 넘기므로 GitHub에는 저장하지 않습니다.
 - **dev**: `dev-cicd_workflow`가 빌드부터 dev EC2 배포까지 한 번에 수행합니다.
 - 빌드와 배포를 분리한 이유는 같은 이미지를 태그로 골라 재배포하거나 되돌리기 위해서입니다. 운영 종료 후 세 워크플로 모두 수동 트리거로 바꿔 두었습니다.

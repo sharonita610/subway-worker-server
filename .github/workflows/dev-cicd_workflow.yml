@@ -43,7 +43,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build JAR for Docker
-        run: ./gradlew clean build -x test
+        run: ./gradlew clean build
 
       # 🌟 AWS ECR 인증 및 접속 (OIDC 사용)
       - name: Configure AWS Credentials
