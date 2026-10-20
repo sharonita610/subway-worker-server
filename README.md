@@ -20,7 +20,7 @@
 | 경제 | 동료 · 스킬카드 장터, 가챠, 상점, 구독 · 출석 보상 메일 |
 | 인증 | 토스 로그인(mTLS) 후 발급한 UUID를 `X-User-ID` 헤더로 전달 |
 
-API 62개, 테스트 108개.
+API 62개, 테스트 181개.
 
 ## 아키텍처
 
@@ -56,7 +56,7 @@ config/          Security (X-User-ID 필터, 공개 경로 목록), Swagger, Red
 ## 실행
 
 ```bash
-./gradlew test       # 단위 · 슬라이스 테스트 108개
+./gradlew test       # 단위 · 슬라이스 · 아키텍처 테스트 181개
 ./gradlew bootRun    # MySQL, Redis 필요
 ```
 
@@ -79,3 +79,4 @@ GitHub Actions ─ Gradle build ─ Docker build ─ ECR push ─ (수동 승인
 ## 테스트 전략
 
 - **확률 로직은 통계 테스트로 검증**합니다. 경계값(항상 성공 · 항상 실패)은 정확히, 확률은 1만 회 표본이 기대값 ±3%p 안에 들어오는지 확인합니다.
+- **응답 형식은 스냅샷으로 고정**합니다. `DtoJsonShapeTest`가 모든 DTO record를 직렬화한 JSON 키 구조를 `src/test/resources/dto-json-shapes.txt`와 비교해, 응답 키가 바뀌면 테스트가 먼저 실패합니다.
