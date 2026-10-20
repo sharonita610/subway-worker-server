@@ -2,7 +2,6 @@ package com.game.subwayworkerserver.dto.response.coworker;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
-import com.game.subwayworkerserver.domain.baseinfo.CoworkerElement;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerLevel;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerType;
 import com.game.subwayworkerserver.domain.baseinfo.GachaTreasure;
@@ -38,15 +37,21 @@ class CoworkerResponseDtoTest {
         void fromEntity는_기본_정보와_속성을_그대로_옮긴다() {
             CoworkerBaseInfo info = CoworkerBaseInfo.fromEntity(coworker(10L), List.of(), List.of());
 
-            assertThat(info.id()).isEqualTo(10L);
-            assertThat(info.engName()).isEqualTo("MOONGSHIL");
-            assertThat(info.korName()).isEqualTo("뭉실");
-            assertThat(info.position()).isEqualTo("사원");
-            assertThat(info.engElement()).isEqualTo("PERFORMANCE");
-            assertThat(info.korElement()).isEqualTo("성과");
+            assertThat(info.summary()).isEqualTo(new CoworkerSummary(10L, "MOONGSHIL", "뭉실", "사원", 2, "PERFORMANCE", "성과"));
             assertThat(info.isPartner()).isTrue();
             assertThat(info.onSale()).isFalse();
             assertThat(info.isMaterial()).isFalse();
+        }
+
+        @Test
+        void 식별_정보는_JSON에서_중첩_없이_평탄하게_나간다() {
+            JsonNode node = json(CoworkerBaseInfo.fromEntity(coworker(10L)));
+
+            assertThat(node.has("summary")).isFalse();
+            assertThat(node.get("id").asLong()).isEqualTo(10L);
+            assertThat(node.get("korName").asText()).isEqualTo("뭉실");
+            assertThat(node.get("level").asInt()).isEqualTo(2);
+            assertThat(json(CapturedCoworkerInfo.of(coworker(10L), "사원")).get("korName").asText()).isEqualTo("뭉실");
         }
 
         @Test
@@ -128,8 +133,8 @@ class CoworkerResponseDtoTest {
             CoworkerBaseInfo info = CoworkerBaseInfo.fromDomain(coworkerOnSale());
             JsonNode node = json(info);
 
-            assertThat(info.id()).isEqualTo(10L);
-            assertThat(info.korName()).isEqualTo("뭉실");
+            assertThat(info.summary().id()).isEqualTo(10L);
+            assertThat(info.summary().korName()).isEqualTo("뭉실");
             assertThat(info.isPartner()).isTrue();
             assertThat(info.onSale()).isTrue();
             assertThat(node.at("/exp/max").asInt()).isEqualTo(CoworkerLevel.of(2).getRequiredExpToNextLevel());
@@ -214,8 +219,9 @@ class CoworkerResponseDtoTest {
         void CapturedCoworkerInfo는_직업의_스탯_범위를_문자열로_만든다() {
             CapturedCoworkerInfo info = CapturedCoworkerInfo.of(coworker(10L), "사원");
 
-            assertThat(info.coworkerName()).isEqualTo("뭉실");
-            assertThat(info.position()).isEqualTo("사원");
+            assertThat(info.summary().korName()).isEqualTo("뭉실");
+            assertThat(info.summary().position()).isEqualTo("사원");
+            assertThat(info.summary().id()).isEqualTo(10L);
             assertThat(info.baseHpRange()).isEqualTo("58~91");
             assertThat(info.baseInitManaRange()).isEqualTo("0~5");
             assertThat(info.baseMaxManaRange()).isEqualTo("23~36");
@@ -225,8 +231,8 @@ class CoworkerResponseDtoTest {
             assertThat(info.hp()).isEqualTo(70);
             assertThat(info.activeSkills()).hasSize(2);
             assertThat(info.passiveSkills()).hasSize(2);
-            assertThat(info.engElementName()).isEqualTo("PERFORMANCE");
-            assertThat(info.korElementName()).isEqualTo("성과");
+            assertThat(info.summary().engElement()).isEqualTo("PERFORMANCE");
+            assertThat(info.summary().korElement()).isEqualTo("성과");
         }
 
         @Test
@@ -237,7 +243,7 @@ class CoworkerResponseDtoTest {
             assertThat(response.run()).isFalse();
             assertThat(response.reward()).isEqualTo(BaseReward.getCaptureReward());
             assertThat(response.extraExpReward()).isEqualTo(50);
-            assertThat(response.capturedCoworkerInfo().coworkerName()).isEqualTo("뭉실");
+            assertThat(response.capturedCoworkerInfo().summary().korName()).isEqualTo("뭉실");
         }
 
         @Test
@@ -250,16 +256,6 @@ class CoworkerResponseDtoTest {
             assertThat(response.capturedCoworkerInfo()).isNull();
         }
 
-        @Test
-        void CaptureAvailableCoworkerResponse는_속성과_레벨을_한글로_푼다() {
-            CaptureAvailableCoworkerResponse byEnum = CaptureAvailableCoworkerResponse.of("c-1", CoworkerElement.HEALTH, CoworkerLevel.SENIOR);
-            CaptureAvailableCoworkerResponse byValue = CaptureAvailableCoworkerResponse.of("c-2", "뭉실", "주임", 3);
-
-            assertThat(byEnum.coworkerName()).isEqualTo("건강");
-            assertThat(byEnum.coworkerPosition()).isEqualTo("주임");
-            assertThat(byEnum.coworkerLevel()).isEqualTo(3);
-            assertThat(byValue.coworkerName()).isEqualTo("뭉실");
-        }
     }
 
     @Nested
@@ -270,7 +266,7 @@ class CoworkerResponseDtoTest {
             CoworkerListResponse response = CoworkerListResponse.of(5000, 50, List.of(coworker(10L)));
 
             assertThat(response.reward()).isEqualTo(new BaseReward(50, 5000));
-            assertThat(response.coworkerList()).extracting(CoworkerBaseInfo::id).containsExactly(10L);
+            assertThat(response.coworkerList()).extracting(info -> info.summary().id()).containsExactly(10L);
         }
 
         @Test
@@ -307,7 +303,7 @@ class CoworkerResponseDtoTest {
         void UserUpgradeResponse는_강화된_동료를_감싼다() {
             UserUpgradeResponse response = UserUpgradeResponse.of(coworker(10L), List.of());
 
-            assertThat(response.coworker().id()).isEqualTo(10L);
+            assertThat(response.coworker().summary().id()).isEqualTo(10L);
             assertThat(response.coworker().selectedSkills()).isEmpty();
         }
     }

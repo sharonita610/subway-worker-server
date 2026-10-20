@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.dto.response.user;
 
+import com.game.subwayworkerserver.dto.response.coworker.CoworkerSummary;
 import com.game.subwayworkerserver.domain.baseinfo.SubscriptionItem;
 import com.game.subwayworkerserver.domain.level.UserLevelConfig;
 import com.game.subwayworkerserver.domain.reward.RewardSource;
@@ -51,9 +52,9 @@ class UserResponseDtoTest {
 
     @Test
     void 사용_중인_동료_정보는_직업_직급_속성을_담는다() {
-        List<CoworkerInUseInfo> infos = CoworkerInUseInfo.of(List.of(coworker(10L)));
+        List<CoworkerSummary> infos = CoworkerSummary.of(List.of(coworker(10L)));
 
-        assertThat(infos).containsExactly(new CoworkerInUseInfo("MOONGSHIL", "뭉실", "사원", 2, "PERFORMANCE", "성과"));
+        assertThat(infos).containsExactly(new CoworkerSummary(10L, "MOONGSHIL", "뭉실", "사원", 2, "PERFORMANCE", "성과"));
     }
 
     @Test

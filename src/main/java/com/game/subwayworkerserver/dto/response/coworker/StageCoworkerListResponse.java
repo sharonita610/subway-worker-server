@@ -1,5 +1,6 @@
 package com.game.subwayworkerserver.dto.response.coworker;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.GachaTreasure;
 import com.game.subwayworkerserver.domain.baseinfo.PassiveSkillCard;
@@ -31,12 +32,7 @@ public record StageCoworkerListResponse(
 
     @Builder
     private record StageCoworkerInfo(
-            long id,
-            String engName,
-            String korName,
-            String position,
-            String engElement,
-            String korElement,
+            @JsonUnwrapped CoworkerSummary summary,
             boolean isPartner,
             HpInfo hp,
             MpInfo mp,
@@ -79,12 +75,7 @@ public record StageCoworkerListResponse(
 
             int passiveCardEnumId = equippedPassive != null ? equippedPassive.getSkillCardEnumId() : 0;
             return StageCoworkerInfo.builder()
-                    .id(coworker.getId())
-                    .engName(String.valueOf(coworker.getCoworkerType()))
-                    .korName(coworker.getName())
-                    .position(coworker.getLevel().getTitle())
-                    .engElement(coworker.getCoworkerElement().name())
-                    .korElement(coworker.getCoworkerElement().getKoreanName())
+                    .summary(CoworkerSummary.of(coworker))
                     .isPartner(coworker.isInUse())
                     .hp(HpInfo.of(coworker.getHp(), hpBonus, defenseBonus))
                     .mp(MpInfo.of(coworker.getInitMana(), coworker.getMaxMana(), coworker.getManaRecovery(), manaRecoveryBonus))

@@ -3,7 +3,7 @@ package com.game.subwayworkerserver.service.user;
 import com.game.subwayworkerserver.dto.response.coworker.CoworkerListResponse;
 import com.game.subwayworkerserver.dto.response.item.ItemInfo;
 import com.game.subwayworkerserver.dto.response.item.ItemListResponse;
-import com.game.subwayworkerserver.dto.response.user.CoworkerInUseInfo;
+import com.game.subwayworkerserver.dto.response.coworker.CoworkerSummary;
 import com.game.subwayworkerserver.dto.response.user.UserBaseInfo;
 import com.game.subwayworkerserver.dto.response.user.UserLevelInfo;
 import com.game.subwayworkerserver.dto.response.user.UserResponse;
@@ -110,7 +110,7 @@ public class UserService {
         return new UserResponse(
                 UserBaseInfo.of(user, items),
                 UserLevelInfo.of(user),
-                CoworkerInUseInfo.of(coworkerInUse)
+                CoworkerSummary.of(coworkerInUse)
         );
     }
 

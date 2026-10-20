@@ -1,6 +1,7 @@
 package com.game.subwayworkerserver.dto.response.coworker;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.game.subwayworkerserver.domain.baseinfo.ActiveSkillCard;
 import com.game.subwayworkerserver.domain.baseinfo.CoworkerLevel;
 import com.game.subwayworkerserver.domain.baseinfo.GachaTreasure;
@@ -19,15 +20,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * 동료 목록·장터·강화 결과에서 쓰는 동료 상세 정보. 식별 정보는 CoworkerSummary를 평탄하게 품는다.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
 public record CoworkerBaseInfo(
-        long id,
-        String engName,
-        String korName,
-        String position,
-        String engElement,
-        String korElement,
+        @JsonUnwrapped CoworkerSummary summary,
         boolean isPartner,
         boolean onSale,
         boolean isMaterial,
@@ -35,17 +34,10 @@ public record CoworkerBaseInfo(
         StatsInfos statList,
         EnabledSkills enabledSkills,
         List<SkillCard> selectedSkills
-
 ) {
-
     public static CoworkerBaseInfo fromDomain(CoworkerOnSale coworkerOnSale) {
         return CoworkerBaseInfo.builder()
-                .id(coworkerOnSale.coworkerId())
-                .engName(coworkerOnSale.engName())
-                .korName(coworkerOnSale.korName())
-                .position(coworkerOnSale.position())
-                .engElement(coworkerOnSale.engElement())
-                .korElement(coworkerOnSale.korElement())
+                .summary(CoworkerSummary.of(coworkerOnSale))
                 .isPartner(coworkerOnSale.inUse())
                 .onSale(coworkerOnSale.onSale())
                 .isMaterial(coworkerOnSale.isMaterial())
@@ -54,21 +46,12 @@ public record CoworkerBaseInfo(
                 .enabledSkills(EnabledSkills.of(coworkerOnSale))
                 .selectedSkills(List.of())
                 .build();
-
     }
 
-    public static CoworkerBaseInfo fromEntity(
-            CoworkerEntity coworker,
-            List<UserGachaEntity> userGachaEntities,
-            List<SkillCardEntity> skillCardEntityList
-    ) {
+    /** 보물 보너스와 장착 스킬까지 포함한 전체 정보 */
+    public static CoworkerBaseInfo fromEntity(CoworkerEntity coworker, List<UserGachaEntity> userGachaEntities, List<SkillCardEntity> skillCardEntityList) {
         return CoworkerBaseInfo.builder()
-                .id(coworker.getId())
-                .engName(String.valueOf(coworker.getCoworkerType()))
-                .korName(coworker.getName())
-                .position(coworker.getLevel().getTitle())
-                .engElement(coworker.getCoworkerElement().name())
-                .korElement(coworker.getCoworkerElement().getKoreanName())
+                .summary(CoworkerSummary.of(coworker))
                 .isPartner(coworker.isInUse())
                 .onSale(coworker.isOnSale())
                 .isMaterial(coworker.isMaterial())
@@ -79,8 +62,16 @@ public record CoworkerBaseInfo(
                 .build();
     }
 
+    public static CoworkerBaseInfo fromEntity(CoworkerEntity coworker) {
+        return fromEntity(coworker, List.of(), List.of());
+    }
+
+    public static CoworkerBaseInfo of(CoworkerEntity coworker, List<SkillCardEntity> coworkerSkills) {
+        return fromEntity(coworker, List.of(), coworkerSkills);
+    }
+
     private static List<SkillCard> getSelectedSkill(final long coworkerId, List<SkillCardEntity> skillCardEntityList) {
-        if(skillCardEntityList == null || skillCardEntityList.isEmpty()){
+        if (skillCardEntityList == null || skillCardEntityList.isEmpty()) {
             return Collections.emptyList();
         }
         return skillCardEntityList.stream()
@@ -104,44 +95,7 @@ public record CoworkerBaseInfo(
                 .toList();
     }
 
-    public static CoworkerBaseInfo fromEntity(CoworkerEntity coworker) {
-        return CoworkerBaseInfo.builder()
-                .id(coworker.getId())
-                .engName(String.valueOf(coworker.getCoworkerType()))
-                .korName(coworker.getName())
-                .position(coworker.getLevel().getTitle())
-                .engElement(coworker.getCoworkerElement().name())
-                .korElement(coworker.getCoworkerElement().getKoreanName())
-                .isPartner(coworker.isInUse())
-                .onSale(coworker.isOnSale())
-                .exp(ExpInfo.of(coworker))
-                .statList(StatsInfos.of(coworker, List.of()))
-                .enabledSkills(EnabledSkills.of(coworker))
-                .selectedSkills(List.of())
-                .build();
-    }
-
-    public static CoworkerBaseInfo of(CoworkerEntity coworker, List<SkillCardEntity> coworkerSkills) {
-        return CoworkerBaseInfo.builder()
-                .id(coworker.getId())
-                .engName(String.valueOf(coworker.getCoworkerType()))
-                .korName(coworker.getName())
-                .position(coworker.getLevel().getTitle())
-                .engElement(coworker.getCoworkerElement().name())
-                .korElement(coworker.getCoworkerElement().getKoreanName())
-                .isPartner(coworker.isInUse())
-                .onSale(coworker.isOnSale())
-                .exp(ExpInfo.of(coworker))
-                .statList(StatsInfos.of(coworker, List.of()))
-                .enabledSkills(EnabledSkills.of(coworker))
-                .selectedSkills(getSelectedSkill(coworker.getId(), coworkerSkills))
-                .build();
-
-    }
-
-    private record StatBaseInfo(
-            long defaultPower, long treasure, long total
-    ) {
+    private record StatBaseInfo(long defaultPower, long treasure, long total) {
         public static StatBaseInfo of(long defaultPower, long treasure) {
             return new StatBaseInfo(defaultPower, treasure, defaultPower + treasure);
         }
@@ -156,31 +110,19 @@ public record CoworkerBaseInfo(
             StatBaseInfo manaRecovery
     ) {
         public static StatsInfos of(final CoworkerEntity coworker, List<UserGachaEntity> userGachaEntities) {
-
             Map<GachaTreasure, Long> bonusMap = userGachaEntities.stream()
-                    .collect(Collectors.groupingBy(
-                            UserGachaEntity::getGacha,
-                            Collectors.summingLong(UserGachaEntity::getGachaCount)
-                    ));
-
-            long hpBonus = bonusMap.getOrDefault(GachaTreasure.HP_INCREASE, 0L);
-            long attackBonus = bonusMap.getOrDefault(GachaTreasure.ATTACK_UP, 0L);
-            long defenseBonus = bonusMap.getOrDefault(GachaTreasure.DEFENSE_UP, 0L);
-            long manaRecoveryBonus = bonusMap.getOrDefault(GachaTreasure.MP_RECOVERY_UP, 0L);
-
-
-            StatBaseInfo hpInfo = StatBaseInfo.of(coworker.getHp(), hpBonus);
-            StatBaseInfo manaInfo = StatBaseInfo.of(coworker.getInitMana(), 0L);
-            StatBaseInfo maxManaInfo = StatBaseInfo.of(coworker.getMaxMana(), 0L);
-            StatBaseInfo attackInfo = StatBaseInfo.of(coworker.getAttack(), attackBonus);
-            StatBaseInfo defenseInfo = StatBaseInfo.of(coworker.getDefense(), defenseBonus);
-            StatBaseInfo manaRecoveryInfo = StatBaseInfo.of(coworker.getManaRecovery(), manaRecoveryBonus);
-
-            return new StatsInfos(hpInfo, manaInfo, maxManaInfo, attackInfo, defenseInfo, manaRecoveryInfo);
+                    .collect(Collectors.groupingBy(UserGachaEntity::getGacha, Collectors.summingLong(UserGachaEntity::getGachaCount)));
+            return new StatsInfos(
+                    StatBaseInfo.of(coworker.getHp(), bonusMap.getOrDefault(GachaTreasure.HP_INCREASE, 0L)),
+                    StatBaseInfo.of(coworker.getInitMana(), 0L),
+                    StatBaseInfo.of(coworker.getMaxMana(), 0L),
+                    StatBaseInfo.of(coworker.getAttack(), bonusMap.getOrDefault(GachaTreasure.ATTACK_UP, 0L)),
+                    StatBaseInfo.of(coworker.getDefense(), bonusMap.getOrDefault(GachaTreasure.DEFENSE_UP, 0L)),
+                    StatBaseInfo.of(coworker.getManaRecovery(), bonusMap.getOrDefault(GachaTreasure.MP_RECOVERY_UP, 0L))
+            );
         }
 
         public static StatsInfos of(final CoworkerOnSale coworkerOnSale) {
-
             return new StatsInfos(
                     StatBaseInfo.of(coworkerOnSale.hp(), 0L),
                     StatBaseInfo.of(coworkerOnSale.initMana(), 0L),
@@ -192,9 +134,7 @@ public record CoworkerBaseInfo(
         }
     }
 
-    private record ExpInfo(
-            int level, int now, int max, int total
-    ) {
+    private record ExpInfo(int level, int now, int max, int total) {
         public static ExpInfo of(CoworkerEntity coworkerEntity) {
             return new ExpInfo(
                     coworkerEntity.getLevel().getLevel(),
@@ -210,14 +150,8 @@ public record CoworkerBaseInfo(
     }
 
     private static String getDescription(SkillCardEntity card) {
-        String description;
-        if (card.getType().equals(SkillCardType.ACTIVE)) {
-            ActiveSkillCard activeCard = ActiveSkillCard.from(card.getSkillCardEnumId());
-            description = activeCard.getDescription();
-        } else {
-            PassiveSkillCard passiveCard = PassiveSkillCard.from(card.getSkillCardEnumId());
-            description = passiveCard.getDescription();
-        }
-        return description;
+        return card.getType().equals(SkillCardType.ACTIVE)
+                ? ActiveSkillCard.from(card.getSkillCardEnumId()).getDescription()
+                : PassiveSkillCard.from(card.getSkillCardEnumId()).getDescription();
     }
 }
