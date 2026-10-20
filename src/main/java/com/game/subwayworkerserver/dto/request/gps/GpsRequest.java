@@ -21,4 +21,3 @@ public record GpsRequest(
         Double rangeKm
 ) {}
 
-

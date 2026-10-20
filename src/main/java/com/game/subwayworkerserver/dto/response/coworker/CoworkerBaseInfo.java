@@ -20,9 +20,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-/**
- * 동료 목록·장터·강화 결과에서 쓰는 동료 상세 정보. 식별 정보는 CoworkerSummary를 평탄하게 품는다.
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
 public record CoworkerBaseInfo(
@@ -48,7 +45,6 @@ public record CoworkerBaseInfo(
                 .build();
     }
 
-    /** 보물 보너스와 장착 스킬까지 포함한 전체 정보 */
     public static CoworkerBaseInfo fromEntity(CoworkerEntity coworker, List<UserGachaEntity> userGachaEntities, List<SkillCardEntity> skillCardEntityList) {
         return CoworkerBaseInfo.builder()
                 .summary(CoworkerSummary.of(coworker))

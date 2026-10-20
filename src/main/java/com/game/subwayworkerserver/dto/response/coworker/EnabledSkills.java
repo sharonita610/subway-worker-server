@@ -6,7 +6,6 @@ import com.game.subwayworkerserver.entity.CoworkerEntity;
 
 import java.util.List;
 
-/** 동료가 쓸 수 있는 액티브·패시브 스킬 정의 */
 public record EnabledSkills(
         List<SkillCardInfo> activeSkills,
         List<SkillCardInfo> passiveSkills

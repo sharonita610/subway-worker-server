@@ -87,7 +87,6 @@ public record StageCoworkerListResponse(
                     .build();
         }
 
-
         private record HpInfo(
                 long nowHp, long maxHp, long hpRecover, long shield, long armor
         ) {
@@ -194,7 +193,6 @@ public record StageCoworkerListResponse(
             );
         }
     }
-
 
     private record ResurrectionInfo(
             boolean hasResurrection,

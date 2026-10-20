@@ -8,7 +8,6 @@ import lombok.Builder;
 
 import java.util.List;
 
-/** 방금 포획한 동료. 직업의 스탯 범위를 함께 보여준다. */
 @Builder
 public record CapturedCoworkerInfo(
         @JsonUnwrapped CoworkerSummary summary,

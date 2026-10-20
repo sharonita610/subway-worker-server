@@ -30,7 +30,6 @@ public record UserTrapListResponse(
             LocalDateTime expireTime
     ) {
 
-
         public static UserTrapBaseInfo of(
                 final String engName, final String korName, final double latitude, final double longitude, final LocalDateTime expiresAt
         ) {

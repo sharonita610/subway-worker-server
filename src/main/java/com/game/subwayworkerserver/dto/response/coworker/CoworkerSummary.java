@@ -6,9 +6,6 @@ import com.game.subwayworkerserver.entity.CoworkerEntity;
 
 import java.util.List;
 
-/**
- * 동료를 식별하는 공통 정보. 동료가 나오는 모든 응답이 이 record를 품어서 같은 키 이름을 쓴다.
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record CoworkerSummary(
         Long id,

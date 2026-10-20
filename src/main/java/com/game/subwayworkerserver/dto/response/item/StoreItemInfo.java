@@ -5,7 +5,6 @@ import com.game.subwayworkerserver.domain.item.ItemName;
 
 import java.util.List;
 
-/** 상점의 도구 한 종류. 하루 한도가 있는 랜덤 도구(RANDOM_*)에만 오늘 구매 횟수와 한도를 붙인다. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record StoreItemInfo(
         String engName,

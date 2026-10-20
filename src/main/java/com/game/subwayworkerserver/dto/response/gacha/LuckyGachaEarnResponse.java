@@ -19,7 +19,6 @@ public record LuckyGachaEarnResponse(
         );
     }
 
-    /** 추가 보상은 보물과 아이템으로 나눠 보여준다. */
     private record ExtraRewardInfo(List<RewardInfo> treasureList, List<RewardInfo> itemList) {
         public static ExtraRewardInfo from(List<ExtraGift> extraGiftList) {
             List<RewardInfo> treasureList = new ArrayList<>();

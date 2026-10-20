@@ -1,6 +1,5 @@
 package com.game.subwayworkerserver.dto.response.skill;
 
-
 import com.game.subwayworkerserver.domain.skill.SkillCard;
 import com.game.subwayworkerserver.entity.SkillCardEntity;
 

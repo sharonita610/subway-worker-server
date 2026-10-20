@@ -6,9 +6,6 @@ import com.game.subwayworkerserver.domain.baseinfo.VacationTicket;
 
 import java.util.List;
 
-/**
- * 재화 묶음 상품(코인 팩, 휴가 티켓 팩). 첫 구매 상품에만 isFirstBuyOffer와 구매 가능 여부가 붙는다.
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record PackStoreInfo(
         String name,
